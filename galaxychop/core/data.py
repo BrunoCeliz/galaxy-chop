@@ -105,7 +105,7 @@ class ParticleSet:
         Indicates if the specific potential energy is computed.
     arr_ : Instances of ``ArrayAccessor``
         Access to the attributes (defined with uttrs) of the provided instance,
-        and if they are of atropy.units.Quantity type it converts them into
+        and if they are of astropy.units.Quantity type it converts them into
         numpy.ndarray.
     """
 

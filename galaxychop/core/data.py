@@ -473,7 +473,7 @@ class Galaxy:
 
         """
         #Bruno:
-        # Todo l oque sea, pero por lo gral cuando alguien pide \
+        # Todo lo que sea, pero por lo gral cuando alguien pide \
         # un .hdf5 creo que es mejor que tenga la mayor cantidad \
         # de info posible (véase todos los datos del post-procesado \
         # que ofrecen los cutouts.hdf5 de IllustrisTNG...)
@@ -487,7 +487,8 @@ class Galaxy:
         )
 
     def to_dict(self, *, ptypes=None, attributes=None):
-        """Convert the galaxy to dict with information as a numpy array with \
+        """
+        Convert the galaxy to dict with information as a numpy array with \
         coerced units.
 
         Parameters
@@ -519,7 +520,8 @@ class Galaxy:
         return the_dict
 
     def disassemble(self):
-        """Convert all the attributes of the galaxy into a play dict.
+        """
+        Convert all the attributes of the galaxy into a play dict.
 
         The resulting dict can be used to build a new galaxy with
         ``galaxychop.mkgalaxy``.
@@ -556,6 +558,9 @@ class Galaxy:
 
         disassembled = dict(**stars_kws, **dark_matter_kws, **gas_kws)
         return disassembled
+        #Bruno:
+        # Acá *quizás* estaría bueno retornar 3 dics separados en vez \
+        # de uno con todo mezclado, si no, ¿Para qué la desarmé?
 
     def copy(self):
         """Make a copy of the Galaxy."""
@@ -583,7 +588,8 @@ class Galaxy:
 
     @property
     def kinetic_energy_(self):
-        """Specific kinetic energy of stars, dark matter and gas particles.
+        """
+        Specific kinetic energy of stars, dark matter and gas particles.
 
         Returns
         -------
@@ -608,7 +614,8 @@ class Galaxy:
 
     @property
     def potential_energy_(self):
-        """Specific potential energy of stars, dark matter and gas particles.
+        """
+        Specific potential energy of stars, dark matter and gas particles.
 
         This property doesn't compute the potential energy, only returns its
         value if it is already computed, i.e. ``has_potential_`` is True. To
@@ -636,6 +643,11 @@ class Galaxy:
                 self.dark_matter.potential,
                 self.gas.potential,
             )
+        #Bruno:
+        # else? ; Aprovechando que está el nuevo Error, debería estar acá...
+        # Lo probemos...
+        else:
+            raise NoGravitationalPotentialError # ¿Así? Probar...
 
     @property
     def total_energy_(self):
@@ -667,6 +679,9 @@ class Galaxy:
                 self.dark_matter.total_energy_,
                 self.gas.total_energy_,
             )
+        #Bruno: Repito...
+        else:
+            raise NoGravitationalPotentialError
 
     @property
     def angular_momentum_(self):

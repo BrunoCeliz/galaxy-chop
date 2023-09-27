@@ -33,7 +33,8 @@ from .. import constants as const
 
 @uttr.s(frozen=True, slots=True, repr=False)
 class _GalaxyStellarDynamics:
-    """Circularity information about the stars particles of a galaxy.
+    """
+    Circularity information about the stars particles of a galaxy.
 
     Parameters
     ----------
@@ -42,7 +43,7 @@ class _GalaxyStellarDynamics:
     normalized_star_Jz: np.array
         z-component normalized specific angular momentum of the stars.
     eps: np.array
-        Circularity parameter (eps : J_z/J_circ).
+        Circularity parameter (eps: J_z/J_circ).
     eps_r: np.array
         Projected circularity parameter (eps_r: J_p/J_circ).
     x: np.array
@@ -59,6 +60,10 @@ class _GalaxyStellarDynamics:
     eps = uttr.ib(converter=np.copy)
     eps_r = uttr.ib(converter=np.copy)
 
+    #Bruno:
+    # 'x' e 'y' son nombres chotos, ¿no?, debería ser algo más \
+    # intuitivo como 'norm_energy_bin' y 'norm_Jz_bin'. Además \
+    # ¿No se grafica Circularidad(Energía)?
     x = uttr.ib(converter=np.copy, metadata={"asdict": False})
     y = uttr.ib(converter=np.copy, metadata={"asdict": False})
 

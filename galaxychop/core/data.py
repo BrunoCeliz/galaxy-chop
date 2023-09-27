@@ -127,8 +127,15 @@ class ParticleSet:
         converter=(lambda v: np.copy(v) if v is not None else v),
         repr=False,
     )
+    #Bruno:
+    # Comment de potential -> Si le doy un array "malo" (a.k.a. todos zeros \
+    # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
+    # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(converter=float, repr=False)
+    #Bruno:
+    # Commnet del softening -> Debe tener las mismas unidades de x,y,z, \
+    # porque es lo que se usa para calcular el potencial después...
 
     has_potential_: bool = uttr.ib(init=False)
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
@@ -402,11 +409,19 @@ class Galaxy:
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
         return f"<Galaxy {stars_repr}, {dm_repr}, {gas_repr}, {has_pot}>"
+        #Bruno:
+        # Cuando ocurra el caso de que haya partículas con y otras sin \
+        # potencial -> Debería devolver un warning + un False en vez de \
+        # un error (como que "hubo un error con el potencial, así que lo \
+        # ignoramos y te lo seteamos en False). Así de paso no se corta \
+        # el proceso...
+    
 
     # UTILITIES ===============================================================
 
     def to_dataframe(self, *, ptypes=None, attributes=None):
-        """Convert the galaxy to pandas DataFrame.
+        """
+        Convert the galaxy to pandas DataFrame.
 
         This method builds a data frame from the particles of the Galaxy.
 
@@ -437,7 +452,8 @@ class Galaxy:
         return pd.concat(parts, ignore_index=True)
 
     def to_hdf5(self, path_or_stream, *, metadata=None, **kwargs):
-        """Shortcut to ``galaxychop.io.to_hdf5()``.
+        """
+        Shortcut to ``galaxychop.io.to_hdf5()``.
 
         It is responsible for storing a galaxy in HDF5 format. The procedure
         only stores the attributes ``m``, ``x``, ``y``, ``z``, ``vx``, ``vy``
@@ -456,6 +472,11 @@ class Galaxy:
             ``astropy.io.misc.hdf5.write_table_hdf5()``
 
         """
+        #Bruno:
+        # Todo l oque sea, pero por lo gral cuando alguien pide \
+        # un .hdf5 creo que es mejor que tenga la mayor cantidad \
+        # de info posible (véase todos los datos del post-procesado \
+        # que ofrecen los cutouts.hdf5 de IllustrisTNG...)
         from .. import io
 
         return io.to_hdf5(

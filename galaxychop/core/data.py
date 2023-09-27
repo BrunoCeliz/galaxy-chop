@@ -781,8 +781,6 @@ class Galaxy:
         with the maximum z-component of the normalized specific angular
         momentum per bin (`x`) and the maximum value of the z-component of the
         normalized specific angular momentum per bin (`y`).
-        #Bruno:
-        # Ojo con esa última frase ¿No sería la energía específica en el eje 'x'?
 
         >>> import galaxychop as gchop
         >>> galaxy = gchop.Galaxy(...)

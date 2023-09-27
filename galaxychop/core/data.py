@@ -724,7 +724,8 @@ class Galaxy:
         reassign=const.SD_DEFAULT_REASSIGN,
         runtime_warnings=const.SD_RUNTIME_WARNING_ACTION,
     ):
-        """Calculate galaxy stars particles circularity information.
+        """
+        Calculate galaxy stars particles circularity information.
 
         Shortcut to ``galaxychop.core.sdynamics.stellar_dynamics()``.
 
@@ -747,15 +748,21 @@ class Galaxy:
             to 1 or -1, depending on the case. False discards these particles.
         runtime_warnings : Any warning filter action (default "ignore")
             stellar_synamics usually launches RuntimeWarning during the eps
-            calculation because there may be some particle with jcirc=0.
-            By default the function decides to ignore these warnings.
+            (J_z/J_circ) calculation because there may be some particle with
+            jcirc=0. By default the function decides to ignore these warnings.
             `runtime_warnings` can be set to any valid "action" in the python
             warnings module.
+            #Bruno:
+            # ¿Se pueden poner mayúsculas dentro de ese paréntesis?
 
         Return
         ------
         GalaxyStellarDynamics :
             Circularity attributes of the star components of the galaxy
+        #Bruno:
+        # No me gustó (aunque creo que no entendí qué hace sdynamics.py)
+        # ¿Por qué no poner bien qué devuelve, en vez de este nombre que 
+        # aparenta ser una clase?
 
         Notes
         -----
@@ -774,6 +781,8 @@ class Galaxy:
         with the maximum z-component of the normalized specific angular
         momentum per bin (`x`) and the maximum value of the z-component of the
         normalized specific angular momentum per bin (`y`).
+        #Bruno:
+        # Ojo con esa última frase ¿No sería la energía específica en el eje 'x'?
 
         >>> import galaxychop as gchop
         >>> galaxy = gchop.Galaxy(...)

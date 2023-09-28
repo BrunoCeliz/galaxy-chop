@@ -27,6 +27,8 @@ from ..utils import doc_inherit
 # =============================================================================
 # GAUSSIAN ABC
 # =============================================================================
+
+
 class DynamicStarsGaussianDecomposerABC(
     DynamicStarsDecomposerMixin, GalaxyDecomposerABC
 ):
@@ -105,6 +107,8 @@ class DynamicStarsGaussianDecomposerABC(
 # =============================================================================
 # GMM
 # =============================================================================
+
+
 class GaussianMixture(DynamicStarsGaussianDecomposerABC):
     """
     GaussianMixture class.

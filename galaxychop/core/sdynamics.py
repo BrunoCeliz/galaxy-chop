@@ -54,7 +54,6 @@ class _GalaxyStellarDynamics:
         momentum per bin.
 
     """
-
     normalized_star_energy = uttr.ib(converter=np.copy)
     normalized_star_Jz = uttr.ib(converter=np.copy)
     eps = uttr.ib(converter=np.copy)

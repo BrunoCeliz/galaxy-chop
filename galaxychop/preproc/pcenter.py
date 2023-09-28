@@ -41,9 +41,12 @@ def center(galaxy):
         
     """
     if not galaxy.has_potential_:
-        raise ValueError("galaxy must has the potential energy")
+        raise NoGravitationalPotentialError(
+            "galaxy must has the potential energy"
+        )
     #Bruno:
-    # Poner el "NoGravPot" como error, con el mismo sms que antes
+    # Poner el "NoGravPot" como error, con el mismo sms que antes ¿Sigue \
+    # valiendo?
 
     # We extract only the needed column to centrer the galaxy
     df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z", "potential"])
@@ -103,9 +106,9 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
         
     """
     if not galaxy.has_potential_:
-        raise ValueError("galaxy must has the potential energy")
-    #Bruno:
-    # Lo mismo del error...
+        raise NoGravitationalPotentialError(
+            "galaxy must has the potential energy"
+        )
 
     # We extract only the needed column to centrer the galaxy
     df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])

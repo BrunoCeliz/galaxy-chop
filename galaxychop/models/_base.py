@@ -4,8 +4,11 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
-"""Common functionalities for galaxy decomposition."""
+# =============================================================================
+# DOCS
+# =============================================================================
 
+"""Common functionalities for galaxy decomposition."""
 
 # =============================================================================
 # IMPORTS
@@ -45,7 +48,8 @@ _PTYPES_ORDER = tuple(p.name.lower() for p in core.ParticleSetType)
 
 @attr.s(frozen=True, slots=True, repr=False)
 class Components:
-    """Class of components resulting from dynamic decomposition.
+    """
+    Class of components resulting from dynamic decomposition.
 
     This class creates the components of the galaxy from the result of the
     dynamic decomposition.
@@ -78,7 +82,8 @@ class Components:
     )
 
     def __attrs_post_init__(self):
-        """Length validator.
+        """
+        Length validator.
 
         This method validates that the lengths of labels, ptypes are equal.
         On the other hand, if probabilities is not None, its length must be the
@@ -92,7 +97,8 @@ class Components:
             raise ValueError("All length must be the same")
 
     def map_labels(self, lmap=None):
-        """Access all the labels mapped to the lmap dictionary.
+        """
+        Access all the labels mapped to the lmap dictionary.
 
         If no lmap is provided, the function tries to use the internal
         lmap dict. If the instance doesn't has an lmap dict this method
@@ -165,7 +171,8 @@ class Components:
         return df
 
     def describe(self, lmap=None):
-        """Create a description of the sizes and masses of each component.
+        """
+        Create a description of the sizes and masses of each component.
 
         The method takes into account only stellar particles that could be
         classified.
@@ -254,7 +261,8 @@ class Components:
 
 
 def hparam(default, **kwargs):
-    """Create a hyper parameter for decomposers.
+    """
+    Create a hyper parameter for decomposers.
 
     By design decision, hyper-parameter is required to have a sensitive default
     value.
@@ -285,7 +293,8 @@ def hparam(default, **kwargs):
 # =============================================================================
 @attr.s(frozen=True, repr=False)
 class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
-    """Abstract class to facilitate the creation of decomposers.
+    """
+    Abstract class to facilitate the creation of decomposers.
 
     This class requests the redefinition of three methods: get_attributes,
     get_rows_mask and split.
@@ -322,7 +331,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     # block meta checks =======================================================
     def __init_subclass__(cls):
-        """Initiate of subclasses.
+        """
+        Initiate of subclasses.
 
         It ensures that every inherited class is decorated by ``attr.s()`` and
         assigns as class configuration the parameters defined in the class
@@ -344,7 +354,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_attributes(self):
-        """Attributes for the parameter space.
+        """
+        Attributes for the parameter space.
 
         Returns
         -------
@@ -355,7 +366,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_rows_mask(self, X, y, attributes):
-        """Mask for the valid rows to operate clustering.
+        """
+        Mask for the valid rows to operate clustering.
 
         This method gets the mask for the valid rows to operate clustering.
 
@@ -382,7 +394,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def split(self, X, y, attributes):
-        """Compute clustering.
+        """
+        Compute clustering.
 
         Parameters
         ----------
@@ -457,7 +470,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         return pd.concat([stars_df, dm_df, gas_df], ignore_index=True)
 
     def attributes_matrix(self, galaxy, attributes):
-        """Matrix of particle attributes.
+        """
+        Matrix of particle attributes.
 
         This method obtains the matrix with the particles and attributes
         necessary to operate the clustering.
@@ -530,7 +544,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         return X, y
 
     def complete_labels(self, X, labels, rows_mask):
-        """Complete the labels of all particles.
+        """
+        Complete the labels of all particles.
 
         This method assigns the labels obtained from clustering to the
         particles used for this purpose. The rest are assigned as label=Nan.
@@ -562,7 +577,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         return new_labels
 
     def complete_probs(self, X, probs, rows_mask):
-        """Complete the probabilities of all particles.
+        """
+        Complete the probabilities of all particles.
 
         This method assigns the probabilities obtained from clustering to the
         particles used for this purpose, the rest are assigned as label=Nan.
@@ -617,7 +633,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         return {}
 
     def decompose(self, galaxy):
-        """Decompose method.
+        """
+        Decompose method.
 
         Assign the component of the galaxy to which each particle belongs.
         Validation of the input galaxy instance.
@@ -675,7 +692,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
 
 class DynamicStarsDecomposerMixin:
-    """Dynamic Stars Decomposer Mixin Class.
+    """
+    Dynamic Stars Decomposer Mixin Class.
 
     This class redefines the get_row_mask method so that dynamic decomposition
     is performed using only stellar particles.

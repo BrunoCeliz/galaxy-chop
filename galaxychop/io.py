@@ -133,7 +133,7 @@ def to_hdf5(path_or_stream, galaxy, *, metadata=None, **kwargs):
     Parameters
     ----------
     path_or_stream : str or file-like
-        Path or file like objet to the h5 to store the galaxy.
+        Path or file like object to the h5 to store the galaxy.
     galaxy : galaxychop.data.Galaxy
         The galaxy to store.
     metadata : dict or None (default None)

@@ -4,6 +4,10 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
+# =============================================================================
+# DOCS
+# =============================================================================
+
 """Module galaxy-chop."""
 
 # =============================================================================
@@ -105,7 +109,7 @@ class ParticleSet:
         Indicates if the specific potential energy is computed.
     arr_ : Instances of ``ArrayAccessor``
         Access to the attributes (defined with uttrs) of the provided instance,
-        and if they are of atropy.units.Quantity type it converts them into
+        and if they are of astropy.units.Quantity type it converts them into
         numpy.ndarray.
     """
 
@@ -127,8 +131,15 @@ class ParticleSet:
         converter=(lambda v: np.copy(v) if v is not None else v),
         repr=False,
     )
+    #Bruno:
+    # Comment de potential -> Si le doy un array "malo" (a.k.a. todos zeros \
+    # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
+    # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(converter=float, repr=False)
+    #Bruno:
+    # Commnet del softening -> Debe tener las mismas unidades de x,y,z, \
+    # porque es lo que se usa para calcular el potencial después...
 
     has_potential_: bool = uttr.ib(init=False)
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
@@ -402,11 +413,19 @@ class Galaxy:
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
         return f"<Galaxy {stars_repr}, {dm_repr}, {gas_repr}, {has_pot}>"
+        #Bruno:
+        # Cuando ocurra el caso de que haya partículas con y otras sin \
+        # potencial -> Debería devolver un warning + un False en vez de \
+        # un error (como que "hubo un error con el potencial, así que lo \
+        # ignoramos y te lo seteamos en False). Así de paso no se corta \
+        # el proceso...
+    
 
     # UTILITIES ===============================================================
 
     def to_dataframe(self, *, ptypes=None, attributes=None):
-        """Convert the galaxy to pandas DataFrame.
+        """
+        Convert the galaxy to pandas DataFrame.
 
         This method builds a data frame from the particles of the Galaxy.
 
@@ -437,7 +456,8 @@ class Galaxy:
         return pd.concat(parts, ignore_index=True)
 
     def to_hdf5(self, path_or_stream, *, metadata=None, **kwargs):
-        """Shortcut to ``galaxychop.io.to_hdf5()``.
+        """
+        Shortcut to ``galaxychop.io.to_hdf5()``.
 
         It is responsible for storing a galaxy in HDF5 format. The procedure
         only stores the attributes ``m``, ``x``, ``y``, ``z``, ``vx``, ``vy``
@@ -456,6 +476,11 @@ class Galaxy:
             ``astropy.io.misc.hdf5.write_table_hdf5()``
 
         """
+        #Bruno:
+        # Todo lo que sea, pero por lo gral cuando alguien pide \
+        # un .hdf5 creo que es mejor que tenga la mayor cantidad \
+        # de info posible (véase todos los datos del post-procesado \
+        # que ofrecen los cutouts.hdf5 de IllustrisTNG...)
         from .. import io
 
         return io.to_hdf5(
@@ -466,7 +491,8 @@ class Galaxy:
         )
 
     def to_dict(self, *, ptypes=None, attributes=None):
-        """Convert the galaxy to dict with information as a numpy array with \
+        """
+        Convert the galaxy to dict with information as a numpy array with \
         coerced units.
 
         Parameters
@@ -498,7 +524,8 @@ class Galaxy:
         return the_dict
 
     def disassemble(self):
-        """Convert all the attributes of the galaxy into a play dict.
+        """
+        Convert all the attributes of the galaxy into a play dict.
 
         The resulting dict can be used to build a new galaxy with
         ``galaxychop.mkgalaxy``.
@@ -535,6 +562,9 @@ class Galaxy:
 
         disassembled = dict(**stars_kws, **dark_matter_kws, **gas_kws)
         return disassembled
+        #Bruno:
+        # Acá *quizás* estaría bueno retornar 3 dics separados en vez \
+        # de uno con todo mezclado, si no, ¿Para qué la desarmé?
 
     def copy(self):
         """Make a copy of the Galaxy."""
@@ -562,7 +592,8 @@ class Galaxy:
 
     @property
     def kinetic_energy_(self):
-        """Specific kinetic energy of stars, dark matter and gas particles.
+        """
+        Specific kinetic energy of stars, dark matter and gas particles.
 
         Returns
         -------
@@ -587,7 +618,8 @@ class Galaxy:
 
     @property
     def potential_energy_(self):
-        """Specific potential energy of stars, dark matter and gas particles.
+        """
+        Specific potential energy of stars, dark matter and gas particles.
 
         This property doesn't compute the potential energy, only returns its
         value if it is already computed, i.e. ``has_potential_`` is True. To
@@ -615,6 +647,11 @@ class Galaxy:
                 self.dark_matter.potential,
                 self.gas.potential,
             )
+        #Bruno:
+        # else? ; Aprovechando que está el nuevo Error, debería estar acá...
+        # Lo probemos...
+        else:
+            raise NoGravitationalPotentialError # ¿Así? Probar...
 
     @property
     def total_energy_(self):
@@ -646,6 +683,9 @@ class Galaxy:
                 self.dark_matter.total_energy_,
                 self.gas.total_energy_,
             )
+        #Bruno: Repito...
+        else:
+            raise NoGravitationalPotentialError
 
     @property
     def angular_momentum_(self):
@@ -688,7 +728,8 @@ class Galaxy:
         reassign=const.SD_DEFAULT_REASSIGN,
         runtime_warnings=const.SD_RUNTIME_WARNING_ACTION,
     ):
-        """Calculate galaxy stars particles circularity information.
+        """
+        Calculate galaxy stars particles circularity information.
 
         Shortcut to ``galaxychop.core.sdynamics.stellar_dynamics()``.
 
@@ -711,15 +752,21 @@ class Galaxy:
             to 1 or -1, depending on the case. False discards these particles.
         runtime_warnings : Any warning filter action (default "ignore")
             stellar_synamics usually launches RuntimeWarning during the eps
-            calculation because there may be some particle with jcirc=0.
-            By default the function decides to ignore these warnings.
+            (J_z/J_circ) calculation because there may be some particle with
+            jcirc=0. By default the function decides to ignore these warnings.
             `runtime_warnings` can be set to any valid "action" in the python
             warnings module.
+            #Bruno:
+            # ¿Se pueden poner mayúsculas dentro de ese paréntesis?
 
         Return
         ------
         GalaxyStellarDynamics :
             Circularity attributes of the star components of the galaxy
+        #Bruno:
+        # No me gustó (aunque creo que no entendí qué hace sdynamics.py)
+        # ¿Por qué no poner bien qué devuelve, en vez de este nombre que 
+        # aparenta ser una clase?
 
         Notes
         -----

@@ -4,7 +4,11 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
-"""Base objects and functions og galaxychop."""
+# =============================================================================
+# DOCS
+# =============================================================================
+
+"""Base objects and functions of galaxychop."""
 
 # =============================================================================
 # IMPORTS

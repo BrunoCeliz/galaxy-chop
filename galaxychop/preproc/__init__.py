@@ -4,12 +4,18 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
-"""preprocessing module."""
+# =============================================================================
+# DOCS
+# =============================================================================
+
+"""Preprocessing module."""
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
+#Bruno:
+# Cuando agregue (nuevamente) el Octree de C, volver a acá...
 from .pcenter import center, is_centered
 from .potential_energy import potential
 from .salign import is_star_aligned, star_align
@@ -31,11 +37,17 @@ __all__ = [
 # FUNCTIONS
 # =============================================================================
 
+#Bruno:
+# ¿Esto era lo otro que molestaba? Deberíamos repetir un _base.py con un ABC \
+# para estos pre-procesadores y unificar. Además, agregar el Octree + la \
+# integración de C (Cython u otro)...
+# ¡El r_cut puede ser un hparam!
 
 def center_and_align(galaxy, *, r_cut=None):
-    """Sequentially performs centering and alignment.
+    """
+    Sequentially performs centering and alignment.
 
-    ``center_and_align(gal) <==> star_align(center(gal))``
+    ``center_and_align(galaxy) <==> star_align(center(galaxy))``
 
     Parameters
     ----------
@@ -58,11 +70,14 @@ def center_and_align(galaxy, *, r_cut=None):
 
     return aligned
 
-
+#Bruno:
+# Ídem para "rtol" y "atol"...
 def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
-    """Validate if the galaxy is centered and aligned.
+    """
+    Validate if the galaxy is centered and aligned.
 
-    ``is_center_and_align(gal) <==> is_centered(gal) and is_star_aligned(gal)``
+    ``is_center_and_align(galaxy) <==> is_centered(galaxy) and \
+                                       is_star_aligned(galaxy)``
 
     Parameters
     ----------

@@ -33,7 +33,8 @@ from .. import constants as const
 
 @uttr.s(frozen=True, slots=True, repr=False)
 class _GalaxyStellarDynamics:
-    """Circularity information about the stars particles of a galaxy.
+    """
+    Circularity information about the stars particles of a galaxy.
 
     Parameters
     ----------
@@ -42,7 +43,7 @@ class _GalaxyStellarDynamics:
     normalized_star_Jz: np.array
         z-component normalized specific angular momentum of the stars.
     eps: np.array
-        Circularity parameter (eps : J_z/J_circ).
+        Circularity parameter (eps: J_z/J_circ).
     eps_r: np.array
         Projected circularity parameter (eps_r: J_p/J_circ).
     x: np.array
@@ -53,12 +54,15 @@ class _GalaxyStellarDynamics:
         momentum per bin.
 
     """
-
     normalized_star_energy = uttr.ib(converter=np.copy)
     normalized_star_Jz = uttr.ib(converter=np.copy)
     eps = uttr.ib(converter=np.copy)
     eps_r = uttr.ib(converter=np.copy)
 
+    #Bruno:
+    # 'x' e 'y' son nombres chotos, ¿no?, debería ser algo más \
+    # intuitivo como 'norm_energy_bin' y 'norm_Jz_bin'. Además \
+    # ¿No se grafica Circularidad(Energía) también?
     x = uttr.ib(converter=np.copy, metadata={"asdict": False})
     y = uttr.ib(converter=np.copy, metadata={"asdict": False})
 
@@ -78,7 +82,8 @@ class _GalaxyStellarDynamics:
 
     @classmethod
     def circularity_attributes(cls):
-        """Retrieve all the circularity attributes stored in the JCirc class.
+        """
+        Retrieve all the circularity attributes stored in the JCirc class.
 
         This method returns a tuple of str ignoring those that are marked as
         "asdict=False".
@@ -91,7 +96,8 @@ class _GalaxyStellarDynamics:
         return tuple(fields)
 
     def to_dict(self):
-        """Convert the instance to a dict.
+        """
+        Convert the instance to a dict.
 
         Attributes are ignored if they are marked as "asdict=False".
 
@@ -101,7 +107,8 @@ class _GalaxyStellarDynamics:
         )
 
     def isfinite(self):
-        """Return a mask of which elements are finite in all attributes.
+        """
+        Return a mask of which elements are finite in all attributes.
 
         Attributes are ignored if they are marked as "asdict=False".
 
@@ -109,6 +116,8 @@ class _GalaxyStellarDynamics:
         selfd = self.to_dict()
         return np.all([np.isfinite(v) for v in selfd.values()], axis=0)
 
+#Bruno:
+# Revisar nombre de variables y el uso de componentes no-estelares...
 
 def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     # this function exists to silence the warnings in the public one
@@ -118,6 +127,13 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
         attributes=["ptypev", "total_energy", "Jx", "Jy", "Jz"]
     )
 
+    #Bruno:
+    # ¿Eh? "J_p" = vect(J)-J_z (a.k.a. "todo lo que no es J_z") \
+    # =/= "J_proyectado", ¡Es "J_perpendicular"! -> ¿En qué otras \
+    # partes de la docs está puesto como proyect? ¿Algún autor lo \
+    # llama "J_proyect"?...; Además, "J_r" confunde bastante imo.
+    # Btw, ¿No es más lento trabajar con el df de la Galaxia? (aunque \
+    # el rendimiento no importa para estos cálculos de menor orden...)
     Jr_part = np.sqrt(df.Jx.values**2 + df.Jy.values**2)
     E_tot = df.total_energy.values
 
@@ -133,6 +149,10 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     aux0 = np.arange(-1.0, -0.1, bin0)
     aux1 = np.arange(-0.1, 0.0, bin1)
     aux = np.concatenate([aux0, aux1], axis=0)
+    #Bruno:
+    # Yo banco muchísimo el uso de una variable "aux" en mis NBs, \
+    # pero mepa que acá, así como 'x' e 'y', deberían llevar nombres \
+    # adecuados...
 
     x = np.zeros(len(aux) + 1)
     y = np.zeros(len(aux) + 1)
@@ -140,6 +160,9 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     x[0] = -1.0
     y[0] = np.abs(Jz[np.argmin(E)])
 
+    #Bruno:
+    # ¿Eh? Esto se debería poder hacer de otra forma más en \
+    # línea con los otros .py ...
     for i in range(1, len(aux)):
         (mask,) = np.where((E <= aux[i]) & (E > aux[i - 1]))
         s = np.argsort(np.abs(Jz[mask]))
@@ -186,6 +209,10 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     df_star = df[df.ptypev == ParticleSetType.STARS.value]
     Jr_star = np.sqrt(df_star.Jx.values**2 + df_star.Jy.values**2)
     Etot_s = df_star.total_energy.values
+    #Bruno:
+    # ¿Recién ahora se encarga de las estrellas? ¿De qué me \
+    # sirve considerar todo lo anterior para DM? (Igual quizás \ 
+    # para el gas sí es deseable, así que no digo nada...)
 
     # Remove the star particles that are not bound:
     # E > 0 and with E = -inf.
@@ -219,6 +246,9 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
         # We reassign particles that have circularity > 1 to circularity = 1.
         mask = np.where(eps_ > 1.0)[0]
         eps_[mask] = 1.0
+        #Bruno:
+        # ¿Por qué en "bound" lo define como "(bound,) = ..." y acá no? \
+        # Es una nimiedad, pero unificar...
 
         # We reassign particles that have circularity < -1 to circularity = -1.
         mask = np.where(eps_ < -1.0)[0]
@@ -276,7 +306,7 @@ def stellar_dynamics(
         in the range of (-0.1, 0) of the normalized energy.
     reassign : list. Default=False
         It allows to define what to do with stellar particles with circularity
-        parameter values >1 or <-1. True reassigns the value to 1 or -1,
+        parameter values > 1 or < -1. True reassigns the value to 1 or -1,
         depending on the case. False discards these particles.
     runtime_warnings : Any warning filter action (default "ignore")
         stellar_synamics usually launches RuntimeWarning during the eps
@@ -331,6 +361,10 @@ def stellar_dynamics(
             "You cannot calculate stellar dynamics in a "
             "galaxy without potential."
         )
+    #Bruno:
+    # Copiar este mensaje en el otro lado que llamé al "raise \
+    # NoGrav..." (en la parte de Galaxy donde define Energía \
+    # pot y total <-> data.py).
 
     with warnings.catch_warnings():
         warnings.simplefilter(runtime_warnings, category=RuntimeWarning)

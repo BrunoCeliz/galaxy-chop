@@ -22,9 +22,9 @@ from ..core import data
 # BACKENDS
 # =============================================================================
 
-
 def center(galaxy):
-    """Galaxy particle centering.
+    """
+    Galaxy particle centering.
 
     Centers the position of all galaxy particles respect to the position of the
     lowest potential particle.
@@ -38,9 +38,15 @@ def center(galaxy):
     galaxy : new ``Galaxy class`` object
         A new galaxy object with centered positions respect to the position of
         the lowest potential particle.
+        
     """
     if not galaxy.has_potential_:
-        raise ValueError("galaxy must has the potential energy")
+        raise NoGravitationalPotentialError(
+            "galaxy must have the potential energy"
+        )
+    #Bruno:
+    # Poner el "NoGravPot" como error, con el mismo sms que antes ¿Sigue \
+    # valiendo?
 
     # We extract only the needed column to centrer the galaxy
     df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z", "potential"])
@@ -75,10 +81,14 @@ def center(galaxy):
     )
 
     return data.mkgalaxy(**new)
+    #Bruno:
+    # No entendí qué retorna, qué implica ese "disassemble" y ese "update" \
+    # ¿Por qué los "**" antes del "new"?
 
 
 def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
-    """Validate if the galaxy is centered.
+    """
+    Validate if the galaxy is centered.
 
     Parameters
     ----------
@@ -93,9 +103,12 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     bool
         True if galaxy is centered respect to the position of the lowest
         potential particle, False otherwise.
+        
     """
     if not galaxy.has_potential_:
-        raise ValueError("galaxy must has the potential energy")
+        raise NoGravitationalPotentialError(
+            "galaxy must have the potential energy"
+        )
 
     # We extract only the needed column to centrer the galaxy
     df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])
@@ -104,4 +117,5 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     minpot_idx = df.potential.argmin()
     min_values = df.iloc[minpot_idx]
 
+    # we check if the most bounded particle is (0,0,0)
     return np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)

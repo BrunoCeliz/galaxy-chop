@@ -42,7 +42,7 @@ def center(galaxy):
     """
     if not galaxy.has_potential_:
         raise NoGravitationalPotentialError(
-            "galaxy must has the potential energy"
+            "galaxy must have the potential energy"
         )
     #Bruno:
     # Poner el "NoGravPot" como error, con el mismo sms que antes ¿Sigue \
@@ -107,7 +107,7 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     """
     if not galaxy.has_potential_:
         raise NoGravitationalPotentialError(
-            "galaxy must has the potential energy"
+            "galaxy must have the potential energy"
         )
 
     # We extract only the needed column to centrer the galaxy

@@ -95,6 +95,7 @@ def read_hdf5(
     Returns
     -------
     galaxy : ``Galaxy class`` object.
+
     """
     with h5py.File(path_or_stream, "r") as f:
         star_table = Table.read(f["stars"])
@@ -122,7 +123,8 @@ def read_hdf5(
 
 
 def to_hdf5(path_or_stream, galaxy, *, metadata=None, **kwargs):
-    """HDF5 file writer.
+    """
+    HDF5 file writer.
 
     It is responsible for storing a galaxy in HDF5 format. The procedure only
     stores the attributes ``m``, ``x``, ``y``, ``z``, ``vx``, ``vy`` and
@@ -228,6 +230,7 @@ def read_npy(
     Returns
     -------
     galaxy : ``Galaxy class`` object.
+
     """
     particles_star = np.load(path_or_stream_star)
     particles_dark = np.load(path_or_stream_dark)

@@ -5,3 +5,4 @@ futuro facilitar el uso de pipelines y no estar creando nuevas galaxias modifici
 unificar el uso de los diferentes métodos de preprocesamiento y descomposición.
 - Lo de GriSPy/Octree son integración de funciones, no es urgente como lo de mayor nivel de 
 abstracción que es lo previamente mencionado.
+- Hacer test y pasar el flake8...

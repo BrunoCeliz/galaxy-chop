@@ -82,7 +82,8 @@ class _GalaxyStellarDynamics:
 
     @classmethod
     def circularity_attributes(cls):
-        """Retrieve all the circularity attributes stored in the JCirc class.
+        """
+        Retrieve all the circularity attributes stored in the JCirc class.
 
         This method returns a tuple of str ignoring those that are marked as
         "asdict=False".
@@ -95,7 +96,8 @@ class _GalaxyStellarDynamics:
         return tuple(fields)
 
     def to_dict(self):
-        """Convert the instance to a dict.
+        """
+        Convert the instance to a dict.
 
         Attributes are ignored if they are marked as "asdict=False".
 
@@ -115,7 +117,7 @@ class _GalaxyStellarDynamics:
         return np.all([np.isfinite(v) for v in selfd.values()], axis=0)
 
 #Bruno:
-# Acá arrancan las chanchadas de docs/comments...
+# Revisar nombre de variables y el uso de componentes no-estelares...
 
 def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     # this function exists to silence the warnings in the public one

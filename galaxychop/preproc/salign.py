@@ -213,6 +213,4 @@ def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     Jztot = np.sum(df.Jz.values[mask] * df.m.values[mask])
     Jtot = np.sqrt(Jxtot**2 + Jytot**2 + Jztot**2)
 
-    #Bruno:
-    # ¿Eh? ¿Cómo comparar esto?
     return np.allclose(Jztot, Jtot, rtol=rtol, atol=atol)

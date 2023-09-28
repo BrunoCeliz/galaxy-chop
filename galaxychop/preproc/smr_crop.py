@@ -49,7 +49,8 @@ def _get_half_smr_crop(sdf, cut_radius_factor):
 
 
 def half_star_mass_radius_crop(galaxy, *, num_radii=3):
-    """Crop select stars within a specified number of the radii enclosing \
+    """
+    Crop select stars within a specified number of the radii enclosing \
     half fractions of the stellar mass.
 
     Parameters
@@ -90,6 +91,13 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
 
     del trim_stars_df
 
+    #Bruno:
+    # Si cortamos las estrellas hasta 3r_half, ¿Por qué no al gas? ;
+    # Además, también se podrían agregar otros cortes (e.g. Einasto, \
+    # NFW, half light radii (!, aunque para ello debería considerarse \
+    # la magnitud/luminosidad de cada partícula, que si bien no es \
+    # imposible pero estira el scope de esto y habría que retocar \
+    # muchas otras varias cosas...))
     dm = galaxy.dark_matter.copy()
     gas = galaxy.gas.copy()
 

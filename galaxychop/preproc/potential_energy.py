@@ -27,6 +27,10 @@ try:
     from .fortran import potential as potential_f
 except ImportError:  # pragma: no cover
     potential_f = None
+#Bruno:
+# Cuando agregue el Octree, debería agregar también esto. \
+# ¿También debería tocar la línea siguiente (default)? Porque \
+# es preferible usar el Octree antes que un direct summation...
 
 #: The default potential backend to use.
 DEFAULT_POTENTIAL_BACKEND = "numpy" if potential_f is None else "fortran"
@@ -38,7 +42,8 @@ DEFAULT_POTENTIAL_BACKEND = "numpy" if potential_f is None else "fortran"
 
 
 def fortran_potential(x, y, z, m, softening):
-    """Wrap the Fortran implementation of the gravitational potential.
+    """
+    Wrap the Fortran implementation of the gravitational potential.
 
     Parameters
     ----------
@@ -62,7 +67,8 @@ def fortran_potential(x, y, z, m, softening):
 
 
 def numpy_potential(x, y, z, m, softening):
-    """Numpy implementation for the gravitational potential energy calculation.
+    """
+    Numpy implementation for the gravitational potential energy calculation.
 
     Parameters
     ----------
@@ -121,6 +127,7 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
     galaxy: new ``Galaxy class`` object
         A new galaxy object with the specific potential energy of particles
         calculated.
+        
     """
     if galaxy.has_potential_:
         raise ValueError("galaxy potential are already calculated")

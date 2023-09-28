@@ -130,7 +130,7 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
         
     """
     if galaxy.has_potential_:
-        raise ValueError("galaxy potential are already calculated")
+        raise ValueError("galaxy potential is already calculated")
 
     # extract the implementation
     backend_function = POTENTIAL_BACKENDS[backend]

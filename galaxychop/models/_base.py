@@ -356,6 +356,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     # block  to implement in every method =====================================
 
+    #Bruno:
+    # "NotImplemented" porque es un WIP/to-do?
     @abc.abstractmethod
     def get_attributes(self):
         """
@@ -368,6 +370,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()
 
+    #Bruno:
+    # Ojo con las variables 'X' e 'y'... ¿Falta "Shape: (...;...)"?
     @abc.abstractmethod
     def get_rows_mask(self, X, y, attributes):
         """
@@ -379,13 +383,13 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         ----------
         X : np.ndarray(n_particles, attributes)
             2D array where each file it is a diferent particle and each column
-            is a attribute of the particles. n_particles is the total number of
+            is an attribute of the particles. n_particles is the total number of
             particles.
         y : np.ndarray(n_particles,)
-            1D array where is identified the nature of each particle:
+            1D array where is identified the type of each particle:
             0 = stars, 1 = dark matter, 2 = gas. n_particles is the total
             number of particles.
-        attributes: tuple
+        attributes : tuple
             Dictionary keys of ``ParticleSet class`` parameters with particle
             attributes used to operate the clustering.
 
@@ -393,6 +397,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         -------
         mask : nd.array(m_particles)
             Mask only with valid values to operate the clustering.
+            
         """
         raise NotImplementedError()
 
@@ -419,6 +424,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             Probabilities of the particles to belong to each component, in case
             the dynamic decomposition model includes them. Otherwise it adopts
             the value None.
+            
         """
         raise NotImplementedError()
 
@@ -465,12 +471,21 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         # GAS
         gas_rows = len(galaxy.gas)
         gas_nans = np.full(gas_rows, np.nan)
+        #Bruno:
+        # Si el gas no interesa en la descomposición dinámica \
+        # ¿Por qué se normaliza según la partícula de mayor energía/ \
+        # momento angular y no según la ESTRELLA de mayor E/Jz? Rev...
 
         gas_columns = {attr: gas_nans for attr in attributes}
         gas_columns["ptypev"] = core.ParticleSetType.GAS.value
 
         gas_df = pd.DataFrame(gas_columns)
 
+        #Bruno:
+        # Entonces, este método hace que cualquier descomponedor \
+        # calcule la stellar dynamics de la galaxia, ¿no? Luego, \
+        # ¿Para qué agregar DM y gas entonces? ¿O es por completitud \
+        # y unificación de outputs de los descomponedores?
         return pd.concat([stars_df, dm_df, gas_df], ignore_index=True)
 
     def attributes_matrix(self, galaxy, attributes):
@@ -497,6 +512,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             1D array where is identified the nature of each particle:
             0 = STARS, 1=DM, 2=Gas. n_particles is the total number of
             particles.
+            
         """
         # first we split the attributes between the ones from circularity
         # and the ones from "galaxy.to_dataframe()"
@@ -525,6 +541,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
                 ptypes=_PTYPES_ORDER, attributes=df_attrs
             )
             result.append(dfgal)
+        #Bruno:
+        # ¿Dónde está el "df_attrs"?
 
         # If we have JCIRC attributes =========================================
         #     I'm going to need a lot of NANs that represent that gas and dm
@@ -539,12 +557,11 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
         # remove if ptypev is duplicated
         df = df.loc[:, ~df.columns.duplicated()]
-
-        # separamos la matriz y las clases
+        
+        # separate matrix and classes
         X = df[attributes].to_numpy()
         y = df.ptypev.to_numpy()
-
-        # retornamos
+        
         return X, y
 
     def complete_labels(self, X, labels, rows_mask):
@@ -613,14 +630,17 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             total number of particles. Particles that do not belong to any
             component are assigned the label Nan. This method returns None in
             case the clustering method returns None probabilities.
+            
         """
         if probs is None:
             return None
+        #Bruno:
+        # ¿Debería agregarse un sms que avise que no están las probs?
 
         # the number of particles are incorrect so we simple remove the data
         probs_shape = list(np.shape(probs)[1:])
 
-        # We need this many rows
+        # we need this many rows
         complete_shape = tuple([len(X)] + probs_shape)
 
         # now we create the container for the probabilities
@@ -653,6 +673,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         Components :
             Instance of the ``Component class``, with the result of the dynamic
             decomposition.
+            
         """
         attributes = self.get_attributes()
 

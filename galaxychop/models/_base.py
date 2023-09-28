@@ -63,7 +63,7 @@ class Components:
         Indicates the type of particle: stars = 0, dark matter = 1, gas = 2.
         Shape: (n,1).
     m : np.ndarray
-        Particle masses.
+        Particle masses. Shape: (n,1).
     lmap : dict
         Meaning of the component numbers.
     probabilities : np.ndarray or None
@@ -95,6 +95,8 @@ class Components:
             lens.add(len(self.probabilities))
         if len(lens) > 1:
             raise ValueError("All length must be the same")
+        #Bruno:
+        # El sms de error puede ser mejor, ¿no?
 
     def map_labels(self, lmap=None):
         """
@@ -212,7 +214,7 @@ class Components:
             )
 
             # add all the mass_prob and convert to a dict
-            # {"proba_0": X.xxx, "probs_1": Y.yyy}
+            # {"probs_0": X.xxx, "probs_1": Y.yyy}
             # where X.xxx and Y.yyy are the mass probability
             probs_m = probs_m_particles.sum().to_dict()
 
@@ -291,6 +293,8 @@ def hparam(default, **kwargs):
 # =============================================================================
 # ABC
 # =============================================================================
+
+
 @attr.s(frozen=True, repr=False)
 class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
     """

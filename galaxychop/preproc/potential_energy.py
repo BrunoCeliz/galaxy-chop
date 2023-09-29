@@ -164,6 +164,9 @@ POTENTIAL_BACKENDS = {
     "grispy": grispy_potential,
     "numpy": numpy_potential,
 }
+#Bruno:
+# Ya está copiado el Octree, así que remember agregarlo acá... \
+# ¡Ojo con los inputs del Octree! (No revisé nada de eso todavía)
 
 
 #: The default potential backend to use.

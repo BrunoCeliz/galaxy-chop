@@ -103,7 +103,7 @@ def grispy_potential(x, y, z, m, softening):
     # Juan no me matés pls. Rev como hacer más lindo el loop.
     epot = np.empty(len(m))
     for idx, particle in enumerate(m):
-        centre = [x[idx], y[idx], z[idx]]
+        centre = np.array([x[idx], y[idx], z[idx]])
         epot[idx] = potential_grispy(
             centre,
             x, y, z, m,

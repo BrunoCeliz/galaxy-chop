@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <omp.h>
 
-////#define PERIODIC // Las posiciones estan bien suponemos
+////#define PERIODIC /* There is no periodicity with already centered galaxies */
 #define Thetamax 0.45
 #define KERNEL_LENGTH 10000
 #define SOFT 3

@@ -16,7 +16,18 @@
 
 import astropy.units as u
 
+#Bruno:
+# ¿Lo tengo que importar acá si es que ya lo importo en el gsp_pot.py?
+import grispy as gsp
+
 import numpy as np
+
+#Bruno:
+# ¿Así se importa desde otro .py? Revisar...
+from .grispy_potential import (
+    make_grid,
+    potential_grispy,
+)
 
 from .. import (
     constants as const,
@@ -65,6 +76,50 @@ def fortran_potential(x, y, z, m, softening):
 
     return epot * const.G, np.asarray
 
+def grispy_potential(x, y, z, m, softening):
+    """
+    GriSPy implementation of the gravitational potential energy calculation.
+
+    Parameters
+    ----------
+    x, y, z : np.ndarray
+        Positions of particles. Shape: (n,1).
+    m : np.ndarray
+        Masses of particles. Shape: (n,1).
+    softening : float, optional
+        Softening parameter. Shape: (1,).
+
+    Returns
+    -------
+    np.ndarray : float
+        Specific potential energy of particles.
+
+    """
+    # Make the grid of the system
+    l_box, grid = make_grid(x, y, z)
+
+    # For each particle, compute its potential energy
+    #Bruno:
+    # Juan no me matés pls. Rev como hacer más lindo el loop.
+    epot = np.empty(len(m))
+    for idx, particle in enumerate(m):
+        centre = [x[idx], y[idx], z[idx]]
+        epot[idx] = potential_grispy(
+            centre,
+            x, y, z, m,
+            softening,
+            bubble_size=5*softening,
+            shell_width=0.1*l_box,
+            l_box=l_box,
+            grid=grid
+            )
+    #Bruno:
+    # Está chanchísimo escrito esto. WIP; btw, le saqué el uso de \
+    # "G" adentro de la func y lo aplico desde acá directamente, \
+    # apra unificar...
+
+    return epot * const.G, np.asarray
+
 
 def numpy_potential(x, y, z, m, softening):
     """
@@ -106,6 +161,7 @@ def numpy_potential(x, y, z, m, softening):
 
 POTENTIAL_BACKENDS = {
     "fortran": fortran_potential,
+    "grispy": grispy_potential,
     "numpy": numpy_potential,
 }
 

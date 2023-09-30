@@ -18,7 +18,11 @@ import astropy.units as u
 
 #Bruno:
 # ¿Lo tengo que importar acá si es que ya lo importo en el gsp_pot.py?
-import grispy as gsp
+
+#import grispy as gsp
+
+#Bruno:
+# Al pasarle el flake8 me dijo que no estba en uso, así que no se importa.
 
 import numpy as np
 
@@ -75,6 +79,7 @@ def fortran_potential(x, y, z, m, softening):
     epot = potential_f.fortran_potential(x, y, z, m, soft)
 
     return epot * const.G, np.asarray
+
 
 def grispy_potential(x, y, z, m, softening):
     """
@@ -186,7 +191,7 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
     galaxy: new ``Galaxy class`` object
         A new galaxy object with the specific potential energy of particles
         calculated.
-        
+
     """
     if galaxy.has_potential_:
         raise ValueError("galaxy potential is already calculated")

@@ -61,7 +61,7 @@ def make_grid(x, y, z, n_cells=2**4):
           that encloses all particles. Shape: (1,).
     #Bruno:
     # ¿Cómo se pone bien? Revisar...
-    grid : ``GriSPy`` object 
+    grid : ``GriSPy`` object
         Grid populated with all the galaxy particles.
           Shape: (n,1).
     #Bruno:
@@ -80,7 +80,8 @@ def make_grid(x, y, z, n_cells=2**4):
     # No uso la masa "m", pero ojo con los procedures en relación a los
     # demás métodos...
 
-    return l_box,grid
+    return l_box, grid
+
 
 def potential_grispy(centre, x, y, z, m, softening,
                      bubble_size, shell_width, l_box, grid):
@@ -121,7 +122,7 @@ def potential_grispy(centre, x, y, z, m, softening,
     Returns
     -------
     pot_shells : float
-        Potential of the given particle through the shells' monopole 
+        Potential of the given particle through the shells' monopole
         aproximation. Shape: (1,).
 
     """
@@ -135,14 +136,14 @@ def potential_grispy(centre, x, y, z, m, softening,
 
     # Use the bubble method to find the closest particles
     bubble_dist, bubble_ind = grid.bubble_neighbors(
-        centre, 
+        centre,
         distance_upper_bound=bubble_size
     )
-    
+
     # Compute the potential contribution via direct-sumation
     # of these bubble's particles
-    pot_shells = 0. # The potential variable.
-    for idx,distance in enumerate(bubble_dist[0]):
+    pot_shells = 0.  # The potential variable.
+    for idx, distance in enumerate(bubble_dist[0]):
         if distance > 0.:
             pot_shells -= m[bubble_ind[0][idx]]/distance
         else:
@@ -152,8 +153,8 @@ def potential_grispy(centre, x, y, z, m, softening,
         # Otra versión de esto (mucho más lenta, pero creo que correcta)
         #d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
         #pot_shells -= m[bubble_ind[0][idx]]/d_and_soft
-            
-    d_min_shell = bubble_size # Shell's lower limit to initialize the loop
+
+    d_min_shell = bubble_size  # Shell's lower limit to initialize the loop
     while d_min_shell < l_box:
         # Use the shell method to populate it
         shell_dist, shell_ind = grid.shell_neighbors(
@@ -163,7 +164,7 @@ def potential_grispy(centre, x, y, z, m, softening,
         )
 
         # Compute the monopole potential contribution of this shell
-        for idx,distance in enumerate(shell_dist[0]):
+        for idx, distance in enumerate(shell_dist[0]):
             # Due to non-periodicity, distance > 0 always
             pot_shells -= m[shell_ind[0][idx]]/distance
 
@@ -171,6 +172,6 @@ def potential_grispy(centre, x, y, z, m, softening,
             #d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
             #pot_shells -= m[shell_ind[0][idx]]/d_and_soft
 
-        d_min_shell += shell_width # Repeat for next shell (further away)
-        
+        d_min_shell += shell_width  # Repeat for next shell (further away)
+
     return pot_shells

@@ -14,6 +14,11 @@
 # metodología de las funciones anteriores de cálculo de \
 # potencial ('numpy' y 'fortran')...
 
+#Bruno:
+# Idea de test: Para ~1000 partículas distribuidas random \
+# que el método de GriSPy no difiera en más de ~5% (muy \
+# poco estricto) del método de fortran (driect-sumation)
+
 # This file is part of
 # the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
 # Copyright (c) 2021, Valeria Cristiani

@@ -16,17 +16,17 @@
 
 import astropy.units as u
 
-#Bruno:
+# Bruno:
 # ¿Lo tengo que importar acá si es que ya lo importo en el gsp_pot.py?
 
-#import grispy as gsp
+# import grispy as gsp
 
-#Bruno:
+# Bruno:
 # Al pasarle el flake8 me dijo que no estba en uso, así que no se importa.
 
 import numpy as np
 
-#Bruno:
+# Bruno:
 # ¿Así se importa desde otro .py? Revisar...
 from .grispy_potential import (
     make_grid,
@@ -42,7 +42,7 @@ try:
     from .fortran import potential as potential_f
 except ImportError:  # pragma: no cover
     potential_f = None
-#Bruno:
+# Bruno:
 # Cuando agregue el Octree, debería agregar también esto. \
 # ¿También debería tocar la línea siguiente (default)? Porque \
 # es preferible usar el Octree antes que un direct summation...
@@ -104,21 +104,24 @@ def grispy_potential(x, y, z, m, softening):
     l_box, grid = make_grid(x, y, z)
 
     # For each particle, compute its potential energy
-    #Bruno:
+    # Bruno:
     # Juan no me matés pls. Rev como hacer más lindo el loop.
     epot = np.empty(len(m))
     for idx, particle in enumerate(m):
         centre = np.array([x[idx], y[idx], z[idx]])
         epot[idx] = potential_grispy(
             centre,
-            x, y, z, m,
+            x,
+            y,
+            z,
+            m,
             softening,
-            bubble_size=5*softening,
-            shell_width=0.1*l_box,
+            bubble_size=5 * softening,
+            shell_width=0.1 * l_box,
             l_box=l_box,
-            grid=grid
-            )
-    #Bruno:
+            grid=grid,
+        )
+    # Bruno:
     # Está chanchísimo escrito esto. WIP; btw, le saqué el uso de \
     # "G" adentro de la func y lo aplico desde acá directamente, \
     # apra unificar...
@@ -169,7 +172,7 @@ POTENTIAL_BACKENDS = {
     "grispy": grispy_potential,
     "numpy": numpy_potential,
 }
-#Bruno:
+# Bruno:
 # Ya está copiado el Octree, así que remember agregarlo acá... \
 # ¡Ojo con los inputs del Octree! (No revisé nada de eso todavía)
 

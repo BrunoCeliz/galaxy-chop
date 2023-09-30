@@ -1,20 +1,20 @@
-#Bruno:
+# Bruno:
 # Para comenzar a hacer algo, veamos la implementación \
 # del potencial con GriSPy (aunqeu ya esté testeado que \
 # no es el algoirtmo más rápido ni más preciso...).
 
-#Bruno:
+# Bruno:
 # OJO que el copy de esto es sobre la branch "master" \
 # =/= "dev", así que puede que algo esté desfazado...
 
-#Bruno:
+# Bruno:
 # Estaría bueno tener una clase que abarque los métodos \
 # para calcular potencial, así como los descomponedores \
 # Gausseanos, etc...; Por ahora, me limito a copiar la \
 # metodología de las funciones anteriores de cálculo de \
 # potencial ('numpy' y 'fortran')...
 
-#Bruno:
+# Bruno:
 # Idea de test: Para ~1000 partículas distribuidas random \
 # que el método de GriSPy no difiera en más de ~5% (muy \
 # poco estricto) del método de fortran (driect-sumation)
@@ -74,22 +74,21 @@ def make_grid(x, y, z, n_cells=2**4):
 
     """
     # Size of the box that contains all particles
-    l_box = max(np.abs([max(x)-min(x),
-                       max(y)-min(y),
-                       max(z)-min(z)]))
+    l_box = max(np.abs([max(x) - min(x), max(y) - min(y), max(z) - min(z)]))
 
     # Make the grid (n_cells ~ 2**4 works well for 1e+4 ~ 1e+5 particles)
     grid = gsp.GriSPy(x, y, z, n_cells)
 
-    #Bruno:
+    # Bruno:
     # No uso la masa "m", pero ojo con los procedures en relación a los
     # demás métodos...
 
     return l_box, grid
 
 
-def potential_grispy(centre, x, y, z, m, softening,
-                     bubble_size, shell_width, l_box, grid):
+def potential_grispy(
+    centre, x, y, z, m, softening, bubble_size, shell_width, l_box, grid
+):
     """
     Compute the potential of a particle given the grid and the particles.
 
@@ -131,33 +130,32 @@ def potential_grispy(centre, x, y, z, m, softening,
         aproximation. Shape: (1,).
 
     """
-    #Bruno:
+    # Bruno:
     # En este caso no hace falta el potencial ¿O sí?
     # Lo cambié para que, si ya tiene potencial, largue error
-    #if galaxy.has_potential_:
+    # if galaxy.has_potential_:
     #    raise ValueError("galaxy already has the potential energy")
-    #Bruno:
+    # Bruno:
     # Entonces sí debería comer galaxias...
 
     # Use the bubble method to find the closest particles
     bubble_dist, bubble_ind = grid.bubble_neighbors(
-        centre,
-        distance_upper_bound=bubble_size
+        centre, distance_upper_bound=bubble_size
     )
 
     # Compute the potential contribution via direct-sumation
     # of these bubble's particles
-    pot_shells = 0.  # The potential variable.
+    pot_shells = 0.0  # The potential variable.
     for idx, distance in enumerate(bubble_dist[0]):
-        if distance > 0.:
-            pot_shells -= m[bubble_ind[0][idx]]/distance
+        if distance > 0.0:
+            pot_shells -= m[bubble_ind[0][idx]] / distance
         else:
             continue
 
-        #Bruno:
+        # Bruno:
         # Otra versión de esto (mucho más lenta, pero creo que correcta)
-        #d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
-        #pot_shells -= m[bubble_ind[0][idx]]/d_and_soft
+        # d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
+        # pot_shells -= m[bubble_ind[0][idx]]/d_and_soft
 
     d_min_shell = bubble_size  # Shell's lower limit to initialize the loop
     while d_min_shell < l_box:
@@ -165,17 +163,17 @@ def potential_grispy(centre, x, y, z, m, softening,
         shell_dist, shell_ind = grid.shell_neighbors(
             centre,
             distance_lower_bound=d_min_shell,
-            distance_upper_bound=d_min_shell + shell_width
+            distance_upper_bound=d_min_shell + shell_width,
         )
 
         # Compute the monopole potential contribution of this shell
         for idx, distance in enumerate(shell_dist[0]):
             # Due to non-periodicity, distance > 0 always
-            pot_shells -= m[shell_ind[0][idx]]/distance
+            pot_shells -= m[shell_ind[0][idx]] / distance
 
             # Otra versión de esto (mucho más lenta, pero creo que correcta)
-            #d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
-            #pot_shells -= m[shell_ind[0][idx]]/d_and_soft
+            # d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
+            # pot_shells -= m[shell_ind[0][idx]]/d_and_soft
 
         d_min_shell += shell_width  # Repeat for next shell (further away)
 

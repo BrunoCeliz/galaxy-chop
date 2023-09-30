@@ -104,7 +104,7 @@ def potential_grispy(
     ---------- *Revisar
     centre : np.array
         3D spatial position of the particle to compute its potential.
-        Shape: (n,3).
+        Shape: (1,3).
     x,y,z : np.array
         3D spatial position of all the galaxy particles. Shape: (n,3).
     m : np.array

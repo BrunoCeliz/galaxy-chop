@@ -9,6 +9,8 @@
 # =============================================================================
 
 import astropy.units as u
+ 
+from attr import validators
 
 import numpy as np
 
@@ -22,7 +24,8 @@ from .. import (
     core,
 )
 
-from ._base.py import ( hparam # D: aca importara algun ABC de la que hereda Potential
+from ._base.py import (
+    hparam,  # D: aca importara algun ABC de la que hereda Potential
 )
 
 try:
@@ -36,6 +39,7 @@ DEFAULT_POTENTIAL_BACKEND = "numpy" if potential_f is None else "fortran"
 # =============================================================================
 # BACKENDS
 # =============================================================================
+
 
 def fortran_potential(x, y, z, m, softening):
     """
@@ -143,6 +147,7 @@ def numpy_potential(x, y, z, m, softening):
 
     return mdist.sum(axis=1) * const.G, np.asarray
 
+
 # =============================================================================
 # API
 # =============================================================================
@@ -153,7 +158,8 @@ POTENTIAL_BACKENDS = {
     "numpy": numpy_potential,
 }
 
-class Potential(): # D: Hereda de un tentativo GalaxyTransformerABC ?
+
+class Potential:  # D: Hereda de un tentativo GalaxyTransformerABC ?
     """
     Potential energy calculation.
 
@@ -164,7 +170,7 @@ class Potential(): # D: Hereda de un tentativo GalaxyTransformerABC ?
     ----------
     galaxy : ``Galaxy class`` object
 
-    backends: 
+    backends:
 
     Returns
     -------
@@ -174,11 +180,13 @@ class Potential(): # D: Hereda de un tentativo GalaxyTransformerABC ?
 
     """
 
-    # Idea de implementacion 
+    # Idea de implementacion
     # pot = Potential(backend="frotran")
     # gal = pot.transform(gal)
     # D: no se si esto deberia ser un hiperparametro de la clase ?
-    backend = hparam(default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict))
+    backend = hparam(
+        default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
+    )
 
     def transform(self, galaxy, *, backend):
 
@@ -219,11 +227,9 @@ class Potential(): # D: Hereda de un tentativo GalaxyTransformerABC ?
         new = galaxy.disassemble()
 
         new.update(
-        potential_s=-pot_s * (u.km / u.s) ** 2,
-        potential_dm=-pot_dm * (u.km / u.s) ** 2,
-        potential_g=-pot_g * (u.km / u.s) ** 2,
+            potential_s=-pot_s * (u.km / u.s) ** 2,
+            potential_dm=-pot_dm * (u.km / u.s) ** 2,
+            potential_g=-pot_g * (u.km / u.s) ** 2,
         )
 
         return core.mkgalaxy(**new)
-
-

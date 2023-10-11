@@ -170,3 +170,5 @@ class JThreshold():
     @doc_inherit(GalaxyDecomposerABC.get_lmap)
     def get_lmap(self):
         return {0: "Spheroid", 1: "Disk"}
+
+        

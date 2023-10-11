@@ -1,9 +1,0 @@
-# Para dejar mis anotaciones/pensamientos por escrito acá, además de las físicas...
-
-@classmethod -> https://es.stackoverflow.com/questions/4626/para-qu%C3%A9-sirve-classmethod-en-python
-
-@uttrs.s / uttrs.ib() -> https://www.attrs.org/en/stable/examples.html
-
-De la clase (27/09/23) -> Hacer test de todo + debugg con ipdb + style con flake8/black.
-
-Comments en data.py -> Hay cosas que (desde un punta de vista naïve) se pueden hacer mejor.

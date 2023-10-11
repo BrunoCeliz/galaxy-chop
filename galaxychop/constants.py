@@ -22,20 +22,23 @@ import astropy.units as u
 # =============================================================================
 
 SD_DEFAULT_CBIN = (0.05, 0.005)
-"""Default binning of circularity for stellar dynamics calculation.
+"""
+Default binning of circularity for stellar dynamics calculation.
 
 Please check the documentation of ``galaxychop.circ.stellar_dynamics()``.
 
 """
 SD_DEFAULT_REASSIGN = False
-"""Default value to reassign the values of the particle stellar dynamics.
+"""
+Default value to reassign the values of the particle stellar dynamics.
 
 Please check the documentation of ``galaxychop.circ.stellar_dynamics()``.
 
 """
 
 SD_RUNTIME_WARNING_ACTION = "ignore"
-"""Default of "what-to-do" about the RuntimeWarning in stellar_dynamics \
+"""
+Default of "what-to-do" about the RuntimeWarning in stellar_dynamics \
 calculation.
 
 Please check the documentation of ``galaxychop.circ.stellar_dynamics()``.

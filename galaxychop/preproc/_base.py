@@ -14,7 +14,7 @@
 # DOCS
 # =============================================================================
 
-"""Common functionalities for potential energy calculation."""
+"""Common functionalities for galaxy preprocessing."""
 
 # =============================================================================
 # IMPORTS
@@ -34,9 +34,7 @@ from .. import (
     constants as consts,
     core,
 )
-
-#Bruno:
-# from ..core import sdynamics as sdyn <- Supongo que esto no
+from ..core import sdynamics as sdyn
 from ..utils import doc_inherit
 
 # =============================================================================
@@ -45,130 +43,143 @@ from ..utils import doc_inherit
 
 _PTYPES_ORDER = tuple(p.name.lower() for p in core.ParticleSetType)
 
-#Bruno:
-# Nada de "Results", copio y pego los ABC y vamos viendo como acoplar las \
-# funcionalidades a los calculadores de potenciales (!).
-# *PD: ¿Cómo chucha los llamo? ¿"Potential calculators"? ¿"Potential \
-# energy calculator"? Uso el 1ro y desp vemos...
+# =============================================================================
+# FUNCTIONS
+# =============================================================================
 
-#Bruno:
-# Quité el "Functions". Después nos enteraremos si lo queremos...
-# Plot twist, el ABC definido no me convenció para potenciales. \
-# Quizás no entendí la mecánica para aplicarlo a mi problema, pero \
-# métodos de "mask" o "attributes" acá no tienen sentido (aunque \
-# quizás si para los pre-procesadores...). Si ese cierto que el método \
-# "decompose" es el análogo que estoy buscando...
-# Meanwhile hagamos una clase no más, nada de ABCs (y revisar las \
-# slides de Juan).
-
-class JThreshold():
+def hparam(default, **kwargs):
     """
-    JThreshold class.
+    Create a hyper parameter for decomposers.
 
-    Implementation of galaxy dynamical decomposition model using only the
-    circularity parameter. Tissera et al.(2012) [2]_,
-    Marinacci et al.(2014) [3]_, Vogelsberger et al.(2014) [4]_,
-    Park et al.(2019) [5]_ .
+    By design decision, hyper-parameter is required to have a sensitive default
+    value.
 
     Parameters
     ----------
-    eps_cut : float, default=0.6
-        Cut-off value in the circularity parameter. Stellar particles with
-        eps > eps_cut are assigned to the disk and stellar particles with
-        eps <= eps_cut to the spheroid.
+    default :
+        Sensitive default value of the hyper-parameter.
+    **kwargs :
+        Additional keyword arguments are passed and are documented in
+        ``attr.ib()``.
+
+    Return
+    ------
+    Hyper parameter with a default value.
 
     Notes
     -----
-    Index of the cluster each stellar particles belongs to:
-        Index=0: correspond to galaxy spheroid.
-        Index=1: correspond to galaxy disk.
-
-    Examples
-    --------
-    Example of implementation.
-
-    >>> import galaxychop as gchop
-    >>> galaxy = gchop.read_hdf5(...)
-    >>> galaxy = gchop.utils.star_align(gchop.utils.center(galaxy))
-    >>> chopper = gchop.JThreshold()
-    >>> chopper.decompose(galaxy)
-
-    References
-    ----------
-    .. [2] Tissera, P. B., White, S. D. M., and Scannapieco, C.,
-        “Chemical signatures of formation processes in the stellar
-        populations of simulated galaxies”,
-        Monthly Notices of the Royal Astronomical Society, vol. 420, no. 1,
-        pp. 255-270, 2012. doi:10.1111/j.1365-2966.2011.20028.x.
-        `<https://ui.adsabs.harvard.edu/abs/2012MNRAS.420..255T/abstract>`_
-    .. [3] Marinacci, F., Pakmor, R., and Springel, V.,
-        “The formation of disc galaxies in high-resolution moving-mesh
-        cosmological simulations”, Monthly Notices of the Royal Astronomical
-        Society, vol. 437, no. 2, pp. 1750-1775, 2014.
-        doi:10.1093/mnras/stt2003.
-        `<https://ui.adsabs.harvard.edu/abs/2014MNRAS.437.1750M/abstract>`_
-    .. [4] Vogelsberger, M., “Introducing the Illustris Project: simulating
-        the coevolution of dark and visible matter in the Universe”,
-        Monthly Notices of the Royal Astronomical Society, vol. 444, no. 2,
-        pp. 1518-1547, 2014. doi:10.1093/mnras/stu1536.
-        `<https://ui.adsabs.harvard.edu/abs/2014MNRAS.444.1518V/abstract>`_
-    .. [5] Park, M.-J., “New Horizon: On the Origin of the Stellar Disk and
-        Spheroid of Field Galaxies at z = 0.7”, The Astrophysical Journal,
-        vol. 883, no. 1, 2019. doi:10.3847/1538-4357/ab3afe.
-        `<https://ui.adsabs.harvard.edu/abs/2019ApJ...883...25P/abstract>`_
-        
+    This function is a thin-wrapper over the attrs function ``attr.ib()``.
     """
-    eps_cut = hparam(default=0.6)
+    metadata = kwargs.pop("metadata", {})
+    metadata["__gchop_model_hparam__"] = True
+    return attr.ib(default=default, metadata=metadata, kw_only=True, **kwargs)
 
-    @eps_cut.validator
-    def check_eps_cut(self, attribute, value):
-        """
-        Eps_cut value validator.
+# =============================================================================
+# ABC
+# =============================================================================
 
-        This method validates that the value of eps_cut is in the interval
-        (-1,1).
-        
-        """
-        eps_cut = self.eps_cut
-        if eps_cut > 1.0 or eps_cut < -1.0:
-            raise ValueError(
-                "The cut-off value in the circularity parameter is not between"
-                f"(-1,1). Got eps_cut {eps_cut}"
-            )
+@attr.s(frozen=True, repr=False)
+class GalaxyTransformerABC(metaclass=abc.ABCMeta):
+    """
+    Abstract class to facilitate the creation of preprocessors 
+    (a.k.a. Transformers).
 
-    @doc_inherit(GalaxyDecomposerABC.get_attributes)
-    def get_attributes(self):
+    # Bruno: No en nuestro caso...
+    This class requests the redefinition of three methods: get_attributes,
+    get_rows_mask and split.
+
+    # Bruno: No en nuestro caso...
+    Parameters
+    ----------
+    cbins : tuple
+        It contains the two widths of bins necessary for the calculation of the
+        circular angular momentum.  Shape: (2,). Dafult value = (0.05, 0.005).
+    reassign : list
+        It allows to define what to do with stellar particles with circularity
+        parameter values >1 or <-1. Default value = [False].
+
+    """
+    # Bruno:
+    # Si nos interesan estas cosas ¿Qué nos interesa para los preprocesadores?
+    # A center, align y potential le interesan únicamente que las partículas \
+    # tengan potencial, pero nada de si son estrellas o no... Por lo menos \
+    # en común, porque no se alinean las partículas de DM...
+    __gchop_model_cls_config__ = {"repr": False, "frozen": True}
+
+    # Bruno:
+    # El hparam debería usarlo la Clase Potential (para el backend)...
+
+    # block meta checks =======================================================
+    def __init_subclass__(cls):
         """
-        Notes
-        -----
-        In this model the parameter space is given by
-            eps: circularity parameter (J_z/J_circ).
+        Initiate of subclasses.
+
+        It ensures that every inherited class is decorated by ``attr.s()`` and
+        assigns as class configuration the parameters defined in the class
+        variable `__gchop_model_cls_config__`.
+
+        In other words it is slightly equivalent to:
+
+        .. code-block:: python
+
+            @attr.s(**GalaxyDecomposerABC.__gchop_model_cls_config__)
+            class Decomposer(GalaxyDecomposerABC):
+                pass
+
+        """
+        model_config = getattr(cls, "__gchop_model_cls_config__")
+        attr.s(maybe_cls=cls, **model_config)
+        # ¿Acá no debería cambiar "_model_" por e.g. "_method_"?
+
+    # block  to implement in every method =====================================
+
+    # Bruno:
+    # Again, acá no hay ningún atributo para sacar ni necesitamos \
+    # maskear nada. Pero como no hay que popular componentes, el \
+    # método de todos los preprocesadores lo pongo acá (!)
+    @abc.abstractmethod
+    def transform(self, galaxy):
+        """
+        Preprocess method.
+
+        Transform the particles attributes values (position, 
+        potential energy, etc).
+        Validation of the input galaxy instance.
+
+        Parameters
+        ----------
+        galaxy : ``Galaxy class`` object
+            Instance of Galaxy class.
+
+        Return
+        ------
+        galaxy : ``Galaxy class`` object
+            Instance of Galaxy class, with the result of the 
+            preprocessing manipulation.
             
         """
-        return ["eps"]
+        raise NotImplementedError()
 
-    @doc_inherit(GalaxyDecomposerABC.split)
-    def split(self, X, y, attributes):
-        """
-        Notes
-        -----
-        The attributes used by the model are described in detail in the class
-        documentation.
-        
-        """
-        eps_cut = self.eps_cut
+    # internal ================================================================
 
-        esf_idx = np.where(X <= eps_cut)[0]
-        disk_idx = np.where(X > eps_cut)[0]
+    def __repr__(self):
+        """x.__repr__() <==> repr(x)."""
+        clsname = type(self).__name__
 
-        labels = np.empty(len(X), dtype=int)
-        labels[esf_idx] = 0
-        labels[disk_idx] = 1
+        selfd = attr.asdict(
+            self,
+            recurse=False,
+            filter=lambda attr, _: attr.repr,
+        )
+        attrs_str = ", ".join([f"{k}={repr(v)}" for k, v in selfd.items()])
+        return f"{clsname}({attrs_str})"
 
-        return labels, None
+    # API =====================================================================
+    
+    # Bruno:
+    # En nuestro caso no necesitamos una "attributes_matrix", ni
+    # "rellenar labels/values". Y llevo el decompose arriba...
 
-    @doc_inherit(GalaxyDecomposerABC.get_lmap)
-    def get_lmap(self):
-        return {0: "Spheroid", 1: "Disk"}
-
-        
+# Bruno:
+# No dejo el Mixin porque no hay mask que aplicarle a las \
+# partículas en el potencial -> Utilizo todas

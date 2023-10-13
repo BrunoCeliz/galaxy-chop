@@ -14,7 +14,7 @@
 # IMPORTS
 # =============================================================================
 
-#Bruno:
+# Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
 from .pcenter import center, is_centered
 from .potential_energy import potential
@@ -37,11 +37,12 @@ __all__ = [
 # FUNCTIONS
 # =============================================================================
 
-#Bruno:
+# Bruno:
 # ¿Esto era lo otro que molestaba? Deberíamos repetir un _base.py con un ABC \
 # para estos pre-procesadores y unificar. Además, agregar el Octree + la \
 # integración de C (Cython u otro)...
 # ¡El r_cut puede ser un hparam!
+
 
 def center_and_align(galaxy, *, r_cut=None):
     """
@@ -70,7 +71,8 @@ def center_and_align(galaxy, *, r_cut=None):
 
     return aligned
 
-#Bruno:
+
+# Bruno:
 # Ídem para "rtol" y "atol"...
 def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     """

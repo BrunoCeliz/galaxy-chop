@@ -1,4 +1,4 @@
-#Bruno:
+# Bruno:
 # Supongo que uno de los scopes de este glow-up a GlxChop \
 # tiene que ver con repetir el procedimiento del _base.py \
 # de la carpeta /models. Así que acá debería ~recrear esa \
@@ -47,6 +47,7 @@ _PTYPES_ORDER = tuple(p.name.lower() for p in core.ParticleSetType)
 # FUNCTIONS
 # =============================================================================
 
+
 def hparam(default, **kwargs):
     """
     Create a hyper parameter for decomposers.
@@ -74,14 +75,16 @@ def hparam(default, **kwargs):
     metadata["__gchop_model_hparam__"] = True
     return attr.ib(default=default, metadata=metadata, kw_only=True, **kwargs)
 
+
 # =============================================================================
 # ABC
 # =============================================================================
 
+
 @attr.s(frozen=True, repr=False)
 class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     """
-    Abstract class to facilitate the creation of preprocessors 
+    Abstract class to facilitate the creation of preprocessors
     (a.k.a. Transformers).
 
     # Bruno: No en nuestro caso...
@@ -99,6 +102,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         parameter values >1 or <-1. Default value = [False].
 
     """
+
     # Bruno:
     # Si nos interesan estas cosas ¿Qué nos interesa para los preprocesadores?
     # A center, align y potential le interesan únicamente que las partículas \
@@ -122,8 +126,8 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
 
         .. code-block:: python
 
-            @attr.s(**GalaxyDecomposerABC.__gchop_model_cls_config__)
-            class Decomposer(GalaxyDecomposerABC):
+            @attr.s(**GalaxyTransformerABC.__gchop_model_cls_config__)
+            class Transformer(GalaxyTransformerABC):
                 pass
 
         """
@@ -142,7 +146,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         """
         Preprocess method.
 
-        Transform the particles attributes values (position, 
+        Transform the particles attributes values (position,
         potential energy, etc).
         Validation of the input galaxy instance.
 
@@ -154,9 +158,9 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         Return
         ------
         galaxy : ``Galaxy class`` object
-            Instance of Galaxy class, with the result of the 
+            Instance of Galaxy class, with the result of the
             preprocessing manipulation.
-            
+
         """
         raise NotImplementedError()
 
@@ -173,13 +177,5 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         )
         attrs_str = ", ".join([f"{k}={repr(v)}" for k, v in selfd.items()])
         return f"{clsname}({attrs_str})"
-
-    # API =====================================================================
     
-    # Bruno:
-    # En nuestro caso no necesitamos una "attributes_matrix", ni
-    # "rellenar labels/values". Y llevo el decompose arriba...
-
-# Bruno:
-# No dejo el Mixin porque no hay mask que aplicarle a las \
-# partículas en el potencial -> Utilizo todas
+# B: Todo lo demás sobra(ba).

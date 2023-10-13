@@ -18,7 +18,6 @@ import os
 
 
 def check(exe, recompilar=True):
-
     if not os.path.exists("%s.so" % exe) or recompilar:
         print("Compile %s.c" % exe)
         comando = "gcc -c -O3 -fPIC -Wall -lm -fopenmp %s.c -o %s.o" % (
@@ -41,7 +40,6 @@ def check(exe, recompilar=True):
 
 
 def calcula_potencial(Npart, mp, x, y, z):
-
     array_1d_float = npct.ndpointer(
         dtype=np.float32, ndim=1, flags="C_CONTIGUOUS"
     )

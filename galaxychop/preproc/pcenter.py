@@ -14,108 +14,136 @@
 # IMPORTS
 # =============================================================================
 
+# B: Remember que a todo esto lo queremos hacer clases, así que probemos!
 import numpy as np
 
-from ..core import data
+# B: Me falta importar de las otras carpetas...
+from ._base import GalaxyTransformerABC, hparam
+from ..core import (
+    data,
+    NoGravitationalPotentialError
+)
+from ..utils import doc_inherit
 
 # =============================================================================
 # BACKENDS
 # =============================================================================
 
-def center(galaxy):
+
+class Centralizer(GalaxyTransformerABC):
     """
-    Galaxy particle centering.
+    # B: Polémico... Revisar análogos de clase en ../models \
+    # y supongo que suar la doc de la func acá? ¿Y que le queda \
+    # al método entonces?
 
-    Centers the position of all galaxy particles respect to the position of the
-    lowest potential particle.
-
-    Parameters
-    ----------
-    galaxy : ``Galaxy class`` object
-
-    Returns
-    -------
-    galaxy : new ``Galaxy class`` object
-        A new galaxy object with centered positions respect to the position of
-        the lowest potential particle.
-        
     """
-    if not galaxy.has_potential_:
-        raise NoGravitationalPotentialError(
-            "galaxy must have the potential energy"
-        )
-    #Bruno:
-    # Poner el "NoGravPot" como error, con el mismo sms que antes ¿Sigue \
-    # valiendo?
+    # B: Decoro (siguiendo la metodología de ../models) con el abc...
+    # ¿Pero queremos? No parece ser muy útil la docs def en el ABC.
+    # Por ahora, copio la func en el método...
+    @doc_inherit(GalaxyTransformerABC.transform)
+    def transform(self, galaxy, *):
+        """
+        Galaxy particle centering.
 
-    # We extract only the needed column to centrer the galaxy
-    df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z", "potential"])
+        Centers the position of all galaxy particles respect to the position 
+        of the lowest potential particle.
 
-    # minimum potential index of all particles and we extract data frame row
-    minpot_idx = df.potential.argmin()
-    min_values = df.iloc[minpot_idx]
+        Parameters
+        ----------
+        galaxy : ``Galaxy class`` object
 
-    # We subtract all position columns by the position with the lowest
-    # potential value and replace this new position columns on dataframe
-    columns = ["x", "y", "z"]
-    df[columns] = df[columns] - min_values[columns]
+        Returns
+        -------
+        galaxy : new ``Galaxy class`` object
+            A new galaxy object with centered positions respect to the position of
+            the lowest potential particle.
 
-    # We split the dataframe by particle type.
-    stars = df[df.ptypev == data.ParticleSetType.STARS.value]
-    dark_matter = df[df.ptypev == data.ParticleSetType.DARK_MATTER.value]
-    gas = df[df.ptypev == data.ParticleSetType.GAS.value]
+        """
+        if not galaxy.has_potential_:
+            raise NoGravitationalPotentialError(
+                "galaxy must have the potential energy"
+            )
 
-    # patch
-    new = galaxy.disassemble()
+        # B: Cosa -> Así como para el cálculo de potencial, 
+        # esto "desarma" galaxias y manipula sus atributos
+        # i.e. en una pipeline no queremos ese behaviour...
 
-    new.update(
-        x_s=stars.x.to_numpy(),
-        y_s=stars.y.to_numpy(),
-        z_s=stars.z.to_numpy(),
-        x_dm=dark_matter.x.to_numpy(),
-        y_dm=dark_matter.y.to_numpy(),
-        z_dm=dark_matter.z.to_numpy(),
-        x_g=gas.x.to_numpy(),
-        y_g=gas.y.to_numpy(),
-        z_g=gas.z.to_numpy(),
-    )
+        # We extract only the needed column to centrer the galaxy
+        df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z", "potential"])
 
-    return data.mkgalaxy(**new)
-    #Bruno:
-    # No entendí qué retorna, qué implica ese "disassemble" y ese "update" \
-    # ¿Por qué los "**" antes del "new"?
+        # minimum potential index of all particles and we extract data frame row
+        minpot_idx = df.potential.argmin()
+        min_values = df.iloc[minpot_idx]
 
+        # We subtract all position columns by the position with the lowest
+        # potential value and replace this new position columns on dataframe
+        columns = ["x", "y", "z"]
+        df[columns] = df[columns] - min_values[columns]
 
-def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
-    """
-    Validate if the galaxy is centered.
+        # We split the dataframe by particle type.
+        stars = df[df.ptypev == data.ParticleSetType.STARS.value]
+        dark_matter = df[df.ptypev == data.ParticleSetType.DARK_MATTER.value]
+        gas = df[df.ptypev == data.ParticleSetType.GAS.value]
 
-    Parameters
-    ----------
-    galaxy : ``Galaxy class`` object
-    rtol : float
-        Relative tolerance. Default value = 1e-05.
-    atol : float
-        Absolute tolerance. Default value = 1e-08.
+        # patch
+        new = galaxy.disassemble()
 
-    Returns
-    -------
-    bool
-        True if galaxy is centered respect to the position of the lowest
-        potential particle, False otherwise.
-        
-    """
-    if not galaxy.has_potential_:
-        raise NoGravitationalPotentialError(
-            "galaxy must have the potential energy"
+        # B: Así en gral, ¿No faltan "self"s? Digo, parece que \
+        # dentro de estos métodos de clase casi ni usamos "self" \
+        # y en mi cabeza se deebría usar mucho más...
+        new.update(
+            x_s=stars.x.to_numpy(),
+            y_s=stars.y.to_numpy(),
+            z_s=stars.z.to_numpy(),
+            x_dm=dark_matter.x.to_numpy(),
+            y_dm=dark_matter.y.to_numpy(),
+            z_dm=dark_matter.z.to_numpy(),
+            x_g=gas.x.to_numpy(),
+            y_g=gas.y.to_numpy(),
+            z_g=gas.z.to_numpy(),
         )
 
-    # We extract only the needed column to centrer the galaxy
-    df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])
+        # Bruno:
+        # No entendí qué retorna, qué implica ese "disassemble" y ese "update" \
+        # ¿Por qué los "**" antes del "new"?
+        return data.mkgalaxy(**new)
 
-    # minimum potential index of all particles and we extract data frame row
-    minpot_idx = df.potential.argmin()
-    min_values = df.iloc[minpot_idx]
 
-    # we check if the most bounded particle is (0,0,0)
-    return np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
+    # B: ¿Esta func la quiero como método? Como es un "centralizer", \
+    # lo dejemos adentro...
+    # Y este vuelve a desarmar la galaxia ¿Sería mejor que cada clase \
+    # se encargue de sarmar la glx y desp le pasa a c/ método los \
+    # parámetros de intereés?...
+    def is_centered(self, galaxy, *, rtol=1e-05, atol=1e-08):
+        """
+        Validate if the galaxy is centered.
+
+        Parameters
+        ----------
+        galaxy : ``Galaxy class`` object
+        rtol : float
+            Relative tolerance. Default value = 1e-05.
+        atol : float
+            Absolute tolerance. Default value = 1e-08.
+
+        Returns
+        -------
+        bool
+            True if galaxy is centered respect to the position of the lowest
+            potential particle, False otherwise.
+
+        """
+        if not galaxy.has_potential_:
+            raise NoGravitationalPotentialError(
+                "galaxy must have the potential energy"
+            )
+
+        # We extract only the needed column to centrer the galaxy
+        df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])
+
+        # minimum potential index of all particles and we extract data frame row
+        minpot_idx = df.potential.argmin()
+        min_values = df.iloc[minpot_idx]
+
+        # we check if the most bounded particle is (0,0,0)
+        return np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)

@@ -1,3 +1,9 @@
+# This file is part of
+# the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
+# Copyright (c) Cristiani, et al. 2021, 2022, 2023
+# License: MIT
+# Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
+
 # =============================================================================
 # DOCS
 # =============================================================================
@@ -9,7 +15,7 @@
 # =============================================================================
 
 import astropy.units as u
- 
+
 from attr import validators
 
 import numpy as np
@@ -184,12 +190,14 @@ class Potential:  # D: Hereda de un tentativo GalaxyTransformerABC ?
     # pot = Potential(backend="frotran")
     # gal = pot.transform(gal)
     # D: no se si esto deberia ser un hiperparametro de la clase ?
+
+    # B: Según Juan, esto debería ser ya el "default_backend" y \
+    # tendríamos que validar si es una llave del dict de backends...
     backend = hparam(
         default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
     )
 
     def transform(self, galaxy, *, backend):
-
         if galaxy.has_potential_:
             raise ValueError("galaxy potential is already calculated")
 

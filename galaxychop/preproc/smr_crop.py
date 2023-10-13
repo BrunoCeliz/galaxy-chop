@@ -91,7 +91,7 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
 
     del trim_stars_df
 
-    #Bruno:
+    # Bruno:
     # Si cortamos las estrellas hasta 3r_half, ¿Por qué no al gas? ;
     # Además, también se podrían agregar otros cortes (e.g. Einasto, \
     # NFW, half light radii (!, aunque para ello debería considerarse \

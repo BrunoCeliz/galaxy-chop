@@ -57,7 +57,7 @@ def _get_rot_matrix(m, x, y, z, Jx, Jy, Jz, r_cut):
     -------
     A : np.ndarray
         Rotation matrix. Shape: (3,3).
-        
+
     """
     mask = _make_mask(x, y, z, r_cut)
 
@@ -109,7 +109,7 @@ def star_align(galaxy, *, r_cut=None):
     galaxy: new ``Galaxy class`` object
         A new galaxy object with their total angular momentum aligned with the
         z-axis.
-        
+
     """
     if r_cut is not None and r_cut <= 0.0:
         raise ValueError("r_cut must not be lower than 0.")
@@ -199,7 +199,7 @@ def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         True if galaxy is centered respect to the position of the lowest
         potential particle, and if the total angular momentum of the galaxy
         is aligned with the z-axis, False otherwise.
-        
+
     """
     # Now we extract only the needed column to rotate the galaxy
     df = galaxy.stars.to_dataframe(

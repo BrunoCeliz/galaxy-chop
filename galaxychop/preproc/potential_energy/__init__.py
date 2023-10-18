@@ -31,7 +31,7 @@ from .. import (
 )
 
 from ._base.py import (
-    hparam,  # D: aca importara algun ABC de la que hereda Potential
+    hparam, GalaxyTransformerABC 
 )
 
 try:
@@ -165,7 +165,7 @@ POTENTIAL_BACKENDS = {
 }
 
 
-class Potential:  # D: Hereda de un tentativo GalaxyTransformerABC ?
+class Potential(GalaxyTransformerABC):  # D: Hereda de un tentativo GalaxyTransformerABC ?
     """
     Potential energy calculation.
 
@@ -189,20 +189,33 @@ class Potential:  # D: Hereda de un tentativo GalaxyTransformerABC ?
     # Idea de implementacion
     # pot = Potential(backend="frotran")
     # gal = pot.transform(gal)
-    # D: no se si esto deberia ser un hiperparametro de la clase ?
 
     # B: Según Juan, esto debería ser ya el "default_backend" y \
+    
+    
+    # D: saco hparam(
+    #    default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
+    #) 
+    # D: puse como default numpy
     # tendríamos que validar si es una llave del dict de backends...
-    backend = hparam(
-        default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
-    )
+    # D: de esta forma podria ser?
+    def __init__(self, backend="numpy"):
+        self.backend = backend
+        if self.backend in POTENTIAL_BACKENDS:
+            raise TypeError("The backend entered is not in the possible Backends")
+        if self.backend == "octree":
+            raise NotImplementedError("An implementation has not yet been provided")
+        else:   
+            pass
 
-    def transform(self, galaxy, *, backend):
+
+    def transformer(self, galaxy, *): #Le puse transformer porque la clase madre \
+        #  GalaxyTransformerABC tiene un metodo transform
         if galaxy.has_potential_:
             raise ValueError("galaxy potential is already calculated")
 
         # extract the implementation
-        backend_function = POTENTIAL_BACKENDS[backend]
+        backend_function = POTENTIAL_BACKENDS[self.backend]
 
         # convert the galaxy in multiple arrays
         df = galaxy.to_dataframe(attributes=["x", "y", "z", "m", "softening"])

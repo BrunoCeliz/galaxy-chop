@@ -53,6 +53,7 @@ REQUIREMENTS = [
     "h5py",
     "custom_inherit",
     "seaborn",
+    "grispy",
 ]
 
 # =============================================================================
@@ -77,9 +78,11 @@ setup(
     url="https://github.com/vcristiani/galaxy-chop",
     packages=[
         "galaxychop",
+        "galaxychop.core",
         "galaxychop.models",
         "galaxychop.preproc",
-        "galaxychop.preproc.fortran",
+        "galaxychop.preproc.potential_energy",
+        "galaxychop.preproc.potential_energy.fortran",
         "galaxychop.utils",
     ],
     license="MIT",
@@ -95,6 +98,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
     ],

@@ -131,13 +131,13 @@ class ParticleSet:
         converter=(lambda v: np.copy(v) if v is not None else v),
         repr=False,
     )
-    #Bruno:
+    # Bruno:
     # Comment de potential -> Si le doy un array "malo" (a.k.a. todos zeros \
     # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
     # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(converter=float, repr=False)
-    #Bruno:
+    # Bruno:
     # Commnet del softening -> Debe tener las mismas unidades de x,y,z, \
     # porque es lo que se usa para calcular el potencial después...
 
@@ -413,13 +413,12 @@ class Galaxy:
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
         return f"<Galaxy {stars_repr}, {dm_repr}, {gas_repr}, {has_pot}>"
-        #Bruno:
+        # Bruno:
         # Cuando ocurra el caso de que haya partículas con y otras sin \
         # potencial -> Debería devolver un warning + un False en vez de \
         # un error (como que "hubo un error con el potencial, así que lo \
         # ignoramos y te lo seteamos en False). Así de paso no se corta \
         # el proceso...
-    
 
     # UTILITIES ===============================================================
 
@@ -476,7 +475,7 @@ class Galaxy:
             ``astropy.io.misc.hdf5.write_table_hdf5()``
 
         """
-        #Bruno:
+        # Bruno:
         # Todo lo que sea, pero por lo gral cuando alguien pide \
         # un .hdf5 creo que es mejor que tenga la mayor cantidad \
         # de info posible (véase todos los datos del post-procesado \
@@ -562,7 +561,7 @@ class Galaxy:
 
         disassembled = dict(**stars_kws, **dark_matter_kws, **gas_kws)
         return disassembled
-        #Bruno:
+        # Bruno:
         # Acá *quizás* estaría bueno retornar 3 dics separados en vez \
         # de uno con todo mezclado, si no, ¿Para qué la desarmé?
 
@@ -647,11 +646,11 @@ class Galaxy:
                 self.dark_matter.potential,
                 self.gas.potential,
             )
-        #Bruno:
+        # Bruno:
         # else? ; Aprovechando que está el nuevo Error, debería estar acá...
         # Lo probemos...
         else:
-            raise NoGravitationalPotentialError # ¿Así? Probar...
+            raise NoGravitationalPotentialError  # ¿Así? Probar...
 
     @property
     def total_energy_(self):
@@ -683,7 +682,7 @@ class Galaxy:
                 self.dark_matter.total_energy_,
                 self.gas.total_energy_,
             )
-        #Bruno: Repito...
+        # Bruno: Repito...
         else:
             raise NoGravitationalPotentialError
 
@@ -765,7 +764,7 @@ class Galaxy:
             Circularity attributes of the star components of the galaxy
         #Bruno:
         # No me gustó (aunque creo que no entendí qué hace sdynamics.py)
-        # ¿Por qué no poner bien qué devuelve, en vez de este nombre que 
+        # ¿Por qué no poner bien qué devuelve, en vez de este nombre que
         # aparenta ser una clase?
 
         Notes

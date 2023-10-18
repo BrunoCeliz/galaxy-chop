@@ -142,8 +142,10 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     # maskear nada. Pero como no hay que popular componentes, el \
     # método de todos los preprocesadores lo pongo acá (!)
     @abc.abstractmethod
-    def transform(self, galaxy): # D. esta bien que se llame igual que el metodo de Potential?
-    # cambio metodo del potential a transformer
+    def transform(
+        self, galaxy
+    ):  # D. esta bien que se llame igual que el metodo de Potential?
+        # cambio metodo del potential a transformer
         """
         Preprocess method.
 
@@ -164,7 +166,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
 
         """
         # D: aca iria el checheo de que los atributos sea lo que tiene que ser?
-    
+
         raise NotImplementedError()
 
     # internal ================================================================
@@ -180,5 +182,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         )
         attrs_str = ", ".join([f"{k}={repr(v)}" for k, v in selfd.items()])
         return f"{clsname}({attrs_str})"
-    
+
+
 # B: Todo lo demás sobra(ba).

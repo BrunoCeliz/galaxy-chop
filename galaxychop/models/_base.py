@@ -95,7 +95,7 @@ class Components:
             lens.add(len(self.probabilities))
         if len(lens) > 1:
             raise ValueError("All length must be the same")
-        #Bruno:
+        # Bruno:
         # El sms de error puede ser mejor, ¿no?
 
     def map_labels(self, lmap=None):
@@ -356,7 +356,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     # block  to implement in every method =====================================
 
-    #Bruno:
+    # Bruno:
     # "NotImplemented" porque es un WIP/to-do?
     @abc.abstractmethod
     def get_attributes(self):
@@ -370,7 +370,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()
 
-    #Bruno:
+    # Bruno:
     # Ojo con las variables 'X' e 'y'... ¿Falta "Shape: (...;...)"?
     @abc.abstractmethod
     def get_rows_mask(self, X, y, attributes):
@@ -397,7 +397,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         -------
         mask : nd.array(m_particles)
             Mask only with valid values to operate the clustering.
-            
+
         """
         raise NotImplementedError()
 
@@ -424,7 +424,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             Probabilities of the particles to belong to each component, in case
             the dynamic decomposition model includes them. Otherwise it adopts
             the value None.
-            
+
         """
         raise NotImplementedError()
 
@@ -471,7 +471,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         # GAS
         gas_rows = len(galaxy.gas)
         gas_nans = np.full(gas_rows, np.nan)
-        #Bruno:
+        # Bruno:
         # Si el gas no interesa en la descomposición dinámica \
         # ¿Por qué se normaliza según la partícula de mayor energía/ \
         # momento angular y no según la ESTRELLA de mayor E/Jz? Rev...
@@ -481,7 +481,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
         gas_df = pd.DataFrame(gas_columns)
 
-        #Bruno:
+        # Bruno:
         # Entonces, este método hace que cualquier descomponedor \
         # calcule la stellar dynamics de la galaxia, ¿no? Luego, \
         # ¿Para qué agregar DM y gas entonces? ¿O es por completitud \
@@ -512,7 +512,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             1D array where is identified the nature of each particle:
             0 = STARS, 1=DM, 2=Gas. n_particles is the total number of
             particles.
-            
+
         """
         # first we split the attributes between the ones from circularity
         # and the ones from "galaxy.to_dataframe()"
@@ -541,7 +541,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
                 ptypes=_PTYPES_ORDER, attributes=df_attrs
             )
             result.append(dfgal)
-        #Bruno:
+        # Bruno:
         # ¿Dónde está el "df_attrs"?
 
         # If we have JCIRC attributes =========================================
@@ -557,11 +557,11 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
         # remove if ptypev is duplicated
         df = df.loc[:, ~df.columns.duplicated()]
-        
+
         # separate matrix and classes
         X = df[attributes].to_numpy()
         y = df.ptypev.to_numpy()
-        
+
         return X, y
 
     def complete_labels(self, X, labels, rows_mask):
@@ -630,11 +630,11 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             total number of particles. Particles that do not belong to any
             component are assigned the label Nan. This method returns None in
             case the clustering method returns None probabilities.
-            
+
         """
         if probs is None:
             return None
-        #Bruno:
+        # Bruno:
         # ¿Debería agregarse un sms que avise que no están las probs?
 
         # the number of particles are incorrect so we simple remove the data
@@ -673,7 +673,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         Components :
             Instance of the ``Component class``, with the result of the dynamic
             decomposition.
-            
+
         """
         attributes = self.get_attributes()
 

@@ -25,6 +25,7 @@ from ..utils import doc_inherit
 # KNN
 # =============================================================================
 
+
 class KMeans(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
     """
     KMeans class.
@@ -73,8 +74,9 @@ class KMeans(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
     .. [6] Pedregosa et al., Journal of Machine Learning Research 12,
         pp. 2825-2830, 2011.
         `<https://jmlr.csail.mit.edu/papers/v12/pedregosa11a.html>`_
-        
+
     """
+
     n_components = hparam(default=2)
     init = hparam(default="k-means++")
     n_init = hparam(default=10)
@@ -93,7 +95,7 @@ class KMeans(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
             normalized_star_energy: normalized specific energy of the stars
             eps: circularity parameter (J_z/J_circ)
             eps_r: projected circularity parameter (J_p/J_circ).
-            
+
         """
         return ["normalized_star_energy", "eps", "eps_r"]
 
@@ -104,7 +106,7 @@ class KMeans(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
         -----
         The attributes used by the kmeans model are described in detail in the
         class documentation.
-        
+
         """
         random_state = np.random.RandomState(self.random_state.bit_generator)
 

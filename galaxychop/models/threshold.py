@@ -80,8 +80,9 @@ class JThreshold(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
         Spheroid of Field Galaxies at z = 0.7”, The Astrophysical Journal,
         vol. 883, no. 1, 2019. doi:10.3847/1538-4357/ab3afe.
         `<https://ui.adsabs.harvard.edu/abs/2019ApJ...883...25P/abstract>`_
-        
+
     """
+
     eps_cut = hparam(default=0.6)
 
     @eps_cut.validator
@@ -91,7 +92,7 @@ class JThreshold(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
 
         This method validates that the value of eps_cut is in the interval
         (-1,1).
-        
+
         """
         eps_cut = self.eps_cut
         if eps_cut > 1.0 or eps_cut < -1.0:
@@ -107,7 +108,7 @@ class JThreshold(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
         -----
         In this model the parameter space is given by
             eps: circularity parameter (J_z/J_circ).
-            
+
         """
         return ["eps"]
 
@@ -118,7 +119,7 @@ class JThreshold(DynamicStarsDecomposerMixin, GalaxyDecomposerABC):
         -----
         The attributes used by the model are described in detail in the class
         documentation.
-        
+
         """
         eps_cut = self.eps_cut
 

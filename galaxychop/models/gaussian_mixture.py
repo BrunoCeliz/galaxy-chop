@@ -99,7 +99,7 @@ class DynamicStarsGaussianDecomposerABC(
             normalized_star_energy: normalized specific energy of the stars
             eps: circularity parameter (J_z/J_circ)
             eps_r: projected circularity parameter (J_p/J_circ).
-            
+
         """
         return ["normalized_star_energy", "eps", "eps_r"]
 
@@ -147,8 +147,9 @@ class GaussianMixture(DynamicStarsGaussianDecomposerABC):
         Monthly Notices of the Royal Astronomical Society, vol. 477, no. 4,
         pp. 4915-4930, 2018. doi:10.1093/mnras/sty1022.
         `<https://ui.adsabs.harvard.edu/abs/2018MNRAS.477.4915O/abstract>`_
-        
+
     """
+
     n_components = hparam(default=2)
 
     @doc_inherit(GalaxyDecomposerABC.split)
@@ -231,8 +232,9 @@ class AutoGaussianMixture(DynamicStarsGaussianDecomposerABC):
         Using Unsupervised Machine Learning”, The Astrophysical Journal,
         vol. 884, no. 2, 2019. doi:10.3847/1538-4357/ab43cc.
         `<https://ui.adsabs.harvard.edu/abs/2019ApJ...884..129D/abstract>`_
-        
+
     """
+
     c_bic = hparam(default=0.1)
     n_jobs = hparam(default=None)
 

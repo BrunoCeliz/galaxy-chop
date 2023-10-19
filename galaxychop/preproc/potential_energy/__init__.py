@@ -20,7 +20,7 @@ from attr import validators
 
 import numpy as np
 
-from .grispy_potential import (
+from .grispy_calculation import (
     make_grid,
     potential_grispy,
 )
@@ -28,13 +28,10 @@ from .grispy_potential import (
 from .. import (
     constants as const,
     core,
-    _base,
 )
 
-from _base import (
-    GalaxyTransformerABC,
-    hparam,
-)
+# Bruno: -> hparam not used (yet)
+from _base import GalaxyTransformerABC
 
 try:
     from .fortran import potential as potential_f
@@ -74,7 +71,7 @@ def fortran_potential(x, y, z, m, softening):
     return epot * const.G, np.asarray
 
 
-def grispy_potential(x, y, z, m, softening):
+def grispy_calculation(x, y, z, m, softening):
     """
     GriSPy implementation of the gravitational potential energy calculation.
 
@@ -162,12 +159,14 @@ def numpy_potential(x, y, z, m, softening):
 
 POTENTIAL_BACKENDS = {
     "fortran": fortran_potential,
-    "grispy": grispy_potential,
+    "grispy": grispy_calculation,
     "numpy": numpy_potential,
 }
 
 
-class Potential(GalaxyTransformerABC):  # D: Hereda de un tentativo GalaxyTransformerABC ?
+class Potential(
+    GalaxyTransformerABC
+):  # D: Hereda de un tentativo GalaxyTransformerABC ?
     """
     Potential energy calculation.
 
@@ -193,27 +192,31 @@ class Potential(GalaxyTransformerABC):  # D: Hereda de un tentativo GalaxyTransf
     # gal = pot.transform(gal)
 
     # B: Según Juan, esto debería ser ya el "default_backend" y \
-    
-    
+
     # D: saco hparam(
     #    default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
-    #) 
+    # )
     # D: puse como default numpy
     # tendríamos que validar si es una llave del dict de backends...
     # D: de esta forma podria ser?
     def __init__(self, backend="numpy"):
         self.backend = backend
         if self.backend in POTENTIAL_BACKENDS:
-            raise TypeError("The backend entered is not in the possible Backends")
+            raise TypeError(
+                "The backend entered is not in the possible Backends"
+            )
         if self.backend == "octree":
-            raise NotImplementedError("An implementation has not yet been provided")
-        else:   
+            raise NotImplementedError(
+                "An implementation has not yet been provided"
+            )
+        else:
             pass
-
 
     # Bruno:
     # Again, le saco el "*" porque me tira error... (tanto en Py3.8 como Py3.11)
-    def transformer(self, galaxy): #Le puse transformer porque la clase madre \
+    def transformer(
+        self, galaxy
+    ):  # Le puse transformer porque la clase madre \
         #  GalaxyTransformerABC tiene un metodo transform
         if galaxy.has_potential_:
             raise ValueError("galaxy potential is already calculated")

@@ -16,12 +16,23 @@
 
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
-from ._base import *
+"""from ._base import (
+    _PTYPES_ORDER,
+    hparam,
+    GalaxyTransformerABC,
+)"""  # Bruno: ¿"imported but unused"? ¿Y el resto de imports?
 from .pcenter import Centralizer
-from .potential_energy import *
 from .salign import is_star_aligned, star_align
 from .smr_crop import half_star_mass_radius_crop
 
+"""from .potential_energy import (
+    POTENTIAL_BACKENDS,
+    DEFAULT_POTENTIAL_BACKEND,
+    Potential,
+    fortran_potential,
+    grispy_potential,
+    numpy_potential,
+)"""  # Bruno: ¿"imported but unused"? ¿Y el resto de imports?
 
 # Bruno:
 # Acomodar...

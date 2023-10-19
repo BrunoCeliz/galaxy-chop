@@ -356,8 +356,6 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
     # block  to implement in every method =====================================
 
-    # Bruno:
-    # "NotImplemented" porque es un WIP/to-do?
     @abc.abstractmethod
     def get_attributes(self):
         """

@@ -18,11 +18,8 @@
 import numpy as np
 
 # B: Me falta importar de las otras carpetas...
-from ._base import GalaxyTransformerABC, hparam
-from ..core import (
-    data,
-    NoGravitationalPotentialError
-)
+from ._base import GalaxyTransformerABC  # , hparam -> # Bruno: Unused (yet)
+from ..core import data, NoGravitationalPotentialError
 from ..utils import doc_inherit
 
 # =============================================================================
@@ -38,6 +35,7 @@ class Centralizer(GalaxyTransformerABC):
     # al método entonces?
 
     """
+
     # Bruno:
     # Decoro (siguiendo la metodología de ../models) con el abc...
     # ¿Pero queremos? No parece ser muy útil la docs def en el ABC.
@@ -49,7 +47,7 @@ class Centralizer(GalaxyTransformerABC):
         """
         Galaxy particle centering.
 
-        Centers the position of all galaxy particles respect to the position 
+        Centers the position of all galaxy particles respect to the position
         of the lowest potential particle.
 
         Parameters
@@ -68,12 +66,14 @@ class Centralizer(GalaxyTransformerABC):
                 "galaxy must have the potential energy"
             )
 
-        # B: Cosa -> Así como para el cálculo de potencial, 
+        # B: Cosa -> Así como para el cálculo de potencial,
         # esto "desarma" galaxias y manipula sus atributos
         # i.e. en una pipeline no queremos ese behaviour...
 
         # We extract only the needed column to centrer the galaxy
-        df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z", "potential"])
+        df = galaxy.to_dataframe(
+            attributes=["ptypev", "x", "y", "z", "potential"]
+        )
 
         # minimum potential index of all particles and we extract data frame row
         minpot_idx = df.potential.argmin()
@@ -111,7 +111,6 @@ class Centralizer(GalaxyTransformerABC):
         # No entendí qué retorna, qué implica ese "disassemble" y ese "update" \
         # ¿Por qué los "**" antes del "new"?
         return data.mkgalaxy(**new)
-
 
     # Bruno:
     # ¿Esta func la quiero como método? Como es un "centralizer", \
@@ -151,4 +150,6 @@ class Centralizer(GalaxyTransformerABC):
         min_values = df.iloc[minpot_idx]
 
         # we check if the most bounded particle is (0,0,0)
-        return np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
+        return np.allclose(
+            min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol
+        )

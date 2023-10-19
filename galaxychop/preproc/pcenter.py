@@ -32,16 +32,20 @@ from ..utils import doc_inherit
 
 class Centralizer(GalaxyTransformerABC):
     """
-    # B: Polémico... Revisar análogos de clase en ../models \
+    # Bruno:
+    # Polémico... Revisar análogos de clase en ../models \
     # y supongo que suar la doc de la func acá? ¿Y que le queda \
     # al método entonces?
 
     """
-    # B: Decoro (siguiendo la metodología de ../models) con el abc...
+    # Bruno:
+    # Decoro (siguiendo la metodología de ../models) con el abc...
     # ¿Pero queremos? No parece ser muy útil la docs def en el ABC.
     # Por ahora, copio la func en el método...
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(self, galaxy, *):
+    def transform(self, galaxy):
+        # Bruno:
+        # Saco el ", *" porque me tira error...
         """
         Galaxy particle centering.
 
@@ -109,12 +113,13 @@ class Centralizer(GalaxyTransformerABC):
         return data.mkgalaxy(**new)
 
 
-    # B: ¿Esta func la quiero como método? Como es un "centralizer", \
+    # Bruno:
+    # ¿Esta func la quiero como método? Como es un "centralizer", \
     # lo dejemos adentro...
     # Y este vuelve a desarmar la galaxia ¿Sería mejor que cada clase \
     # se encargue de sarmar la glx y desp le pasa a c/ método los \
     # parámetros de intereés?...
-    def is_centered(self, galaxy, *, rtol=1e-05, atol=1e-08):
+    def is_centered(self, galaxy, rtol=1e-05, atol=1e-08):
         """
         Validate if the galaxy is centered.
 

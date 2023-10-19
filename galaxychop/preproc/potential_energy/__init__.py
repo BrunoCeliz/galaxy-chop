@@ -28,10 +28,12 @@ from .grispy_potential import (
 from .. import (
     constants as const,
     core,
+    _base,
 )
 
-from ._base.py import (
-    hparam, GalaxyTransformerABC 
+from _base import (
+    GalaxyTransformerABC,
+    hparam,
 )
 
 try:
@@ -209,7 +211,9 @@ class Potential(GalaxyTransformerABC):  # D: Hereda de un tentativo GalaxyTransf
             pass
 
 
-    def transformer(self, galaxy, *): #Le puse transformer porque la clase madre \
+    # Bruno:
+    # Again, le saco el "*" porque me tira error... (tanto en Py3.8 como Py3.11)
+    def transformer(self, galaxy): #Le puse transformer porque la clase madre \
         #  GalaxyTransformerABC tiene un metodo transform
         if galaxy.has_potential_:
             raise ValueError("galaxy potential is already calculated")

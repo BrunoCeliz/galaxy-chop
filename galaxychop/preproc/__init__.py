@@ -16,12 +16,15 @@
 
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
-from .pcenter import center, is_centered
-from .potential_energy import potential
+from ._base import *
+from .pcenter import Centralizer
+from .potential_energy import *
 from .salign import is_star_aligned, star_align
 from .smr_crop import half_star_mass_radius_crop
 
 
+# Bruno:
+# Acomodar...
 __all__ = [
     # pcenter
     "center",
@@ -66,6 +69,9 @@ def center_and_align(galaxy, *, r_cut=None):
         with the z-axis.
 
     """
+    # Bruno:
+    # Remember que ahora son clases (!)
+    center = Centralizer.transform()
     centered = center(galaxy)
     aligned = star_align(centered, r_cut=r_cut)
 
@@ -101,6 +107,9 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-    return is_centered(galaxy, rtol=rtol, atol=atol) and is_star_aligned(
+    # Bruno:
+    # Remember que ahora son clases (!)
+    check_center = Centralizer.is_centered()
+    return check_center(galaxy, rtol=rtol, atol=atol) and is_star_aligned(
         galaxy, r_cut=r_cut, rtol=rtol, atol=atol
     )

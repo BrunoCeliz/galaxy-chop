@@ -31,7 +31,7 @@ from .. import (
 )
 
 # Bruno: -> hparam not used (yet)
-from _base import GalaxyTransformerABC
+from .._base import GalaxyTransformerABC
 
 try:
     from .fortran import potential as potential_f
@@ -214,10 +214,10 @@ class Potential(
 
     # Bruno:
     # Again, le saco el "*" porque me tira error... (tanto en Py3.8 como Py3.11)
-    def transformer(
+    @doc_inherit(GalaxyTransformerABC.transform)
+    def transform(
         self, galaxy
-    ):  # Le puse transformer porque la clase madre \
-        #  GalaxyTransformerABC tiene un metodo transform
+    ):  
         if galaxy.has_potential_:
             raise ValueError("galaxy potential is already calculated")
 

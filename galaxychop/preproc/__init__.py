@@ -22,8 +22,9 @@
     GalaxyTransformerABC,
 )"""  # Bruno: ¿"imported but unused"? ¿Y el resto de imports?
 from .pcenter import Centralizer
-from .salign import is_star_aligned, star_align
-from .smr_crop import half_star_mass_radius_crop
+from .salign import Aling
+from .smr_crop import half_star_mass_radius_crop # D: Aun no lo hicimos clase
+from .potential_energy import Potential # D: aca no se si esta bien llamado
 
 """from .potential_energy import (
     POTENTIAL_BACKENDS,
@@ -36,6 +37,7 @@ from .smr_crop import half_star_mass_radius_crop
 
 # Bruno:
 # Acomodar...
+# D: Esto como quedaria? que estructura se le da
 __all__ = [
     # pcenter
     "center",
@@ -84,7 +86,7 @@ def center_and_align(galaxy, *, r_cut=None):
     # Remember que ahora son clases (!)
     center = Centralizer.transform()
     centered = center(galaxy)
-    aligned = star_align(centered, r_cut=r_cut)
+    aligned = Aling.transform(centered, r_cut=r_cut) # D: esto tendria que ir asi segun entiendo
 
     return aligned
 

@@ -71,6 +71,8 @@ def hparam(default, **kwargs):
     -----
     This function is a thin-wrapper over the attrs function ``attr.ib()``.
     """
+
+    # D: Esto habria que usarlo para el r_cut
     metadata = kwargs.pop("metadata", {})
     metadata["__gchop_model_hparam__"] = True
     return attr.ib(default=default, metadata=metadata, kw_only=True, **kwargs)

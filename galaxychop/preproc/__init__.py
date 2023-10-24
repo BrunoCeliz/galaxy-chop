@@ -22,7 +22,7 @@
     GalaxyTransformerABC,
 )"""  # Bruno: ¿"imported but unused"? ¿Y el resto de imports?
 from .pcenter import Centralizer
-from .salign import Aling
+from .salign import Aligner
 from .smr_crop import half_star_mass_radius_crop # D: Aun no lo hicimos clase
 from .potential_energy import Potential # D: aca no se si esta bien llamado
 
@@ -85,10 +85,14 @@ def center_and_align(galaxy, *, r_cut=None):
     # Bruno:
     # Remember que ahora son clases (!)
     center = Centralizer.transform()
-    centered = center(galaxy)
-    aligned = Aling.transform(centered, r_cut=r_cut) # D: esto tendria que ir asi segun entiendo
+    align = Aligner.transform()
+    # aligned = Aling.transform(centered, r_cut=r_cut) # D: esto tendria que ir asi segun entiendo
+    # Bruno: 1ro se inicializa el tranform, y luego se le da de comer.
+    # Quizás haya otra forma, por ahora piso la galaxia que se come la func.
+    galaxy = center(galaxy)  # Centering
+    galaxy = align(galaxy, r_cut)  # Aligning
 
-    return aligned
+    return galaxy
 
 
 # Bruno:
@@ -123,6 +127,8 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     # Bruno:
     # Remember que ahora son clases (!)
     check_center = Centralizer.is_centered()
-    return check_center(galaxy, rtol=rtol, atol=atol) and is_star_aligned(
+    check_align = Aligner.is_aligned()
+    return check_center(
+        galaxy, rtol=rtol, atol=atol) and check_align(
         galaxy, r_cut=r_cut, rtol=rtol, atol=atol
     )

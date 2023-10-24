@@ -18,34 +18,21 @@ import numpy as np
 
 from ..core import data
 from ._base import GalaxyTransformerABC, hparam
+from ..utils import doc_inherit
 
 # =============================================================================
 # API
 # =============================================================================
 
 # D: Aling.transform(gal)
-class Aling(GalaxyTransformerABC):
+# Bruno: Lo cambio por "Aligner" (para mantener la forma del "Centralizer") y
+# agrego los "self" que se deben comer los métodos de una clase.
+class Aligner(GalaxyTransformerABC):
     """
-    Align the galaxy.
-
-    Rotates the positions, velocities and angular momentum of the
-    particles so that the total angular moment of the stars particles coincides
-    with the z-axis. Optionally, only stars particles within a cutting radius
-    `(r_cut)` can be used to calculate the rotation matrix.
-
-    Parameters
-    ----------
-    galaxy : ``Galaxy class`` object
-    r_cut : float, optional
-        Default value =  None. If it's provided, it must be positive and the
-        rotation matrix `A` is calculated from the particles with radii smaller
-        than r_cut.
-
-    Returns
-    -------
-    galaxy: new ``Galaxy class`` object
-        A new galaxy object with their total angular momentum aligned with the
-        z-axis.
+    # Bruno:
+    # Polémico... Revisar análogos de clase en ../models \
+    # y supongo que suar la doc de la func acá? ¿Y que le queda \
+    # al método entonces?
 
     """
 
@@ -53,7 +40,7 @@ class Aling(GalaxyTransformerABC):
                                 # que iria y desp como llamarlo desp para los metds
 
     @staticmethod
-    def _make_mask(x, y, z, r_cut):
+    def _make_mask(self, x, y, z, r_cut):
         r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
 
         if r_cut is None:
@@ -62,7 +49,7 @@ class Aling(GalaxyTransformerABC):
         return np.where(r < r_cut)
 
     @staticmethod
-    def _get_rot_matrix(m, x, y, z, Jx, Jy, Jz, r_cut):
+    def _get_rot_matrix(self, m, x, y, z, Jx, Jy, Jz, r_cut):
         """
         Rotation matrix calculation.
 
@@ -122,7 +109,7 @@ class Aling(GalaxyTransformerABC):
         return A
 
     @staticmethod  # D: esto va sin el * por el error
-    def is_star_aligned(galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
+    def is_star_aligned(self, galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
         """
         Validate if the galaxy is aligned.
 
@@ -164,6 +151,29 @@ class Aling(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, r_cut):
+        """
+        Align the galaxy.
+
+        Rotates the positions, velocities and angular momentum of the
+        particles so that the total angular moment of the stars particles coincides
+        with the z-axis. Optionally, only stars particles within a cutting radius
+        `(r_cut)` can be used to calculate the rotation matrix.
+
+        Parameters
+        ----------
+        galaxy : ``Galaxy class`` object
+        r_cut : float, optional
+            Default value =  None. If it's provided, it must be positive and the
+            rotation matrix `A` is calculated from the particles with radii smaller
+            than r_cut.
+
+        Returns
+        -------
+        galaxy: new ``Galaxy class`` object
+            A new galaxy object with their total angular momentum aligned with the
+            z-axis.
+
+        """
         if r_cut is not None and r_cut <= 0.0:
             raise ValueError("r_cut must not be lower than 0.")
 

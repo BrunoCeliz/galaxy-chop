@@ -24,24 +24,25 @@ from ..utils import doc_inherit
 # API
 # =============================================================================
 
+
 # D: Aling.transform(gal)
 # Bruno: Lo cambio por "Aligner" (para mantener la forma del "Centralizer") y
 # agrego los "self" que se deben comer los métodos de una clase.
 class Aligner(GalaxyTransformerABC):
     """
     # Bruno:
-    # Polémico... Revisar análogos de clase en ../models \
-    # y supongo que suar la doc de la func acá? ¿Y que le queda \
-    # al método entonces?
+    # Revisar análogos de clase en ../models y hacer algo parecido acá...
 
     """
 
-    r_cut = hparam(default=None) # D: le pongo none por ponerle algo, no tengo claro 
-                                # que iria y desp como llamarlo desp para los metds
+    r_cut = hparam(
+        default=None
+    )  # D: le pongo none por ponerle algo, no tengo claro
+    # que iria y desp como llamarlo desp para los metds
 
     @staticmethod
     def _make_mask(self, x, y, z, r_cut):
-        r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        r = np.sqrt(x**2 + y**2 + z**2)
 
         if r_cut is None:
             return np.repeat(True, len(r))
@@ -89,8 +90,8 @@ class Aligner(GalaxyTransformerABC):
         rjy = np.sum(mjy[mask])
         rjz = np.sum(mjz[mask])
 
-        rjp = np.sqrt(rjx ** 2 + rjy ** 2)
-        rj = np.sqrt(rjx ** 2 + rjy ** 2 + rjz ** 2)
+        rjp = np.sqrt(rjx**2 + rjy**2)
+        rj = np.sqrt(rjx**2 + rjy**2 + rjz**2)
 
         e1x = rjy / rjp
         e1y = -rjx / rjp
@@ -145,7 +146,7 @@ class Aligner(GalaxyTransformerABC):
         Jxtot = np.sum(df.Jx.values[mask] * df.m.values[mask])
         Jytot = np.sum(df.Jy.values[mask] * df.m.values[mask])
         Jztot = np.sum(df.Jz.values[mask] * df.m.values[mask])
-        Jtot = np.sqrt(Jxtot ** 2 + Jytot ** 2 + Jztot ** 2)
+        Jtot = np.sqrt(Jxtot**2 + Jytot**2 + Jztot**2)
 
         return np.allclose(Jztot, Jtot, rtol=rtol, atol=atol)
 

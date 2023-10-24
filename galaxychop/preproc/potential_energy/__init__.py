@@ -32,6 +32,7 @@ from .. import (
 
 # Bruno: -> hparam not used (yet)
 from .._base import GalaxyTransformerABC
+from ...utils import doc_inherit
 
 try:
     from .fortran import potential as potential_f
@@ -71,7 +72,7 @@ def fortran_potential(x, y, z, m, softening):
     return epot * const.G, np.asarray
 
 
-def grispy_calculation(x, y, z, m, softening):
+def grispy_potential(x, y, z, m, softening):
     """
     GriSPy implementation of the gravitational potential energy calculation.
 
@@ -159,14 +160,13 @@ def numpy_potential(x, y, z, m, softening):
 
 POTENTIAL_BACKENDS = {
     "fortran": fortran_potential,
-    "grispy": grispy_calculation,
+    "grispy": grispy_potential,
     "numpy": numpy_potential,
 }
 
 
-class Potential(
-    GalaxyTransformerABC
-):  # D: Hereda de un tentativo GalaxyTransformerABC ?
+# D: Hereda de un tentativo GalaxyTransformerABC ?
+class Potential(GalaxyTransformerABC):
     """
     Potential energy calculation.
 
@@ -215,9 +215,7 @@ class Potential(
     # Bruno:
     # Again, le saco el "*" porque me tira error... (tanto en Py3.8 como Py3.11)
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(
-        self, galaxy
-    ):  
+    def transform(self, galaxy):
         if galaxy.has_potential_:
             raise ValueError("galaxy potential is already calculated")
 

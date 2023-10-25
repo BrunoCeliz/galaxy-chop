@@ -89,19 +89,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     Abstract class to facilitate the creation of preprocessors
     (a.k.a. Transformers).
 
-    # Bruno: No en nuestro caso...
-    This class requests the redefinition of three methods: get_attributes,
-    get_rows_mask and split.
-
-    # Bruno: No en nuestro caso...
-    Parameters
-    ----------
-    cbins : tuple
-        It contains the two widths of bins necessary for the calculation of the
-        circular angular momentum.  Shape: (2,). Dafult value = (0.05, 0.005).
-    reassign : list
-        It allows to define what to do with stellar particles with circularity
-        parameter values >1 or <-1. Default value = [False].
+    This class requests the redefinition of one method: transform.
 
     """
 
@@ -110,10 +98,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     # A center, align y potential le interesan únicamente que las partículas \
     # tengan potencial, pero nada de si son estrellas o no... Por lo menos \
     # en común, porque no se alinean las partículas de DM...
-    __gchop_model_cls_config__ = {"repr": False, "frozen": True}
-
-    # Bruno:
-    # El hparam debería usarlo la Clase Potential (para el backend)...
+    __gchop_method_cls_config__ = {"repr": False, "frozen": True}
 
     # block meta checks =======================================================
     def __init_subclass__(cls):
@@ -122,32 +107,24 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
 
         It ensures that every inherited class is decorated by ``attr.s()`` and
         assigns as class configuration the parameters defined in the class
-        variable `__gchop_model_cls_config__`.
+        variable `__gchop_method_cls_config__`.
 
         In other words it is slightly equivalent to:
 
         .. code-block:: python
 
-            @attr.s(**GalaxyTransformerABC.__gchop_model_cls_config__)
+            @attr.s(**GalaxyTransformerABC.__gchop_method_cls_config__)
             class Transformer(GalaxyTransformerABC):
                 pass
 
         """
-        model_config = getattr(cls, "__gchop_model_cls_config__")
-        attr.s(maybe_cls=cls, **model_config)
-        # ¿Acá no debería cambiar "_model_" por e.g. "_method_"?
+        method_config = getattr(cls, "__gchop_method_cls_config__")
+        attr.s(maybe_cls=cls, **method_config)
 
     # block  to implement in every method =====================================
 
-    # Bruno:
-    # Again, acá no hay ningún atributo para sacar ni necesitamos \
-    # maskear nada. Pero como no hay que popular componentes, el \
-    # método de todos los preprocesadores lo pongo acá (!)
     @abc.abstractmethod
-    def transform(
-        self, galaxy
-    ):  # D. esta bien que se llame igual que el metodo de Potential?
-        # cambio metodo del potential a transformer
+    def transform(self, galaxy):
         """
         Preprocess method.
 
@@ -186,4 +163,4 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         return f"{clsname}({attrs_str})"
 
 
-# B: Todo lo demás sobra(ba).
+# Bruno: Todo lo demás sobra(ba).

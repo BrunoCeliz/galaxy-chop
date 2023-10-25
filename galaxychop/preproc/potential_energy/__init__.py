@@ -165,10 +165,9 @@ POTENTIAL_BACKENDS = {
 }
 
 
-# D: Hereda de un tentativo GalaxyTransformerABC ?
 class Potential(GalaxyTransformerABC):
     """
-    Potential energy calculation.
+    Potential class.
 
     Given the positions and masses of particles, calculate
     their specific gravitational potential energy.
@@ -176,8 +175,9 @@ class Potential(GalaxyTransformerABC):
     Parameters
     ----------
     galaxy : ``Galaxy class`` object
-
-    backends:
+        The galaxy object without the potential energy of particles
+    backends : str, default="numpy"
+        Method to calculate the potential energy of each particle
 
     Returns
     -------
@@ -191,7 +191,7 @@ class Potential(GalaxyTransformerABC):
     # pot = Potential(backend="frotran")
     # gal = pot.transform(gal)
 
-    # B: Según Juan, esto debería ser ya el "default_backend" y \
+    # Bruno: Según Juan, esto debería ser ya el "default_backend" y \
 
     # D: saco hparam(
     #    default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
@@ -212,12 +212,10 @@ class Potential(GalaxyTransformerABC):
         else:
             pass
 
-    # Bruno:
-    # Again, le saco el "*" porque me tira error... (tanto en Py3.8 como Py3.11)
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
         if galaxy.has_potential_:
-            raise ValueError("galaxy potential is already calculated")
+            raise ValueError("Galaxy potential is already calculated")
 
         # extract the implementation
         backend_function = POTENTIAL_BACKENDS[self.backend]

@@ -30,8 +30,11 @@ from ..utils import doc_inherit
 # agrego los "self" que se deben comer los métodos de una clase.
 class Aligner(GalaxyTransformerABC):
     """
-    # Bruno:
-    # Revisar análogos de clase en ../models y hacer algo parecido acá...
+    Aligner class.
+
+    Given the positions and velocities of particles, check and
+    align them to make the Z-axis perpendicular to the galaxy-plane
+    i.e. make the "face-on" projection the new XY plane.
 
     """
 
@@ -109,7 +112,7 @@ class Aligner(GalaxyTransformerABC):
 
         return A
 
-    @staticmethod  # D: esto va sin el * por el error
+    @staticmethod
     def is_star_aligned(self, galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
         """
         Validate if the galaxy is aligned.
@@ -153,6 +156,8 @@ class Aligner(GalaxyTransformerABC):
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, r_cut):
         """
+        Notes
+        -----
         Align the galaxy.
 
         Rotates the positions, velocities and angular momentum of the

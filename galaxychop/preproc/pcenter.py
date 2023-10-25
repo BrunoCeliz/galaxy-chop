@@ -26,24 +26,32 @@ from ..utils import doc_inherit
 # =============================================================================
 
 
+# Bruno:
+# Algo importantísimo que me parece que falta es que, si la galaxia NO \
+# tiene calculado el potencial, que centre según la media de las posiciones \
+# en cada eje (y, calro, que se lo haga saber al usuario) i.e. si no quiero \
+# calcular el potencial y soy confianzudo, hacé x_i = x_i - prom(x) para \
+# todas las partículas...
+# Más aún ¡Que también haga lo mismo para las velocidades! (no es obvio, \
+# pero si está centrado a datos de simulaciones es obligatorio que el \
+# v_cm = 0 por los cálculos de Jx, Jym Jz...) (!!!)
 class Centralizer(GalaxyTransformerABC):
-    """
     # Bruno:
-    # Polémico... Revisar análogos de clase en ../models \
-    # y supongo que suar la doc de la func acá? ¿Y que le queda \
-    # al método entonces?
+    # Ojo con la doc. NO sé cuál es el resultado final
+    # (y/o qué correspondería a la clase/método (!)).
+    """
+    Centralizer class.
+
+    Given the positions and potential energy of particles, check and
+    center their positions relative to the system.
 
     """
 
-    # Bruno:
-    # Decoro (siguiendo la metodología de ../models) con el abc...
-    # ¿Pero queremos? No parece ser muy útil la docs def en el ABC.
-    # Por ahora, copio la func en el método...
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
-        # Bruno:
-        # Saco el ", *" porque me tira error...
         """
+        Notes
+        -----
         Galaxy particle centering.
 
         Centers the position of all galaxy particles respect to the position
@@ -65,9 +73,9 @@ class Centralizer(GalaxyTransformerABC):
                 "galaxy must have the potential energy"
             )
 
-        # B: Cosa -> Así como para el cálculo de potencial,
-        # esto "desarma" galaxias y manipula sus atributos
-        # i.e. en una pipeline no queremos ese behaviour...
+        # Bruno: Cosa -> Así como para el cálculo de potencial,
+        # esto "desarma" galaxias y manipula sus atributos...
+        # En una pipeline no queremos ese behaviour...
 
         # We extract only the needed column to centrer the galaxy
         df = galaxy.to_dataframe(
@@ -91,9 +99,7 @@ class Centralizer(GalaxyTransformerABC):
         # patch
         new = galaxy.disassemble()
 
-        # B: Así en gral, ¿No faltan "self"s? Digo, parece que \
-        # dentro de estos métodos de clase casi ni usamos "self" \
-        # y en mi cabeza se deebría usar mucho más...
+        # Bruno: "self"s?
         new.update(
             x_s=stars.x.to_numpy(),
             y_s=stars.y.to_numpy(),
@@ -140,6 +146,10 @@ class Centralizer(GalaxyTransformerABC):
             raise NoGravitationalPotentialError(
                 "galaxy must have the potential energy"
             )
+        # Bruno:
+        # Again, quizás como warning, pero que no corte la línea de producción...
+        # (el cómputo del potencial suele molestar mucho para una muestra \
+        # grande de galaxias...)
 
         # We extract only the needed column to centrer the galaxy
         df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])

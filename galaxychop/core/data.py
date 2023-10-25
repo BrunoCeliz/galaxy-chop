@@ -52,6 +52,7 @@ class ParticleSetType(enum.IntEnum):
     type in the ``ParticleSet class``.
 
     """
+
     STARS = 0
     DARK_MATTER = 1
     GAS = 2
@@ -73,6 +74,9 @@ class ParticleSetType(enum.IntEnum):
         return self.name.lower()
 
 
+# Bruno:
+# ¿Será que para que, no me de problemas si le doy de comer listas vacías,
+# debo tocar los converters/validators?
 @uttr.s(frozen=True, slots=True, repr=False)
 class ParticleSet:
     """
@@ -94,7 +98,7 @@ class ParticleSet:
     potential : Quantity, default value = 0
         Specific potential energy of particles. Shape: (n,1). Default unit:
         (km/s)**2.
-    softening : Quantity, default value = 0
+    softening : Quantity. Default value = 0
         Softening radius of particles. Shape: (1,). Default unit: kpc.
     kinetic_energy : Quantity
         Specific kinetic energy of particles. Shape: (n,1). Default unit:
@@ -105,14 +109,20 @@ class ParticleSet:
     Jx_, Jy_, Jz_ : Quantity
         Components of angular momentum of particles. Shapes: (n,1). Default
         units: kpc*km/s.
+    label : Quantity. Default value = None
+        Galaxy component to which each particle belongs (only for stars).
+        Shapes: (n,1).
     has_potential_ : bool.
         Indicates if the specific potential energy is computed.
+    is_decomposed_ : bool.
+        Indicates if the Galaxy is already decomposed.
     arr_ : Instances of ``ArrayAccessor``
         Access to the attributes (defined with uttrs) of the provided instance,
         and if they are of astropy.units.Quantity type it converts them into
         numpy.ndarray.
 
     """
+
     ptype = uttr.ib(validator=attr.validators.instance_of(ParticleSetType))
 
     m: np.ndarray = uttr.ib(unit=u.Msun, converter=np.copy)
@@ -137,13 +147,22 @@ class ParticleSet:
     # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
+    label: np.ndarray = uttr.ib(
+        validator=attr.validators.optional(
+            attr.validators.instance_of(np.ndarray)
+        ),
+        converter=(lambda v: np.copy(v) if v is not None else v),
+        repr=False,
+    )  # Bruno: ¿Así?
 
     has_potential_: bool = uttr.ib(init=False)
+    # Bruno:
+    # Así mismo le debo agregar "decomposed" a la Galaxy (!);
+    # o los labels = "0" (¡sólo si son estrellas!).
+    is_decomposed_: bool = uttr.ib(init=False)
+
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
     total_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
-    # Bruno:
-    # Así mismo le debo agregar "decomposed" a la Galaxy (!); 
-    # o los labels = "0" (¡sólo si son estrellas!).
 
     # angular momentum
     Jx_: np.ndarray = uttr.ib(unit=(u.kpc * u.km / u.s), init=False)
@@ -155,6 +174,10 @@ class ParticleSet:
     @has_potential_.default
     def _has_potential__default(self):
         return self.potential is not None
+
+    @is_decomposed_.default
+    def _is_decomposed__default(self):
+        return self.label is not None
 
     @kinetic_energy_.default
     def _kinetic_energy__default(self):
@@ -177,7 +200,7 @@ class ParticleSet:
     # Bruno:
     # Ojo con esto, porque si la galaxia no tiene las velocidades
     # acomodadas al centro de masa me devuelve valores erróneos.
-    # -> De eso se tiene que encargar el Aligner, no el init de 
+    # -> De eso se tiene que encargar el Aligner, no el init de
     # las partículas...
     @Jx_.default
     def _Jx__default(self):
@@ -215,6 +238,10 @@ class ParticleSet:
 
         if self.has_potential_:
             lengths[len(self.potential)].add("potential")
+        # Bruno:
+        # Aunque prob no haga falta...
+        if self.is_decomposed_:
+            lengths[len(self.label)].add("label")
 
         # now if we have more than one key it is because there are
         # different lengths.
@@ -240,10 +267,20 @@ class ParticleSet:
 
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""
-        return (
-            f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
-            f"softening={self.softening}, potentials={self.has_potential_}>"
-        )
+        # Bruno:
+        # Pero claro, aclarar lo de dinámicamente decompuesto sólo
+        # sirve para estrellas... => if; Ojo como lo llamo (!)
+        if self.ptype.name == 0:
+            return (
+                f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
+                f"softening={self.softening}, potentials={self.has_potential_}, "
+                f"Dynamically decomposed={self.is_decomposed_}.>"
+            )
+        else:
+            return (
+                f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
+                f"softening={self.softening}, potentials={self.has_potential_}.>"
+            )
 
     def __len__(self):
         """len(x) <=> x.__len__()."""
@@ -268,6 +305,10 @@ class ParticleSet:
 
         """
         arr = self.arr_
+        # Bruno:
+        # Ojo, acá inicializo "label" como todos "None" (!) ->
+        # Revisar si le gusta eso o crea algo vacío. En las pruebitas
+        # no hubo drama...
         value_makers = {
             "ptype": lambda: np.full(len(self), self.ptype.humanize()),
             "ptypev": lambda: np.full(len(self), self.ptype.value),
@@ -283,6 +324,9 @@ class ParticleSet:
                 arr.potential
                 if self.has_potential_
                 else np.full(len(self), np.nan)
+            ),
+            "label": lambda: (
+                arr.label if self.is_decomposed_ else np.full(len(self), None)
             ),
             "kinetic_energy": lambda: arr.kinetic_energy_,
             "total_energy": lambda: (
@@ -339,6 +383,7 @@ class ParticleSet:
             vy=self.vy.copy(),
             vz=self.vz.copy(),
             potential=self.potential.copy(),
+            label=self.label.copy(),
             softening=float(self.softening),
         )
         return new
@@ -370,14 +415,23 @@ class Galaxy:
     ----------
     has_potential_: bool
         Indicates if this Galaxy instance has the potential energy computed.
+    is_aligned_ : bool.
+        Indicates if this Galaxy instance has been already aligned i.e. the
+        Z-axis is parallel to the minor axis of the particle system.
+    is_centered_ : bool.
+        Indicates if this Galaxy instance has been already centered i.e.
+        the most bound particle defines the origin of the system.
+    is_decomposed_ : bool.
+        Indicates if this Galaxy instance has been already decomposed.
 
     """
+
     stars = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
     dark_matter = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
     gas = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
 
     # Bruno:
-    # ¡Hay que (además) checkear que haya sido centrada, alineada y 
+    # ¡Hay que (además) checkear que haya sido centrada, alineada y
     # decompuesta!
     has_potential_ = attr.ib(init=False)
     is_aligned_ = attr.ib(init=False)
@@ -402,6 +456,13 @@ class Galaxy:
             )
         return self.stars.has_potential_
 
+    # Bruno:
+    # No sé muy bien cómo implementarlo, pero si sé que sólo importan
+    # las estrellas acá...
+    @is_decomposed_.default
+    def _is_decomposed__default(self):
+        return self.stars.is_decomposed_
+
     def __attrs_post_init__(self):
         """Validate that the type of each particleset is correct."""
         pset_types = [
@@ -423,7 +484,8 @@ class Galaxy:
         dm_repr = f"dark_matter={len(self.dark_matter)}"
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
-        return f"<Galaxy {stars_repr}, {dm_repr}, {gas_repr}, {has_pot}>"
+        is_decomp = f"Dynamically decomposed={self.is_decomposed_}"
+        return f"<Galaxy {stars_repr}, {dm_repr}, {gas_repr}, {has_pot}, {is_decomp}.>"
         # Bruno:
         # Cuando ocurra el caso de que haya partículas con y otras sin \
         # potencial -> Debería devolver un warning + un False en vez de \
@@ -833,6 +895,10 @@ class Galaxy:
 # Quizás es un ejemplo medio choto, pero me pasó en mi análisis que descargué
 # sólo estrellas (sin gas ni DM), y con la versión vieja (vcristiani/master)
 # puedo calcular J y alinear sin drama...
+
+
+# Bruno:
+# Ese asterisco en la mitad me jode ¿Por qué está ahí?
 def mkgalaxy(
     m_s: np.ndarray,
     x_s: np.ndarray,
@@ -862,6 +928,9 @@ def mkgalaxy(
     potential_s: np.ndarray = None,
     potential_dm: np.ndarray = None,
     potential_g: np.ndarray = None,
+    label_s: np.ndarray = None,
+    label_dm: np.ndarray = None,
+    label_g: np.ndarray = None,
 ):
     """
     Galaxy builder.
@@ -895,6 +964,12 @@ def mkgalaxy(
         Specific potential energy of dark matter particles. Shape: (n,1).
     potential_g : np.ndarray, default value = None
         Specific potential energy of gas particles. Shape: (n,1).
+    label_s : np.ndarray, default value = None
+        Galaxy component label of star particles. Shape: (n,1).
+    label_dm : np.ndarray, default value = None
+        Galaxy component label of dark matter particles. Shape: (n,1).
+    label_g : np.ndarray, default value = None
+        Galaxy component label of gas particles. Shape: (n,1).
     softening_s : float, default value = 0
         Softening radius of stellar particles. Shape: (1,).
     softening_dm : float, default value = 0
@@ -918,6 +993,7 @@ def mkgalaxy(
         vz=vz_s,
         softening=softening_s,
         potential=potential_s,
+        label=label_s,
     )
     # Bruno:
     # Acá podría ir un if o un try para tirar un warning avisando
@@ -933,6 +1009,7 @@ def mkgalaxy(
         vz=vz_dm,
         softening=softening_dm,
         potential=potential_dm,
+        label=label_dm,
     )
     gas = ParticleSet(
         ParticleSetType.GAS,
@@ -945,9 +1022,13 @@ def mkgalaxy(
         vz=vz_g,
         softening=softening_g,
         potential=potential_g,
+        label=label_dm,
     )
     galaxy = Galaxy(stars=stars, dark_matter=dark_matter, gas=gas)
     return galaxy
+
+
 # Bruno:
-# O sea, ¿debería tocar la Clase "ParticleSet"? -> Tanto para
-# predefinir los labels como para admitir sólo estrellas...
+# Ojo con todo. No me gustó que también deba definir los "labels" de
+# todas las pariculas (DM y gas, que no tiene sentido. Por ahora lo
+# dejo así, pero es chanchísimo...

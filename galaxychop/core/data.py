@@ -50,8 +50,8 @@ class ParticleSetType(enum.IntEnum):
 
     Name and number that are used to describe the particle
     type in the ``ParticleSet class``.
-    """
 
+    """
     STARS = 0
     DARK_MATTER = 1
     GAS = 2
@@ -111,8 +111,8 @@ class ParticleSet:
         Access to the attributes (defined with uttrs) of the provided instance,
         and if they are of astropy.units.Quantity type it converts them into
         numpy.ndarray.
-    """
 
+    """
     ptype = uttr.ib(validator=attr.validators.instance_of(ParticleSetType))
 
     m: np.ndarray = uttr.ib(unit=u.Msun, converter=np.copy)
@@ -136,14 +136,14 @@ class ParticleSet:
     # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
     # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
-    softening: float = uttr.ib(converter=float, repr=False)
-    # Bruno:
-    # Commnet del softening -> Debe tener las mismas unidades de x,y,z, \
-    # porque es lo que se usa para calcular el potencial después...
+    softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
 
     has_potential_: bool = uttr.ib(init=False)
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
     total_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
+    # Bruno:
+    # Así mismo le debo agregar "decomposed" a la Galaxy (!); 
+    # o los labels = "0" (¡sólo si son estrellas!).
 
     # angular momentum
     Jx_: np.ndarray = uttr.ib(unit=(u.kpc * u.km / u.s), init=False)
@@ -174,6 +174,11 @@ class ParticleSet:
         return kenergy + penergy
 
     # angular momentum
+    # Bruno:
+    # Ojo con esto, porque si la galaxia no tiene las velocidades
+    # acomodadas al centro de masa me devuelve valores erróneos.
+    # -> De eso se tiene que encargar el Aligner, no el init de 
+    # las partículas...
     @Jx_.default
     def _Jx__default(self):
         arr = self.arr_
@@ -365,13 +370,19 @@ class Galaxy:
     ----------
     has_potential_: bool
         Indicates if this Galaxy instance has the potential energy computed.
-    """
 
+    """
     stars = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
     dark_matter = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
     gas = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
 
+    # Bruno:
+    # ¡Hay que (además) checkear que haya sido centrada, alineada y 
+    # decompuesta!
     has_potential_ = attr.ib(init=False)
+    is_aligned_ = attr.ib(init=False)
+    is_centered_ = attr.ib(init=False)
+    is_decomposed_ = attr.ib(init=False)
 
     @has_potential_.default
     def _has_potential__default(self):
@@ -646,11 +657,10 @@ class Galaxy:
                 self.dark_matter.potential,
                 self.gas.potential,
             )
-        # Bruno:
-        # else? ; Aprovechando que está el nuevo Error, debería estar acá...
-        # Lo probemos...
         else:
-            raise NoGravitationalPotentialError  # ¿Así? Probar...
+            raise NoGravitationalPotentialError(
+                "Galaxy does not have the potential energy calculated"
+            )  # Bruno: ¿Así? Probar...
 
     @property
     def total_energy_(self):
@@ -684,7 +694,9 @@ class Galaxy:
             )
         # Bruno: Repito...
         else:
-            raise NoGravitationalPotentialError
+            raise NoGravitationalPotentialError(
+                "Galaxy does not have the potential energy calculated"
+            )
 
     @property
     def angular_momentum_(self):
@@ -814,7 +826,13 @@ class Galaxy:
 # API FUNCTIONS
 # =============================================================================
 
-
+# Bruno:
+# Una cosa que me pasó -> Si no le doy de comer DM y/o gas no debería tirar
+# errores. ¡Puedo hacer un análisis cinemático de las estrellas, sin importar
+# que no tenga la DM!
+# Quizás es un ejemplo medio choto, pero me pasó en mi análisis que descargué
+# sólo estrellas (sin gas ni DM), y con la versión vieja (vcristiani/master)
+# puedo calcular J y alinear sin drama...
 def mkgalaxy(
     m_s: np.ndarray,
     x_s: np.ndarray,
@@ -887,6 +905,7 @@ def mkgalaxy(
     Return
     ------
     galaxy: ``Galaxy class`` object.
+
     """
     stars = ParticleSet(
         ParticleSetType.STARS,
@@ -900,6 +919,9 @@ def mkgalaxy(
         softening=softening_s,
         potential=potential_s,
     )
+    # Bruno:
+    # Acá podría ir un if o un try para tirar un warning avisando
+    # que no hay DM/gas (!)
     dark_matter = ParticleSet(
         ParticleSetType.DARK_MATTER,
         m=m_dm,
@@ -926,3 +948,6 @@ def mkgalaxy(
     )
     galaxy = Galaxy(stars=stars, dark_matter=dark_matter, gas=gas)
     return galaxy
+# Bruno:
+# O sea, ¿debería tocar la Clase "ParticleSet"? -> Tanto para
+# predefinir los labels como para admitir sólo estrellas...

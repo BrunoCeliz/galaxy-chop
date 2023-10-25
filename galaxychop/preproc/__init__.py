@@ -16,21 +16,20 @@
 
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
-"""from ._base import (
-    _PTYPES_ORDER,
-    hparam,
-    GalaxyTransformerABC,
-)"""  # Bruno: ¿"imported but unused"? ¿Y el resto de imports?
+# from .potential_energy import Potential # D: aca no se si esta bien llamado
+# Bruno: Así está definido en el __init_.py de la carpeta "galaxychop" ->
+from . import potential_energy
 from .pcenter import Centralizer
 from .salign import Aligner
 from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase
 
-# from .potential_energy import Potential # D: aca no se si esta bien llamado
-# Bruno: Así está definido en el __init_.py de la carpeta "galaxychop" ->
-from . import potential_energy
-
 # Bruno:
-# Acomodar...
+# Del smr_crop estaría interesante sacar la func "_get_half_smr_crop()", pero
+# está mencionada como privada. Como "cortador" de la galaxia (efectivamente
+# devuelve una galaxia cortada a 3 r_half), le falta aplicar ese corte para
+# gas y DM => ¡No serviría más para calc el potencial! => No nos interesa
+# como "preprocesador" (a.k.a. "Transformer")...
+
 # D: Esto como quedaria? que estructura se le da
 __all__ = [
     # pcenter
@@ -47,13 +46,10 @@ __all__ = [
 # FUNCTIONS
 # =============================================================================
 
+
 # Bruno:
-# ¿Esto era lo otro que molestaba? Deberíamos repetir un _base.py con un ABC \
-# para estos pre-procesadores y unificar. Además, agregar el Octree + la \
-# integración de C (Cython u otro)...
+# Agregar el Octree + la integración de C (Cython u otro)...
 # ¡El r_cut puede ser un hparam!
-
-
 def center_and_align(galaxy, *, r_cut=None):
     """
     Sequentially performs centering and alignment.
@@ -77,20 +73,22 @@ def center_and_align(galaxy, *, r_cut=None):
 
     """
     # Bruno:
-    # Remember que ahora son clases (!)
+    # ¿Para inicializarlo se le pone "()"? ¿Entonces debería darle de comer el
+    # "r_cut" acá?
     center = Centralizer.transform()
     align = Aligner.transform()
-    # aligned = Aling.transform(centered, r_cut=r_cut) # D: esto tendria que ir asi segun entiendo
-    # Bruno: 1ro se inicializa el tranform, y luego se le da de comer.
-    # Quizás haya otra forma, por ahora piso la galaxia que se come la func.
+    # D: esto tendria que ir asi segun entiendo
+    # aligned = Aling.transform(centered, r_cut=r_cut)
+
+    # Bruno: 1ro se inicializa el transform, y luego se le da de comer.
+    # Quizás haya otra forma, por ahora piso la variable galaxy que se come
+    # la func...
     galaxy = center(galaxy)  # Centering
     galaxy = align(galaxy, r_cut)  # Aligning
 
     return galaxy
 
 
-# Bruno:
-# Ídem para "rtol" y "atol"...
 def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     """
     Validate if the galaxy is centered and aligned.

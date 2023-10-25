@@ -25,9 +25,6 @@ from ..utils import doc_inherit
 # =============================================================================
 
 
-# D: Aling.transform(gal)
-# Bruno: Lo cambio por "Aligner" (para mantener la forma del "Centralizer") y
-# agrego los "self" que se deben comer los métodos de una clase.
 class Aligner(GalaxyTransformerABC):
     """
     Aligner class.
@@ -38,13 +35,12 @@ class Aligner(GalaxyTransformerABC):
 
     """
 
-    r_cut = hparam(
-        default=None
-    )  # D: le pongo none por ponerle algo, no tengo claro
-    # que iria y desp como llamarlo desp para los metds
+    r_cut = hparam(default=30)  # Bruno: Nos suelen gustar ~30 kpc
 
     @staticmethod
     def _make_mask(self, x, y, z, r_cut):
+        # Bruno:
+        # ¿No debería ser ~"aux_r = self.r_cut"?
         r = np.sqrt(x**2 + y**2 + z**2)
 
         if r_cut is None:
@@ -155,6 +151,9 @@ class Aligner(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, r_cut):
+        # Bruno:
+        # Falta acomodar/checkear que las velocidades estén corregidas por
+        # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)
         """
         Notes
         -----

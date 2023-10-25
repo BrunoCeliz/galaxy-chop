@@ -1022,7 +1022,7 @@ def mkgalaxy(
         vz=vz_g,
         softening=softening_g,
         potential=potential_g,
-        label=label_dm,
+        label=label_g,
     )
     galaxy = Galaxy(stars=stars, dark_matter=dark_matter, gas=gas)
     return galaxy

@@ -130,13 +130,6 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
         attributes=["ptypev", "total_energy", "Jx", "Jy", "Jz"]
     )
 
-    # Bruno:
-    # ¿Eh? "J_p" = vect(J)-J_z (a.k.a. "todo lo que no es J_z") \
-    # =/= "J_proyectado", ¡Es "J_perpendicular"! -> ¿En qué otras \
-    # partes de la docs está puesto como proyect? ¿Algún autor lo \
-    # llama "J_proyect"?...; Además, "J_r" confunde bastante imo.
-    # Btw, ¿No es más lento trabajar con el df de la Galaxia? (aunque \
-    # el rendimiento no importa para estos cálculos de menor orden...)
     Jr_part = np.sqrt(df.Jx.values**2 + df.Jy.values**2)
     E_tot = df.total_energy.values
 
@@ -153,8 +146,8 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     aux1 = np.arange(-0.1, 0.0, bin1)
     aux = np.concatenate([aux0, aux1], axis=0)
     # Bruno:
-    # Yo banco muchísimo el uso de una variable "aux" en mis NBs, \
-    # pero mepa que acá, así como 'x' e 'y', deberían llevar nombres \
+    # Yo banco muchísimo el uso de una variable "aux" en mis NBs,
+    # pero mepa que acá, así como 'x' e 'y', deberían llevar nombres
     # adecuados...
 
     x = np.zeros(len(aux) + 1)
@@ -164,7 +157,7 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     y[0] = np.abs(Jz[np.argmin(E)])
 
     # Bruno:
-    # ¿Eh? Esto se debería poder hacer de otra forma más en \
+    # ¿Eh? Esto se debería poder hacer de otra forma más en
     # línea con los otros .py ...
     for i in range(1, len(aux)):
         (mask,) = np.where((E <= aux[i]) & (E > aux[i - 1]))
@@ -213,8 +206,8 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     Jr_star = np.sqrt(df_star.Jx.values**2 + df_star.Jy.values**2)
     Etot_s = df_star.total_energy.values
     # Bruno:
-    # ¿Recién ahora se encarga de las estrellas? ¿De qué me \
-    # sirve considerar todo lo anterior para DM? (Igual quizás \
+    # ¿Recién ahora se encarga de las estrellas? ¿De qué me
+    # sirve considerar todo lo anterior para DM? (Igual quizás
     # para el gas sí es deseable, así que no digo nada...)
 
     # Remove the star particles that are not bound:
@@ -247,25 +240,22 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     # values > 1 or <-1.
     if reassign:
         # We reassign particles that have circularity > 1 to circularity = 1.
-        mask = np.where(eps_ > 1.0)[0]
+        (mask,) = np.where(eps_ > 1.0)
         eps_[mask] = 1.0
-        # Bruno:
-        # ¿Por qué en "bound" lo define como "(bound,) = ..." y acá no? \
-        # Es una nimiedad, pero unificar...
 
         # We reassign particles that have circularity < -1 to circularity = -1.
-        mask = np.where(eps_ < -1.0)[0]
+        (mask,) = np.where(eps_ < -1.0)
         eps_[mask] = -1.0
 
     else:
         # We remove particles that have circularity < -1 and circularity > 1.
-        mask = np.where(eps_ > 1.0)[0]
+        (mask,) = np.where(eps_ > 1.0)
         E_star_norm_[mask] = np.nan
         Jz_star_norm_[mask] = np.nan
         eps_[mask] = np.nan
         eps_r_[mask] = np.nan
 
-        mask = np.where(eps_ < -1.0)[0]
+        (mask,) = np.where(eps_ < -1.0)
         E_star_norm_[mask] = np.nan
         Jz_star_norm_[mask] = np.nan
         eps_[mask] = np.nan
@@ -361,13 +351,8 @@ def stellar_dynamics(
     """
     if not galaxy.has_potential_:
         raise NoGravitationalPotentialError(
-            "You cannot calculate stellar dynamics in a "
-            "galaxy without potential."
-        )
-    # Bruno:
-    # Copiar este mensaje en el otro lado que llamé al "raise \
-    # NoGrav..." (en la parte de Galaxy donde define Energía \
-    # pot y total <-> data.py).
+            "Galaxy does not have the potential energy calculated"
+        )  # Bruno: En una de esas esto no sirve/no es necesario
 
     with warnings.catch_warnings():
         warnings.simplefilter(runtime_warnings, category=RuntimeWarning)

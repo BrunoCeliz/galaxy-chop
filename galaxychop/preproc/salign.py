@@ -25,7 +25,7 @@ from ..utils import doc_inherit
 # =============================================================================
 
 
-def _make_mask(self, x, y, z, r_cut):
+def _make_mask(x, y, z, r_cut):
     # Bruno:
     # ¿No debería ser ~"aux_r = self.r_cut"?
     r = np.sqrt(x**2 + y**2 + z**2)
@@ -36,7 +36,7 @@ def _make_mask(self, x, y, z, r_cut):
     return np.where(r < r_cut)
 
 
-def _get_rot_matrix(self, m, x, y, z, Jx, Jy, Jz, r_cut):
+def _get_rot_matrix(m, x, y, z, Jx, Jy, Jz, r_cut):
     """
     Rotation matrix calculation.
 
@@ -207,7 +207,7 @@ class Aligner(GalaxyTransformerABC):
         return data.mkgalaxy(**new)
 
 
-def is_star_aligned(self, galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
+def is_star_aligned(galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
     """
     Validate if the galaxy is aligned.
 

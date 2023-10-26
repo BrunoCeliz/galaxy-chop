@@ -109,7 +109,7 @@ class ParticleSet:
     Jx_, Jy_, Jz_ : Quantity
         Components of angular momentum of particles. Shapes: (n,1). Default
         units: kpc*km/s.
-    label : Quantity. Default value = None
+    label : Quantity. Default value = 0
         Galaxy component to which each particle belongs (only for stars).
         Shapes: (n,1).
     has_potential_ : bool.
@@ -147,7 +147,11 @@ class ParticleSet:
     # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
+
+    # Bruno:
+    # Los labels no deberían requerir de unidades... ¿Culpa del uttrs?
     label: np.ndarray = uttr.ib(
+        unit=None,
         validator=attr.validators.optional(
             attr.validators.instance_of(np.ndarray)
         ),
@@ -177,7 +181,12 @@ class ParticleSet:
 
     @is_decomposed_.default
     def _is_decomposed__default(self):
-        return self.label is not None
+        return isinstance(self.label, float)
+
+    # Bruno:
+    # Es una chanchada, pero estoy probando de que no me ponga como
+    # "is_decomposed == True" cuando aplico algún preprocesamiento =>
+    # Problema con los nans/None/is_decomposed_default() (!)
 
     @kinetic_energy_.default
     def _kinetic_energy__default(self):
@@ -270,7 +279,7 @@ class ParticleSet:
         # Bruno:
         # Pero claro, aclarar lo de dinámicamente decompuesto sólo
         # sirve para estrellas... => if; Ojo como lo llamo (!)
-        if self.ptype.name == 0:
+        if self.ptype.value == 0:  # Estrellas...
             return (
                 f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
                 f"softening={self.softening}, potentials={self.has_potential_}, "
@@ -306,9 +315,9 @@ class ParticleSet:
         """
         arr = self.arr_
         # Bruno:
-        # Ojo, acá inicializo "label" como todos "None" (!) ->
-        # Revisar si le gusta eso o crea algo vacío. En las pruebitas
-        # no hubo drama...
+        # Ojo, hay drama con el "softening" -> lo paso como valor
+        # Cambio el orden del if por comprensión porque no le gustó
+        # el del potential (!?)
         value_makers = {
             "ptype": lambda: np.full(len(self), self.ptype.humanize()),
             "ptypev": lambda: np.full(len(self), self.ptype.value),
@@ -319,14 +328,16 @@ class ParticleSet:
             "vx": lambda: arr.vx,
             "vy": lambda: arr.vy,
             "vz": lambda: arr.vz,
-            "softening": lambda: np.full(len(self), self.softening),
+            "softening": lambda: arr.softening,
             "potential": lambda: (
                 arr.potential
                 if self.has_potential_
                 else np.full(len(self), np.nan)
             ),
             "label": lambda: (
-                arr.label if self.is_decomposed_ else np.full(len(self), None)
+                arr.label
+                if self.is_decomposed_
+                else np.full(len(self), np.nan)
             ),
             "kinetic_energy": lambda: arr.kinetic_energy_,
             "total_energy": lambda: (
@@ -899,6 +910,7 @@ class Galaxy:
 
 # Bruno:
 # Ese asterisco en la mitad me jode ¿Por qué está ahí?
+# (Lo voy a sacar, estaba entre vz_g y softening_s)
 def mkgalaxy(
     m_s: np.ndarray,
     x_s: np.ndarray,
@@ -921,7 +933,6 @@ def mkgalaxy(
     vx_g: np.ndarray,
     vy_g: np.ndarray,
     vz_g: np.ndarray,
-    *,
     softening_s: float = 0.0,
     softening_dm: float = 0.0,
     softening_g: float = 0.0,

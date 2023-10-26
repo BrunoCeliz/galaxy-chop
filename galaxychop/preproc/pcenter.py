@@ -47,7 +47,8 @@ class Centralizer(GalaxyTransformerABC):
     center their positions relative to the system.
 
     """
-
+    # Bruno:
+    # Este self está dudoso. Preguntar...
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
         """

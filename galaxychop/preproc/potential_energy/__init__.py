@@ -25,7 +25,7 @@ from .grispy_calculation import (
     potential_grispy,
 )
 
-from .. import (
+from ... import (
     constants as const,
     core,
 )

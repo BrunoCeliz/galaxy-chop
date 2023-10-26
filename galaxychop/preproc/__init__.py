@@ -16,9 +16,7 @@
 
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
-# from .potential_energy import Potential # D: aca no se si esta bien llamado
-# Bruno: Así está definido en el __init_.py de la carpeta "galaxychop" ->
-from . import potential_energy
+from .potential_energy import Potential # D: aca no se si esta bien llamado
 from .pcenter import Centralizer
 from .salign import Aligner
 from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase

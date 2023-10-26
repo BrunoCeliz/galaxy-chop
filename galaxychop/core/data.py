@@ -148,8 +148,6 @@ class ParticleSet:
 
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
 
-    # Bruno:
-    # Los labels no deberían requerir de unidades... ¿Culpa del uttrs?
     label: np.ndarray = uttr.ib(
         unit=None,
         validator=attr.validators.optional(
@@ -158,6 +156,9 @@ class ParticleSet:
         converter=(lambda v: np.copy(v) if v is not None else v),
         repr=False,
     )  # Bruno: ¿Así?
+
+    # Así está puesto en el _base.py de /models ->
+    # labels = attr.ib(validator=vldt.instance_of(np.ndarray))
 
     has_potential_: bool = uttr.ib(init=False)
     # Bruno:

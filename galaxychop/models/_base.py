@@ -700,6 +700,11 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             ptypes=_PTYPES_ORDER, attributes=["m"]
         ).m.to_numpy()
 
+        # Bruno:
+        # Acá supongo que debería ir la actualización del estado
+        # de la Galaxia decompuesta: updatear los "label" de la
+        # galaxia en cuestión y que pase a "is_decomposed == True"
+
         return Components(
             labels=final_labels,
             ptypes=final_y,

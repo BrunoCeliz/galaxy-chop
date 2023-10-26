@@ -16,7 +16,8 @@
 
 import numpy as np
 
-# B: Me falta importar de las otras carpetas...
+# Bruno:
+# Me falta importar de las otras carpetas...
 from ._base import GalaxyTransformerABC  # , hparam -> # Bruno: Unused (yet)
 from ..core import data, NoGravitationalPotentialError
 from ..utils import doc_inherit

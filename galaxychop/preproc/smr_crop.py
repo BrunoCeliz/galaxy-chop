@@ -23,6 +23,19 @@ from ..core import data
 # =============================================================================
 
 
+# Bruno:
+# "smr" == "Stellar Mass Radius". Esta función no debería ser privada, ya que
+# esta forma de medir el tamaño de la galaxia es re útil y el usuario puede
+# requerirla en caso de que no tenga el dato de la simulación.
+# Dicho sea de paso, exsiten otras formas de medir la galaxia e.g. "Half Mass
+# Radius" (considerando TODAS las partículas (gas, DM y stars)); y más aún,
+# también le podemos devolver el valor de la MASA (no sólo el radio)
+# encerrada, como para evitar que el usuario escriba esas líneas de código
+# aparte, sin usar GlxChop.
+# Otra cosa, aunque quizá sea innecesario, debería existir una columna de
+# "r" para las partículas: si bien ya existe "x, y, z", usamos para muchas
+# cosas la distancia galactocéntrica "r" que debería incorporarse a la clase
+# Galaxy (o dentro del mismo ParticleSet) (!).
 def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf = sdf[["x", "y", "z", "m"]].copy()
 
@@ -30,8 +43,13 @@ def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf.drop(["x", "y", "z"], axis="columns", inplace=True)
 
     sdf.sort_values("radius", inplace=True)
+    # Bruno:
+    # Por esto mismo lo digo, acá ya calculaste el "r", ¿Por qué no
+    # agregárselo a la Galaxia?
 
     sdf["m_cumsum"] = sdf.m.cumsum()
+    # Más aún, acá calculaste la masa -> podría guardarse y devolverla
+    # como dato de la galaxia al usuario...
     sdf.drop(["m"], axis="columns", inplace=True)
 
     half_m_cumsum = sdf.iloc[-1].m_cumsum / 2

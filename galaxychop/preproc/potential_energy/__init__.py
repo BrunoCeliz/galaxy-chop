@@ -194,13 +194,14 @@ class Potential(GalaxyTransformerABC):
     # Bruno: Según Juan, esto debería ser ya el "default_backend" y \
 
     # D: saco hparam(
-    #    default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
+    # default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
     # )
     # D: puse como default numpy
     # tendríamos que validar si es una llave del dict de backends...
     # D: de esta forma podria ser?
-    def __init__(self, backend="numpy"):
+    def __init__(self, backend=DEFAULT_POTENTIAL_BACKEND):
         self.backend = backend
+
         if self.backend in POTENTIAL_BACKENDS:
             raise TypeError(
                 "The backend entered is not in the possible Backends"

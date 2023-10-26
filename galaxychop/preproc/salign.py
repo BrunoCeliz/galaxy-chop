@@ -25,6 +25,77 @@ from ..utils import doc_inherit
 # =============================================================================
 
 
+def _make_mask(self, x, y, z, r_cut):
+    # Bruno:
+    # ¿No debería ser ~"aux_r = self.r_cut"?
+    r = np.sqrt(x**2 + y**2 + z**2)
+
+    if r_cut is None:
+        return np.repeat(True, len(r))
+
+    return np.where(r < r_cut)
+
+
+def _get_rot_matrix(self, m, x, y, z, Jx, Jy, Jz, r_cut):
+    """
+    Rotation matrix calculation.
+
+    Calculates the rotation matrix that aligns the
+    TOTAL angular momentum of
+    the particles with the z-axis. Optionally,
+    only particles within a cutting
+    radius `(r_cut)` can be used.
+
+    Parameters
+    ----------
+    m : np.ndarray
+        Masses of particles. Shape: (n,1).
+    x, y, z : np.ndarray
+        Positions x, y, z of particles. Shape: (n,1).
+    Jx, Jy, Jz : np.ndarray
+        Components of angular momentum of particles.
+        Shape: (n,1).
+    r_cut : float, optional
+        Default value =  None. If it's provided,
+        it must be positive and the
+        rotation matrix `A` is calculated from
+        the particles with radii smaller
+        than r_cut.
+
+    Returns
+    -------
+    A : np.ndarray
+        Rotation matrix. Shape: (3,3).
+
+    """
+    mask = _make_mask(x, y, z, r_cut)
+
+    mjx, mjy, mjz = m * Jx, m * Jy, m * Jz
+
+    rjx = np.sum(mjx[mask])
+    rjy = np.sum(mjy[mask])
+    rjz = np.sum(mjz[mask])
+
+    rjp = np.sqrt(rjx**2 + rjy**2)
+    rj = np.sqrt(rjx**2 + rjy**2 + rjz**2)
+
+    e1x = rjy / rjp
+    e1y = -rjx / rjp
+    e1z = 0.0
+
+    e2x = rjx * rjz / (rjp * rj)
+    e2y = rjy * rjz / (rjp * rj)
+    e2z = -rjp / rj
+
+    e3x = rjx / rj
+    e3y = rjy / rj
+    e3z = rjz / rj
+
+    A = np.array(([e1x, e1y, e1z], [e2x, e2y, e2z], [e3x, e3y, e3z]))
+
+    return A
+
+
 class Aligner(GalaxyTransformerABC):
     """
     Aligner class.
@@ -37,118 +108,6 @@ class Aligner(GalaxyTransformerABC):
 
     r_cut = hparam(default=30)  # Bruno: Nos suelen gustar ~30 kpc
 
-    @staticmethod
-    def _make_mask(self, x, y, z, r_cut):
-        # Bruno:
-        # ¿No debería ser ~"aux_r = self.r_cut"?
-        r = np.sqrt(x**2 + y**2 + z**2)
-
-        if r_cut is None:
-            return np.repeat(True, len(r))
-
-        return np.where(r < r_cut)
-
-    @staticmethod
-    def _get_rot_matrix(self, m, x, y, z, Jx, Jy, Jz, r_cut):
-        """
-        Rotation matrix calculation.
-
-        Calculates the rotation matrix that aligns the
-        TOTAL angular momentum of
-        the particles with the z-axis. Optionally,
-        only particles within a cutting
-        radius `(r_cut)` can be used.
-
-        Parameters
-        ----------
-        m : np.ndarray
-            Masses of particles. Shape: (n,1).
-        x, y, z : np.ndarray
-            Positions x, y, z of particles. Shape: (n,1).
-        Jx, Jy, Jz : np.ndarray
-            Components of angular momentum of particles.
-            Shape: (n,1).
-        r_cut : float, optional
-            Default value =  None. If it's provided,
-            it must be positive and the
-            rotation matrix `A` is calculated from
-            the particles with radii smaller
-            than r_cut.
-
-        Returns
-        -------
-        A : np.ndarray
-            Rotation matrix. Shape: (3,3).
-
-        """
-        mask = self._make_mask(x, y, z, r_cut)
-
-        mjx, mjy, mjz = m * Jx, m * Jy, m * Jz
-
-        rjx = np.sum(mjx[mask])
-        rjy = np.sum(mjy[mask])
-        rjz = np.sum(mjz[mask])
-
-        rjp = np.sqrt(rjx**2 + rjy**2)
-        rj = np.sqrt(rjx**2 + rjy**2 + rjz**2)
-
-        e1x = rjy / rjp
-        e1y = -rjx / rjp
-        e1z = 0.0
-
-        e2x = rjx * rjz / (rjp * rj)
-        e2y = rjy * rjz / (rjp * rj)
-        e2z = -rjp / rj
-
-        e3x = rjx / rj
-        e3y = rjy / rj
-        e3z = rjz / rj
-
-        A = np.array(([e1x, e1y, e1z], [e2x, e2y, e2z], [e3x, e3y, e3z]))
-
-        return A
-
-    @staticmethod
-    def is_star_aligned(self, galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
-        """
-        Validate if the galaxy is aligned.
-
-        Parameters
-        ----------
-        galaxy : ``Galaxy class`` object
-        r_cut : float, optional
-            Default value =  None. If it's provided,
-            it must be positive and the
-            rotation matrix `A` is calculated from
-            the particles with radii smaller
-            than r_cut.
-        rtol : float
-            Relative tolerance. Default value = 1e-05.
-        atol : float
-            Absolute tolerance. Default value = 1e-08.
-
-        Returns
-        -------
-        bool
-            True if galaxy is centered respect to the position of the lowest
-            potential particle, and if the total angular momentum of the galaxy
-            is aligned with the z-axis, False otherwise.
-
-        """
-        # Now we extract only the needed column to rotate the galaxy
-        df = galaxy.stars.to_dataframe(
-            attributes=["m", "x", "y", "z", "Jx", "Jy", "Jz"]
-        )
-
-        mask = self._make_mask(df.x.values, df.y.values, df.z.values, r_cut)
-
-        Jxtot = np.sum(df.Jx.values[mask] * df.m.values[mask])
-        Jytot = np.sum(df.Jy.values[mask] * df.m.values[mask])
-        Jztot = np.sum(df.Jz.values[mask] * df.m.values[mask])
-        Jtot = np.sqrt(Jxtot**2 + Jytot**2 + Jztot**2)
-
-        return np.allclose(Jztot, Jtot, rtol=rtol, atol=atol)
-
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, r_cut):
         # Bruno:
@@ -160,22 +119,25 @@ class Aligner(GalaxyTransformerABC):
         Align the galaxy.
 
         Rotates the positions, velocities and angular momentum of the
-        particles so that the total angular moment of the stars particles coincides
-        with the z-axis. Optionally, only stars particles within a cutting radius
+        particles so that the total angular moment of the
+        stars particles coincides with the z-axis.
+        Optionally, only stars particles within a cutting radius
         `(r_cut)` can be used to calculate the rotation matrix.
 
         Parameters
         ----------
         galaxy : ``Galaxy class`` object
         r_cut : float, optional
-            Default value =  None. If it's provided, it must be positive and the
-            rotation matrix `A` is calculated from the particles with radii smaller
-            than r_cut.
+            Default value =  None.
+            If it's provided, it must be positive and the
+            rotation matrix `A` is calculated from the
+            particles with radii smaller than r_cut.
 
         Returns
         -------
         galaxy: new ``Galaxy class`` object
-            A new galaxy object with their total angular momentum aligned with the
+            A new galaxy object with their total angular
+            momentum aligned with the
             z-axis.
 
         """
@@ -197,7 +159,7 @@ class Aligner(GalaxyTransformerABC):
         gas_df = galaxy.gas.to_dataframe(attributes=pos_columns + vel_columns)
 
         # now we can calculate the rotation matrix
-        A = self._get_rot_matrix(
+        A = _get_rot_matrix(
             m=stars_df["m"].values,
             x=stars_df["x"].values,
             y=stars_df["y"].values,
@@ -243,3 +205,44 @@ class Aligner(GalaxyTransformerABC):
         )
 
         return data.mkgalaxy(**new)
+
+
+def is_star_aligned(self, galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
+    """
+    Validate if the galaxy is aligned.
+
+    Parameters
+    ----------
+    galaxy : ``Galaxy class`` object
+    r_cut : float, optional
+        Default value =  None. If it's provided,
+        it must be positive and the
+        rotation matrix `A` is calculated from
+        the particles with radii smaller
+        than r_cut.
+    rtol : float
+        Relative tolerance. Default value = 1e-05.
+    atol : float
+        Absolute tolerance. Default value = 1e-08.
+
+    Returns
+    -------
+    bool
+        True if galaxy is centered respect to the position of the lowest
+        potential particle, and if the total angular momentum of the galaxy
+        is aligned with the z-axis, False otherwise.
+
+    """
+    # Now we extract only the needed column to rotate the galaxy
+    df = galaxy.stars.to_dataframe(
+        attributes=["m", "x", "y", "z", "Jx", "Jy", "Jz"]
+    )
+
+    mask = _make_mask(df.x.values, df.y.values, df.z.values, r_cut)
+
+    Jxtot = np.sum(df.Jx.values[mask] * df.m.values[mask])
+    Jytot = np.sum(df.Jy.values[mask] * df.m.values[mask])
+    Jztot = np.sum(df.Jz.values[mask] * df.m.values[mask])
+    Jtot = np.sqrt(Jxtot**2 + Jytot**2 + Jztot**2)
+
+    return np.allclose(Jztot, Jtot, rtol=rtol, atol=atol)

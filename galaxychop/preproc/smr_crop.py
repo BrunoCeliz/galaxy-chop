@@ -101,6 +101,8 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     dm = galaxy.dark_matter.copy()
     gas = galaxy.gas.copy()
 
+    # D: aca es cuando hace una copia/ crea una galaxia no?
+
     trim_galaxy = data.Galaxy(stars=trim_stars, dark_matter=dm, gas=gas)
 
     return trim_galaxy

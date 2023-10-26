@@ -31,6 +31,17 @@ from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase
 # como "preprocesador" (a.k.a. "Transformer")...
 
 # D: Esto como quedaria? que estructura se le da
+# D:
+# __all__ = [
+#    "Centralizer",
+#    "is_centered",
+#    "Potential",
+#    "Aligner",
+#    "is_star_aligned",
+#    "center_and_align",
+#    "half_star_mass_radius_crop",
+# ]
+
 __all__ = [
     # pcenter
     "center",
@@ -75,6 +86,13 @@ def center_and_align(galaxy, *, r_cut=None):
     # Bruno:
     # ¿Para inicializarlo se le pone "()"? ¿Entonces debería darle de comer el
     # "r_cut" acá?
+    # D: para mi esto irira como
+    # center = Centralizer()
+    # aling = Aligner()
+    # galaxy = center.transform(galaxy)
+    # galaxy = align.transform(galaxy, r_cut)
+    # inicializamos el objeto, sino me parece que asi va a tirar un error
+
     center = Centralizer.transform()
     align = Aligner.transform()
     # D: esto tendria que ir asi segun entiendo

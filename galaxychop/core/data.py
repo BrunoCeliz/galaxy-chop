@@ -837,6 +837,34 @@ class Galaxy:
 
 
 # =============================================================================
+# DECOMPOSEDGALAXY CLASS (WIP)
+# =============================================================================
+
+@uttr.s(frozen=True, repr=False)
+class DecomposedGalaxy:
+    """
+    DecomposedGalaxy class.
+
+    Builds an object from a ``Galaxy`` and its ``Component`` obtained after
+    applying a dynamical decomposition method to it.
+
+    Parameters
+    ----------
+    Galaxy : ``Galaxy``
+        Instance of ``Galaxy``.
+    Component : ``Component``
+        Instance of ``Component`` with dark matter particles.
+
+    Attributes
+    ----------
+    cosas (WIP)
+
+    """
+    # Bruno:
+    # def __getattr__ y __repr__
+    pass
+
+# =============================================================================
 # API FUNCTIONS
 # =============================================================================
 

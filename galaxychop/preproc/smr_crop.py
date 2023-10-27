@@ -16,11 +16,15 @@
 
 import numpy as np
 
-from ..core import data
+from ._base import GalaxyTransformerABC, hparam
+from ..core import data, NoGravitationalPotentialError
+from ..utils import doc_inherit
 
 # =============================================================================
-# API
+# INTERNALS
 # =============================================================================
+# Bruno: ¿?; btw: esta func debería ser pública/calcular métricas de la galaxia
+# y anexarla a la misma...
 
 
 # Bruno:
@@ -64,6 +68,52 @@ def _get_half_smr_crop(sdf, cut_radius_factor):
     del sdf
 
     return cut_idxs, cut_radius
+
+
+# =============================================================================
+# CUTTER CLASS
+# =============================================================================
+# Bruno:
+# "Cropper" ~> granjero; "Chopper" ~> Helicóptero o Moto;
+# "Cutter" ~> re de nene; lpm
+
+
+class Cutter(GalaxyTransformerABC):
+    """
+    Cutter class.
+
+    Given the positions and mass of particles, compute the stellar
+    half mass radius (radii of the sphere centered at the origin that
+    encloses half of the total sum of stellar particles mass) and
+    return only the stellar component inside of a multiple of it.
+
+    """
+
+    num_radii = hparam(default=3)
+    # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
+    # hay que tener cuidado...
+
+    @doc_inherit(GalaxyTransformerABC.transform)
+    def transform(self, galaxy, num_radii):
+        # Bruno:
+        # Esto returnea glx, pero el dato del r_half es más importante
+        return half_star_mass_radius_crop(galaxy, num_radii)
+
+    # Bruno:
+    # No un "checker" como tal, habría que hacerlo. Un buen test es que
+    # la distancia galactocéntica máxima no sea mayor a
+    # num_radii*r_half...
+    @doc_inherit(GalaxyTransformerABC.checker)
+    def checker(self, galaxy, **kwargs):
+        # Bruno:
+        # ¿Mejor forma que no sea con el "**"? ¿Aclarar? Ojo...
+        return is_star_cutted(galaxy, **kwargs)
+
+
+# =============================================================================
+# API FUNCTIONS
+# =============================================================================
+# Bruno: Rev como dejar este título de sec como en otros módulos...
 
 
 def half_star_mass_radius_crop(galaxy, *, num_radii=3):
@@ -124,3 +174,50 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     trim_galaxy = data.Galaxy(stars=trim_stars, dark_matter=dm, gas=gas)
 
     return trim_galaxy
+
+
+def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
+    """
+    Validate if the galaxy is cutted.
+
+    Parameters
+    ----------
+    galaxy : ``Galaxy class`` object
+    num_radii : float, optional
+        Default value =  3. If it's provided,
+        it must be positive and the galaxy is
+        cutted at that radii, with only particles
+        at radii smaller than num_radii*r_half.
+    rtol : float
+        Relative tolerance. Default value = 1e-05.
+    atol : float
+        Absolute tolerance. Default value = 1e-08.
+
+    Returns
+    -------
+    bool
+        True if galaxy is cutted at given radii, and
+        there is no stellar particles at further distances,
+        False otherwise.
+
+    """
+    # Now we extract only the needed column to rotate the galaxy
+    stars_df = galaxy.stars.to_dataframe(attributes=["m", "x", "y", "z"])
+
+    to_trim_idxs, cut_radius = _get_half_smr_crop(stars_df, num_radii)
+    trim_stars_df = stars_df.drop(to_trim_idxs, axis="rows")
+
+    # Distances of all stellar particles that "survives"
+    distances = np.sqrt(
+        trim_stars_df.x**2 + trim_stars_df.y**2 + trim_stars_df.z**2
+    )
+
+    # maximum distance index of all particles
+    maxdist_idx = np.argmin(distances)[0]
+    max_values = distances[maxdist_idx]
+
+    # Bruno:
+    # Probando cómo checkear ~> todas las no cortadas no deben estar
+    # a mayor distancia que el corte (y como test también agregar que
+    # las cortadas deben estar más lejos que el corte (!!!))
+    return np.all(np.less([max_values, cut_radius]))

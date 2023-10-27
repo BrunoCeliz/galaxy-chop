@@ -148,6 +148,32 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
 
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def checker(self, galaxy):
+        # Bruno:
+        # ¿Me faltarían los **kwargs que utilizo en cada caso?
+        """
+        Checker method.
+
+        Check if the galaxy has already been preprocessed.
+        Validation of the input galaxy instance.
+
+        Parameters
+        ----------
+        galaxy : ``Galaxy class`` object
+            Instance of Galaxy class.
+
+        Return
+        ------
+        bool
+            True if galaxy had already been preprocessed,
+            False otherwise.
+
+        """
+        # D: aca iria el checheo de que los atributos sea lo que tiene que ser?
+
+        raise NotImplementedError()
+
     # internal ================================================================
 
     def __repr__(self):

@@ -21,8 +21,9 @@ from ._base import GalaxyTransformerABC, hparam
 from ..utils import doc_inherit
 
 # =============================================================================
-# API
+# INTERNALS
 # =============================================================================
+# Bruno: ¿?
 
 
 def _make_mask(x, y, z, r_cut):
@@ -96,6 +97,11 @@ def _get_rot_matrix(m, x, y, z, Jx, Jy, Jz, r_cut):
     return A
 
 
+# =============================================================================
+# ALIGNER CLASS
+# =============================================================================
+
+
 class Aligner(GalaxyTransformerABC):
     """
     Aligner class.
@@ -106,108 +112,121 @@ class Aligner(GalaxyTransformerABC):
 
     """
 
-    r_cut = hparam(default=30)  # Bruno: Nos suelen gustar ~30 kpc
+    r_cut = hparam(default=30)
+    # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
+    # hay que tener cuidado...
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, r_cut):
         # Bruno:
         # Falta acomodar/checkear que las velocidades estén corregidas por
         # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)
-        """
-        Notes
-        -----
-        Align the galaxy.
+        return star_align(galaxy, r_cut)  # Suponiendo que así queremos...
 
-        Rotates the positions, velocities and angular momentum of the
-        particles so that the total angular moment of the
-        stars particles coincides with the z-axis.
-        Optionally, only stars particles within a cutting radius
-        `(r_cut)` can be used to calculate the rotation matrix.
-
-        Parameters
-        ----------
-        galaxy : ``Galaxy class`` object
-        r_cut : float, optional
-            Default value =  None.
-            If it's provided, it must be positive and the
-            rotation matrix `A` is calculated from the
-            particles with radii smaller than r_cut.
-
-        Returns
-        -------
-        galaxy: new ``Galaxy class`` object
-            A new galaxy object with their total angular
-            momentum aligned with the
-            z-axis.
-
-        """
-        if r_cut is not None and r_cut <= 0.0:
-            raise ValueError("r_cut must not be lower than 0.")
-
-        # declare all the different groups of columns
-        pos_columns = ["x", "y", "z"]
-        vel_columns = ["vx", "vy", "vz"]
-
-        # Now we extract only the needed column to rotate the galaxy
-        # Note: for stars we need more columns to calculate the rotation matrix
-        stars_df = galaxy.stars.to_dataframe(
-            attributes=["m", "Jx", "Jy", "Jz"] + pos_columns + vel_columns
-        )
-        dm_df = galaxy.dark_matter.to_dataframe(
-            attributes=pos_columns + vel_columns
-        )
-        gas_df = galaxy.gas.to_dataframe(attributes=pos_columns + vel_columns)
-
-        # now we can calculate the rotation matrix
-        A = _get_rot_matrix(
-            m=stars_df["m"].values,
-            x=stars_df["x"].values,
-            y=stars_df["y"].values,
-            z=stars_df["z"].values,
-            Jx=stars_df["Jx"].values,
-            Jy=stars_df["Jy"].values,
-            Jz=stars_df["Jz"].values,
-            r_cut=r_cut,
-        )
-
-        # we rotate  independently positions and velocities in stars dm and gas
-        pos_rot_s = np.dot(A, stars_df[pos_columns].T.values)
-        vel_rot_s = np.dot(A, stars_df[vel_columns].T.values)
-
-        pos_rot_dm = np.dot(A, dm_df[pos_columns].T.values)
-        vel_rot_dm = np.dot(A, dm_df[vel_columns].T.values)
-
-        pos_rot_g = np.dot(A, gas_df[pos_columns].T.values)
-        vel_rot_g = np.dot(A, gas_df[vel_columns].T.values)
-
-        # recreate the valaxy
-        new = galaxy.disassemble()
-
-        new.update(
-            x_s=pos_rot_s.T[:, 0],
-            y_s=pos_rot_s.T[:, 1],
-            z_s=pos_rot_s.T[:, 2],
-            vx_s=vel_rot_s.T[:, 0],
-            vy_s=vel_rot_s.T[:, 1],
-            vz_s=vel_rot_s.T[:, 2],
-            x_dm=pos_rot_dm.T[:, 0],
-            y_dm=pos_rot_dm.T[:, 1],
-            z_dm=pos_rot_dm.T[:, 2],
-            vx_dm=vel_rot_dm.T[:, 0],
-            vy_dm=vel_rot_dm.T[:, 1],
-            vz_dm=vel_rot_dm.T[:, 2],
-            x_g=pos_rot_g.T[:, 0],
-            y_g=pos_rot_g.T[:, 1],
-            z_g=pos_rot_g.T[:, 2],
-            vx_g=vel_rot_g.T[:, 0],
-            vy_g=vel_rot_g.T[:, 1],
-            vz_g=vel_rot_g.T[:, 2],
-        )
-
-        return data.mkgalaxy(**new)
+    @doc_inherit(GalaxyTransformerABC.checker)
+    def checker(self, galaxy, **kwargs):
+        # Bruno:
+        # ¿Mejor forma que no sea con el "**"? ¿Aclarar? Ojo...
+        return is_star_aligned(galaxy, **kwargs)
 
 
-def is_star_aligned(galaxy, r_cut=None, rtol=1e-05, atol=1e-08):
+# =============================================================================
+# API FUNCTIONS
+# =============================================================================
+# Bruno: Rev como dejar este título de sec como en otros módulos...
+
+
+def star_align(galaxy, *, r_cut=None):
+    """
+    Align the galaxy.
+
+    Rotates the positions, velocities and angular momentum of the
+    particles so that the total angular moment of the stars particles coincides
+    with the z-axis. Optionally, only stars particles within a cutting radius
+    `(r_cut)` can be used to calculate the rotation matrix.
+
+    Parameters
+    ----------
+    galaxy : ``Galaxy class`` object
+    r_cut : float, optional
+        Default value =  None. If it's provided, it must be positive and the
+        rotation matrix `A` is calculated from the particles with radii smaller
+        than r_cut.
+
+    Returns
+    -------
+    galaxy: new ``Galaxy class`` object
+        A new galaxy object with their total angular momentum aligned with the
+        z-axis.
+
+    """
+    if r_cut is not None and r_cut <= 0.0:
+        raise ValueError("r_cut must not be lower than 0.")
+
+    # declare all the different groups of columns
+    pos_columns = ["x", "y", "z"]
+    vel_columns = ["vx", "vy", "vz"]
+
+    # Now we extract only the needed column to rotate the galaxy
+    # Note: for stars we need more columns to calculate the rotation matrix
+    stars_df = galaxy.stars.to_dataframe(
+        attributes=["m", "Jx", "Jy", "Jz"] + pos_columns + vel_columns
+    )
+    dm_df = galaxy.dark_matter.to_dataframe(
+        attributes=pos_columns + vel_columns
+    )
+    gas_df = galaxy.gas.to_dataframe(attributes=pos_columns + vel_columns)
+
+    # now we can calculate the rotation matrix
+    A = _get_rot_matrix(
+        m=stars_df["m"].values,
+        x=stars_df["x"].values,
+        y=stars_df["y"].values,
+        z=stars_df["z"].values,
+        Jx=stars_df["Jx"].values,
+        Jy=stars_df["Jy"].values,
+        Jz=stars_df["Jz"].values,
+        r_cut=r_cut,
+    )
+
+    # we rotate  independently positions and velocities in stars dm and gas
+    pos_rot_s = np.dot(A, stars_df[pos_columns].T.values)
+    vel_rot_s = np.dot(A, stars_df[vel_columns].T.values)
+
+    pos_rot_dm = np.dot(A, dm_df[pos_columns].T.values)
+    vel_rot_dm = np.dot(A, dm_df[vel_columns].T.values)
+
+    pos_rot_g = np.dot(A, gas_df[pos_columns].T.values)
+    vel_rot_g = np.dot(A, gas_df[vel_columns].T.values)
+
+    # recreate the valaxy
+    new = galaxy.disassemble()
+
+    new.update(
+        x_s=pos_rot_s.T[:, 0],
+        y_s=pos_rot_s.T[:, 1],
+        z_s=pos_rot_s.T[:, 2],
+        vx_s=vel_rot_s.T[:, 0],
+        vy_s=vel_rot_s.T[:, 1],
+        vz_s=vel_rot_s.T[:, 2],
+        x_dm=pos_rot_dm.T[:, 0],
+        y_dm=pos_rot_dm.T[:, 1],
+        z_dm=pos_rot_dm.T[:, 2],
+        vx_dm=vel_rot_dm.T[:, 0],
+        vy_dm=vel_rot_dm.T[:, 1],
+        vz_dm=vel_rot_dm.T[:, 2],
+        x_g=pos_rot_g.T[:, 0],
+        y_g=pos_rot_g.T[:, 1],
+        z_g=pos_rot_g.T[:, 2],
+        vx_g=vel_rot_g.T[:, 0],
+        vy_g=vel_rot_g.T[:, 1],
+        vz_g=vel_rot_g.T[:, 2],
+    )
+
+    return data.mkgalaxy(**new)
+
+
+def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     """
     Validate if the galaxy is aligned.
 

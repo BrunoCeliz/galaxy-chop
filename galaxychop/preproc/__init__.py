@@ -16,7 +16,8 @@
 
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
-from .potential_energy import Potential # D: aca no se si esta bien llamado
+# Acomodar todo con lo nuevo (Clases que llaman a func externas)...
+from .potential_energy import Potential  # D: aca no se si esta bien llamado
 from .pcenter import Centralizer
 from .salign import Aligner
 from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase

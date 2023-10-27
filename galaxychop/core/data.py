@@ -354,6 +354,7 @@ class ParticleSet:
 # GALAXY CLASS
 # =============================================================================
 
+
 # Bruno:
 # Si me gustaría dejar los checkers de center y align (!)
 @uttr.s(frozen=True, repr=False)

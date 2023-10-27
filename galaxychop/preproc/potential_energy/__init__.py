@@ -42,6 +42,7 @@ except ImportError:  # pragma: no cover
 #: The default potential backend to use.
 DEFAULT_POTENTIAL_BACKEND = "numpy" if potential_f is None else "fortran"
 
+
 # =============================================================================
 # BACKENDS
 # =============================================================================
@@ -155,7 +156,7 @@ def numpy_potential(x, y, z, m, softening):
 
 
 # =============================================================================
-# API
+# POTENTIAL CLASS
 # =============================================================================
 
 POTENTIAL_BACKENDS = {
@@ -215,46 +216,73 @@ class Potential(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
-        if galaxy.has_potential_:
-            raise ValueError("Galaxy potential is already calculated")
+        return potential(galaxy, backend=self.backend)
 
-        # extract the implementation
-        backend_function = POTENTIAL_BACKENDS[self.backend]
 
-        # convert the galaxy in multiple arrays
-        df = galaxy.to_dataframe(attributes=["x", "y", "z", "m", "softening"])
-        x = df.x.to_numpy(dtype=np.float32)
-        y = df.y.to_numpy(dtype=np.float32)
-        z = df.z.to_numpy(dtype=np.float32)
-        m = df.m.to_numpy(dtype=np.float32)
-        softening = np.asarray(df.softening.max(), dtype=np.float32)
+# =============================================================================
+# API FUNCTIONS
+# =============================================================================
+# Bruno: ¿?
 
-        # cleanup df
-        del df
 
-        # execute the function and return
-        pot, postproc = backend_function(x, y, z, m, softening)
+def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
+    """
+    Potential energy calculation.
 
-        # cleanup again
-        del x, y, z, m, softening
+    Given the positions and masses of particles, calculate
+    their specific gravitational potential energy.
 
-        # apply the post process to the final potential
-        pot = postproc(pot)
+    Parameters
+    ----------
+    galaxy : ``Galaxy class`` object
 
-        # recreate a new galaxy
-        num_s = len(galaxy.stars)
-        num = len(galaxy.stars) + len(galaxy.dark_matter)
+    Returns
+    -------
+    galaxy: new ``Galaxy class`` object
+        A new galaxy object with the specific potential energy of particles
+        calculated.
 
-        pot_s = pot[:num_s]
-        pot_dm = pot[num_s:num]
-        pot_g = pot[num:]
+    """
+    if galaxy.has_potential_:
+        raise ValueError("Galaxy potential is already calculated")
 
-        new = galaxy.disassemble()
+    # extract the implementation
+    backend_function = POTENTIAL_BACKENDS[backend]
 
-        new.update(
-            potential_s=-pot_s * (u.km / u.s) ** 2,
-            potential_dm=-pot_dm * (u.km / u.s) ** 2,
-            potential_g=-pot_g * (u.km / u.s) ** 2,
-        )
+    # convert the galaxy in multiple arrays
+    df = galaxy.to_dataframe(attributes=["x", "y", "z", "m", "softening"])
+    x = df.x.to_numpy(dtype=np.float32)
+    y = df.y.to_numpy(dtype=np.float32)
+    z = df.z.to_numpy(dtype=np.float32)
+    m = df.m.to_numpy(dtype=np.float32)
+    softening = np.asarray(df.softening.max(), dtype=np.float32)
 
-        return core.mkgalaxy(**new)
+    # cleanup df
+    del df
+
+    # execute the function and return
+    pot, postproc = backend_function(x, y, z, m, softening)
+
+    # cleanup again
+    del x, y, z, m, softening
+
+    # apply the post process to the final potential
+    pot = postproc(pot)
+
+    # recreate a new galaxy
+    num_s = len(galaxy.stars)
+    num = len(galaxy.stars) + len(galaxy.dark_matter)
+
+    pot_s = pot[:num_s]
+    pot_dm = pot[num_s:num]
+    pot_g = pot[num:]
+
+    new = galaxy.disassemble()
+
+    new.update(
+        potential_s=-pot_s * (u.km / u.s) ** 2,
+        potential_dm=-pot_dm * (u.km / u.s) ** 2,
+        potential_g=-pot_g * (u.km / u.s) ** 2,
+    )
+
+    return core.mkgalaxy(**new)

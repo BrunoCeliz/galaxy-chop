@@ -109,13 +109,8 @@ class ParticleSet:
     Jx_, Jy_, Jz_ : Quantity
         Components of angular momentum of particles. Shapes: (n,1). Default
         units: kpc*km/s.
-    label : Quantity. Default value = 0
-        Galaxy component to which each particle belongs (only for stars).
-        Shapes: (n,1).
     has_potential_ : bool.
         Indicates if the specific potential energy is computed.
-    is_decomposed_ : bool.
-        Indicates if the Galaxy is already decomposed.
     arr_ : Instances of ``ArrayAccessor``
         Access to the attributes (defined with uttrs) of the provided instance,
         and if they are of astropy.units.Quantity type it converts them into
@@ -147,24 +142,7 @@ class ParticleSet:
     # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
-
-    label: np.ndarray = uttr.ib(
-        unit=None,
-        validator=attr.validators.optional(
-            attr.validators.instance_of(np.ndarray)
-        ),
-        converter=(lambda v: np.copy(v) if v is not None else v),
-        repr=False,
-    )  # Bruno: ¿Así?
-
-    # Así está puesto en el _base.py de /models ->
-    # labels = attr.ib(validator=vldt.instance_of(np.ndarray))
-
     has_potential_: bool = uttr.ib(init=False)
-    # Bruno:
-    # Así mismo le debo agregar "decomposed" a la Galaxy (!);
-    # o los labels = "0" (¡sólo si son estrellas!).
-    is_decomposed_: bool = uttr.ib(init=False)
 
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
     total_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
@@ -179,15 +157,6 @@ class ParticleSet:
     @has_potential_.default
     def _has_potential__default(self):
         return self.potential is not None
-
-    @is_decomposed_.default
-    def _is_decomposed__default(self):
-        return isinstance(self.label, float)
-
-    # Bruno:
-    # Es una chanchada, pero estoy probando de que no me ponga como
-    # "is_decomposed == True" cuando aplico algún preprocesamiento =>
-    # Problema con los nans/None/is_decomposed_default() (!)
 
     @kinetic_energy_.default
     def _kinetic_energy__default(self):
@@ -248,10 +217,6 @@ class ParticleSet:
 
         if self.has_potential_:
             lengths[len(self.potential)].add("potential")
-        # Bruno:
-        # Aunque prob no haga falta...
-        if self.is_decomposed_:
-            lengths[len(self.label)].add("label")
 
         # now if we have more than one key it is because there are
         # different lengths.
@@ -277,20 +242,10 @@ class ParticleSet:
 
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""
-        # Bruno:
-        # Pero claro, aclarar lo de dinámicamente decompuesto sólo
-        # sirve para estrellas... => if; Ojo como lo llamo (!)
-        if self.ptype.value == 0:  # Estrellas...
-            return (
-                f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
-                f"softening={self.softening}, potentials={self.has_potential_}, "
-                f"Dynamically decomposed={self.is_decomposed_}.>"
-            )
-        else:
-            return (
-                f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
-                f"softening={self.softening}, potentials={self.has_potential_}.>"
-            )
+        return (
+            f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
+            f"softening={self.softening}, potentials={self.has_potential_}.>"
+        )
 
     def __len__(self):
         """len(x) <=> x.__len__()."""
@@ -333,11 +288,6 @@ class ParticleSet:
             "potential": lambda: (
                 arr.potential
                 if self.has_potential_
-                else np.full(len(self), np.nan)
-            ),
-            "label": lambda: (
-                arr.label
-                if self.is_decomposed_
                 else np.full(len(self), np.nan)
             ),
             "kinetic_energy": lambda: arr.kinetic_energy_,
@@ -395,7 +345,6 @@ class ParticleSet:
             vy=self.vy.copy(),
             vz=self.vz.copy(),
             potential=self.potential.copy(),
-            label=self.label.copy(),
             softening=float(self.softening),
         )
         return new
@@ -405,7 +354,8 @@ class ParticleSet:
 # GALAXY CLASS
 # =============================================================================
 
-
+# Bruno:
+# Si me gustaría dejar los checkers de center y align (!)
 @uttr.s(frozen=True, repr=False)
 class Galaxy:
     """
@@ -433,8 +383,6 @@ class Galaxy:
     is_centered_ : bool.
         Indicates if this Galaxy instance has been already centered i.e.
         the most bound particle defines the origin of the system.
-    is_decomposed_ : bool.
-        Indicates if this Galaxy instance has been already decomposed.
 
     """
 
@@ -443,12 +391,10 @@ class Galaxy:
     gas = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
 
     # Bruno:
-    # ¡Hay que (además) checkear que haya sido centrada, alineada y
-    # decompuesta!
+    # ¡Hay que (además) checkear que haya sido centrada, alineada, etc!
     has_potential_ = attr.ib(init=False)
     is_aligned_ = attr.ib(init=False)
     is_centered_ = attr.ib(init=False)
-    is_decomposed_ = attr.ib(init=False)
 
     @has_potential_.default
     def _has_potential__default(self):
@@ -467,13 +413,6 @@ class Galaxy:
                 f"Found: {has_pot}"
             )
         return self.stars.has_potential_
-
-    # Bruno:
-    # No sé muy bien cómo implementarlo, pero si sé que sólo importan
-    # las estrellas acá...
-    @is_decomposed_.default
-    def _is_decomposed__default(self):
-        return self.stars.is_decomposed_
 
     def __attrs_post_init__(self):
         """Validate that the type of each particleset is correct."""
@@ -911,7 +850,9 @@ class Galaxy:
 
 # Bruno:
 # Ese asterisco en la mitad me jode ¿Por qué está ahí?
-# (Lo voy a sacar, estaba entre vz_g y softening_s)
+# Rta: Es para que lo que siga SI O SI DEBA SER DECLARADO CON NOMBRE
+# i.e. no puedo pasarle un array en la posición del potencial sin
+# decirle que es el potencial.
 def mkgalaxy(
     m_s: np.ndarray,
     x_s: np.ndarray,
@@ -934,15 +875,13 @@ def mkgalaxy(
     vx_g: np.ndarray,
     vy_g: np.ndarray,
     vz_g: np.ndarray,
+    *,
     softening_s: float = 0.0,
     softening_dm: float = 0.0,
     softening_g: float = 0.0,
     potential_s: np.ndarray = None,
     potential_dm: np.ndarray = None,
     potential_g: np.ndarray = None,
-    label_s: np.ndarray = None,
-    label_dm: np.ndarray = None,
-    label_g: np.ndarray = None,
 ):
     """
     Galaxy builder.
@@ -976,12 +915,6 @@ def mkgalaxy(
         Specific potential energy of dark matter particles. Shape: (n,1).
     potential_g : np.ndarray, default value = None
         Specific potential energy of gas particles. Shape: (n,1).
-    label_s : np.ndarray, default value = None
-        Galaxy component label of star particles. Shape: (n,1).
-    label_dm : np.ndarray, default value = None
-        Galaxy component label of dark matter particles. Shape: (n,1).
-    label_g : np.ndarray, default value = None
-        Galaxy component label of gas particles. Shape: (n,1).
     softening_s : float, default value = 0
         Softening radius of stellar particles. Shape: (1,).
     softening_dm : float, default value = 0
@@ -1005,7 +938,6 @@ def mkgalaxy(
         vz=vz_s,
         softening=softening_s,
         potential=potential_s,
-        label=label_s,
     )
     # Bruno:
     # Acá podría ir un if o un try para tirar un warning avisando
@@ -1021,7 +953,6 @@ def mkgalaxy(
         vz=vz_dm,
         softening=softening_dm,
         potential=potential_dm,
-        label=label_dm,
     )
     gas = ParticleSet(
         ParticleSetType.GAS,
@@ -1034,7 +965,6 @@ def mkgalaxy(
         vz=vz_g,
         softening=softening_g,
         potential=potential_g,
-        label=label_g,
     )
     galaxy = Galaxy(stars=stars, dark_matter=dark_matter, gas=gas)
     return galaxy

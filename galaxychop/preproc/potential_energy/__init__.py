@@ -16,8 +16,6 @@
 
 import astropy.units as u
 
-from attr import validators
-
 import numpy as np
 
 from .grispy_calculation import (

@@ -17,7 +17,7 @@
 import numpy as np
 
 from ._base import GalaxyTransformerABC, hparam
-from ..core import data, NoGravitationalPotentialError
+from ..core import data
 from ..utils import doc_inherit
 
 # =============================================================================

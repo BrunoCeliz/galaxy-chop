@@ -37,7 +37,7 @@ set(f2py_module_name "potential")
 set(f2py_module_dir "galaxychop/preproc/fortran")
 set(
     fortran_src_file 
-    "${CMAKE_SOURCE_DIR}/galaxychop/preproc/fortran/potential.f90"
+    "${CMAKE_SOURCE_DIR}/galaxychop/preproc/potential_energy/fortran/potential.f90"
 )
 set(
     generated_module_file 

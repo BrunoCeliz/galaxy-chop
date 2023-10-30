@@ -15,6 +15,7 @@
 # =============================================================================
 
 from . import plot, sdynamics
+from .methods import GchopMethodABC
 from .data import (
     Galaxy,
     NoGravitationalPotentialError,
@@ -32,4 +33,5 @@ __all__ = [
     "mkgalaxy",
     "plot",
     "sdynamics",
+    "GchopMethodABC",
 ]

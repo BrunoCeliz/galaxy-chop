@@ -381,8 +381,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         ----------
         X : np.ndarray(n_particles, attributes)
             2D array where each file it is a diferent particle and each column
-            is an attribute of the particles. n_particles is the total number of
-            particles.
+            is an attribute of the particles.
+            n_particles is the total number of particles.
         y : np.ndarray(n_particles,)
             1D array where is identified the type of each particle:
             0 = stars, 1 = dark matter, 2 = gas. n_particles is the total

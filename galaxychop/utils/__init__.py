@@ -15,6 +15,11 @@
 # =============================================================================
 
 from .decorators import doc_inherit
+from .bunch import Bunch
+from .unames import unique_names
 
-
-__all__ = ["doc_inherit"]
+__all__ = [
+    "doc_inherit",
+    "Bunch",
+    "unique_names",
+]

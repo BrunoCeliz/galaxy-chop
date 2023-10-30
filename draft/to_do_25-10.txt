@@ -11,3 +11,8 @@ las "componentes" por separado... (clase "Components"). Para atacar el problema
 se me ocurrió tocar la clase Galaxy (¡con cuidado!) o agregar una "columna" al 
 dataframe que forma las galaxias que contenga el valor de "label" de c/ partícula
 (sin tocar "ParticleSet", porque es una propiedad a nivel sistema...)
+
+# D: lo que querriamos ver del pipeline es algo asi no?
+pipe = GchopPipeline([("t0", gchop.preproc.Centralizer() ),("t1" ,gchop.preproc.Aligner()),("d", gchop.models.JThreshold())])
+pipe.transform(gal)
+pipe.decompose(gal)

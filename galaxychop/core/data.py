@@ -139,7 +139,8 @@ class ParticleSet:
     # Bruno:
     # Comment de potential -> Si le doy un array "malo" (a.k.a. todos zeros \
     # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
-    # el potencial calculado? Tampoco hay que obligar a calcular el potencial...
+    # el potencial calculado?
+    # Tampoco hay que obligar a calcular el potencial...
 
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
     has_potential_: bool = uttr.ib(init=False)
@@ -840,6 +841,7 @@ class Galaxy:
 # DECOMPOSEDGALAXY CLASS (WIP)
 # =============================================================================
 
+
 @uttr.s(frozen=True, repr=False)
 class DecomposedGalaxy:
     """
@@ -860,9 +862,11 @@ class DecomposedGalaxy:
     cosas (WIP)
 
     """
+
     # Bruno:
     # def __getattr__ y __repr__
     pass
+
 
 # =============================================================================
 # API FUNCTIONS

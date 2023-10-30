@@ -118,6 +118,7 @@ class Aligner(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, r_cut):
+        # D: el transform no deberia ir adentro del argumento de la clase?
         # Bruno:
         # Falta acomodar/checkear que las velocidades estén corregidas por
         # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)

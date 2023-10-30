@@ -63,7 +63,8 @@ class Centralizer(GalaxyTransformerABC):
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
         # Bruno:
-        # Again, quizás como warning, pero que no corte la línea de producción...
+        # Again, quizás como warning, pero que no
+        # corte la línea de producción...
         # (el cómputo del potencial suele molestar mucho para una muestra \
         # grande de galaxias...)
         # El asterisco acá adentro es lo que le molesta...

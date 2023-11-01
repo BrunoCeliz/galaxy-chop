@@ -395,8 +395,6 @@ class Galaxy:
     # Bruno:
     # ¡Hay que (además) checkear que haya sido centrada, alineada, etc!
     has_potential_ = attr.ib(init=False)
-    is_aligned_ = attr.ib(init=False)
-    is_centered_ = attr.ib(init=False)
 
     @has_potential_.default
     def _has_potential__default(self):
@@ -437,10 +435,9 @@ class Galaxy:
         dm_repr = f"dark_matter={len(self.dark_matter)}"
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
-        is_decomp = f"Dynamically decomposed={self.is_decomposed_}"
         return (
             f"<Galaxy {stars_repr}, {dm_repr}, "
-            f"{gas_repr}, {has_pot}, {is_decomp}.>"
+            f"{gas_repr}, {has_pot}.>"
         )
         # Bruno:
         # Cuando ocurra el caso de que haya partículas con y otras sin \

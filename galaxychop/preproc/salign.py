@@ -111,18 +111,21 @@ class Aligner(GalaxyTransformerABC):
     i.e. make the "face-on" projection the new XY plane.
 
     """
+    def __init__(self, r_cut = hparam(default=30) ):
+        self.r_cut = r_cut
 
-    r_cut = hparam(default=30)
+    # r_cut = hparam(default=30) 
+    # D:
     # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
     # hay que tener cuidado...
 
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(self, galaxy, r_cut):
+    def transform(self, galaxy):
         # D: el transform no deberia ir adentro del argumento de la clase?
         # Bruno:
         # Falta acomodar/checkear que las velocidades estén corregidas por
         # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)
-        return star_align(galaxy, r_cut)  # Suponiendo que así queremos...
+        return star_align(galaxy, self.r_cut)  # Suponiendo que así queremos...
 
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):

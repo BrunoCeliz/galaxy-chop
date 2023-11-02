@@ -22,11 +22,10 @@ from .utils import Bunch, unique_names
 # =============================================================================
 # CLASS
 # =============================================================================
-class GchopPipeline(GchopMethodABC):  # D: Importara de un GchopMethodABC
-    # D: aun no me doy cuenta si en este caso es necesario el ABC este
+class GchopPipeline(GchopMethodABC):  
     """Pipeline of transforms with a final galaxy decomposition.
 
-    Sequentially apply a list of transforms and a final D: decomposition?.
+    Sequentially apply a list of transforms and a final decomposition.
     Intermediate steps of the pipeline must be 'transforms', that is, they
     must implement `transform` method.
 
@@ -38,13 +37,13 @@ class GchopPipeline(GchopMethodABC):  # D: Importara de un GchopMethodABC
     Parameters
     ----------
     steps : list
-        List of (name, transform) tuples (implementing evaluate/transform)
+        List of (name, transform) tuples (implementing decompose/transform)
         that are chained, in the order in which they are chained, with the last
-        object an decision-maker.
+        object an decomposer.
 
     See Also
     --------
-    skcriteria.pipeline.mkpipe : Convenience function for simplified
+    gchop.pipeline.mkpipe : Convenience function for simplified
         pipeline construction.
 
     """
@@ -122,7 +121,7 @@ class GchopPipeline(GchopMethodABC):  # D: Importara de un GchopMethodABC
 
     # API =====================================================================
 
-    def evaluate(self, galaxy):
+    def decompose(self, galaxy):
         """Run the all the transformers and the decomposer.
 
         Parameters

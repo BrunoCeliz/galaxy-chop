@@ -34,18 +34,14 @@ class GchopMethodABC(metaclass=abc.ABCMeta):
 
     - ``_gchop_decomp_type``: The type of the decomposer.
     - ``_gchop_parameters``: Availebe parameters.
-    # D: esto no entiendo para que es
     - ``_gchop_abstract_class``: If the class is abstract.
 
     If the class is *abstract* all validations are turned off.
 
     """
 
-    # D: no comprendo esto
-
     _gchop_abstract_class = True
 
-    # D no entiendo que hace esto
     def __init_subclass__(cls):
         """Validate if the subclass are well formed."""
         is_abstract = vars(cls).get("_gchop_abstract_class ", False)

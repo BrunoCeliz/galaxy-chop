@@ -89,9 +89,10 @@ class Cutter(GalaxyTransformerABC):
 
     """
 
-    num_radii = hparam(default=3)
     # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
     # hay que tener cuidado...
+    def __init__(self, num_radii = hparam(default=3) ):
+        self.num_radii = num_radii
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, num_radii):
@@ -136,6 +137,12 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
         enclosing various fractions of the stellar mass.
 
     """
+    # Bruno:
+    # Acá realmente hay que agregar que si "num_radii <= 0" => error...
+    # ¡Copio!
+    if num_radii is not None and num_radii <= 0.0:
+        raise ValueError("num_radii must not be lower than 0.")
+
     # We convert the stars into a dataframe
     stars_df = galaxy.stars.to_dataframe()
 

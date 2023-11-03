@@ -10,14 +10,13 @@ import galaxychop as gchop
 
 import numpy as np
 
-import pandas as pd
-
 import pytest
 
 
 # =============================================================================
 # TRANSFORMER ABC
 # =============================================================================
+
 
 # Bruno:
 # Ojo cómo resulta el match entre lo del test_base de models/...
@@ -73,11 +72,15 @@ def test_GalaxyTransformerABC_transform(read_hdf5_galaxy):
     # la que se come (misma cant de parts, length, etc...).
     class Transformer(gchop.preproc.GalaxyTransformerABC):
         def transform(self, galaxy):
-            df = galaxy.to_dataframe(attributes=["ptypev","z"])
-            df.loc[:,'z'] = np.zeros(len(df))
+            df = galaxy.to_dataframe(attributes=["ptypev", "z"])
+            df.loc[:, "z"] = np.zeros(len(df))
             # Bruno: Copio...
-            stars = df[df.ptypev == gchop.core.data.ParticleSetType.STARS.value]
-            dark_matter = df[df.ptypev == gchop.core.data.ParticleSetType.DARK_MATTER.value]
+            stars = df[
+                df.ptypev == gchop.core.data.ParticleSetType.STARS.value
+            ]
+            dark_matter = df[
+                df.ptypev == gchop.core.data.ParticleSetType.DARK_MATTER.value
+            ]
             gas = df[df.ptypev == gchop.core.data.ParticleSetType.GAS.value]
             new = galaxy.disassemble()
             new.update(
@@ -90,9 +93,9 @@ def test_GalaxyTransformerABC_transform(read_hdf5_galaxy):
         def checker(self, galaxy):
             # Tiene que revisar si todas las partículas tienen z=0
             gal_transf = self.transform(galaxy)
-            df = gal_transf.to_dataframe(attributes=["ptypev","z"])
+            df = gal_transf.to_dataframe(attributes=["ptypev", "z"])
 
-            return np.allclose(df.loc[:,'z'], 0, rtol=1e-05, atol=1e-08)
+            return np.allclose(df.loc[:, "z"], 0, rtol=1e-05, atol=1e-08)
 
     transformer = Transformer()
     gal_transf = transformer.transform(gal)
@@ -103,6 +106,7 @@ def test_GalaxyTransformerABC_transform(read_hdf5_galaxy):
     assert len(gal_transf.stars) == len(gal.gas)
     # Bruno: Ojo con esto. igual está bien que el "checker" debe dar True
     # para cuando al galaxia sea tranformada...
-    assert is_transf == True
+    assert is_transf
+
 
 # Bruno: ¿Y hparam()?

@@ -185,6 +185,7 @@ class Potentializer(GalaxyTransformerABC):
         calculated.
 
     """
+
     # Idea de implementacion
     # pot = Potentializer(backend="frotran")
     # gal = pot.transform(gal)

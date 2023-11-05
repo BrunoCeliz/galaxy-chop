@@ -148,6 +148,8 @@ def test_Galaxy_potential_energy_backend_consistency_grispy(galaxy):
     npt.assert_almost_equal(
         pgal_gsp.gas.potential.value, pgal_f.gas.potential.value, decimal
     )
+
+
 # Bruno:
 # Agregar para el Octree en cuanto lo integremos..
 
@@ -196,4 +198,6 @@ def test_potentializer_transformer(galaxy):
     potentializer = potential_energy.Potentializer()
 
     # Bruno: ¿Está bien?
-    assert potentializer.transform(gal, backend="fortran") == potential_energy.potential(gal, backend="fortran")
+    assert potentializer.transform(
+        gal, backend="fortran"
+    ) == potential_energy.potential(gal, backend="fortran")

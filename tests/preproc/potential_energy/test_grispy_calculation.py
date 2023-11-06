@@ -4,33 +4,38 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
-# WIP (¿Hacer folders para C y fortran?)
 
 # =============================================================================
 # DOCS
 # =============================================================================
 
-"""Test utilities  galaxychop.preproc.grispy_potential"""
+
+"""Test utilities  galaxychop.preproc.potential_energy.grispy_calculation"""
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from galaxychop.preproc import grispy_potential
 
+from galaxychop.preproc.potential_energy import grispy_calculation
 
+import grispy as gsp
 import numpy as np
+
 
 # =============================================================================
 # TESTS
 # =============================================================================
 
 # Bruno:
-# Probemos: i) si l_box (tamaño del grid) encierra a todas las partículas; \
-# ii) si el grid generado es un objeto de GriSPy; iii) (siguiendo los métodos \
-# de otros test, revisar) si el return de la func es un ndarray de \
-# shape = (n,1); ¿Algo más? ¿O como es un import de otra librería no hace
-# falta hacer tests grained?
+# Probemos:
+# i) si l_box (tamaño del grid) encierra a todas las partículas;
+# ii) si el grid generado es un objeto de GriSPy;
+# iii) (revisar los métodos de otros test) si el return de la func es un
+# ndarray de shape = (n,1);
+# ¿Algo más? ¿O como es un import de otra librería no hace falta hacer tests
+# más "grained"?
 
 
 def test_make_grid(galaxy):
@@ -48,10 +53,10 @@ def test_make_grid(galaxy):
     y_sys = df.y.values
     z_sys = df.z.values
 
-    l_box, grid = grispy_potential.make_grid(x_sys, y_sys, z_sys)
+    l_box, grid = grispy_calculation.make_grid(x_sys, y_sys, z_sys)
 
-    # Bruno:
-    # Probamos...
+    # Bruno: Que estén todas las partículas encerradas
+    assert l_box > 0
     assert np.max(x_sys) < l_box
     assert np.min(x_sys) > -l_box
     assert np.max(y_sys) < l_box
@@ -59,14 +64,16 @@ def test_make_grid(galaxy):
     assert np.max(z_sys) < l_box
     assert np.min(z_sys) > -l_box
 
-    # Para lo del grid, que la cantidad de pts en el grid sea igual \
-    # a la cantidad de partículas en el sistema (creo que es un \
+    # Para lo del grid, que la cantidad de pts en el grid sea igual
+    # a la cantidad de partículas en el sistema (creo que es un
     # buen sanity-check);
     # *Existe el "grid.contains(particle)", pero no lo uso acá
     assert len(x_sys) == grid.ndata
+    # Bruno: Ojo...
+    assert isinstance(grid, gsp.GriSPy)
 
 
-def test_potential_grispy(galaxy):
+def test_potential_grispy_one_particle(galaxy):
     gal = galaxy(
         seed=42,
         stars_potential=False,
@@ -81,16 +88,14 @@ def test_potential_grispy(galaxy):
     z_sys = df.z.values
     m_sys = df.m.values
 
-    l_box, grid = grispy_potential.make_grid(x_sys, y_sys, z_sys)
+    l_box, grid = grispy_calculation.make_grid(x_sys, y_sys, z_sys)
 
-    # Bruno:
-    # Ojo que hasta acá repito todo lo de la func anterior...
-
+    # Bruno: Mismo procedimiento para armar el grid, pero testeo
+    # que funcione para 1 partícula (teniendo en cuenta el resto)
     centre = np.array([x_sys[0], y_sys[0], z_sys[0]])
-
     softening = 0.5
 
-    epot = grispy_potential.potential_grispy(
+    epot = grispy_calculation.potential_grispy(
         centre,
         x_sys,
         y_sys,
@@ -103,7 +108,7 @@ def test_potential_grispy(galaxy):
         grid,
     )
 
-    # Bruno:
-    # Probamos...
+    # Bruno: ¿Suficiente? Porque la "calidad" del cómputo
+    # lo probamos en el init de potential_energy...
     assert len(epot) == 1
     assert epot < 0

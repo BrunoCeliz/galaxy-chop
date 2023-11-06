@@ -11,25 +11,33 @@
 # DOCS
 # =============================================================================
 
+
 """This file is for distribute galaxychop."""
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
+
+
 import os
 import setuptools  # noqa
 
 from skbuild import setup
 
+
 # =============================================================================
 # PATH TO THIS MODULE
 # =============================================================================
 
+
 PATH = os.path.abspath(os.path.dirname(__file__))
+
 
 # =============================================================================
 # Get the version from galaxy-chop file itself (not imported)
 # =============================================================================
+
 
 galaxychop_INIT_PATH = os.path.join(PATH, "galaxychop", "__init__.py")
 
@@ -39,9 +47,11 @@ with open(galaxychop_INIT_PATH, "r") as f:
             VERSION = line.split("=", 1)[-1].replace('"', "").strip()
             break
 
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
+
 
 REQUIREMENTS = [
     "numpy >= 1.13.3",
@@ -56,16 +66,20 @@ REQUIREMENTS = [
     "grispy",
 ]
 
+
 # =============================================================================
 # DESCRIPTION
 # =============================================================================
 
+
 with open("README.md") as fp:
     LONG_DESCRIPTION = fp.read()
+
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
+
 
 setup(
     name="galaxychop",
@@ -100,6 +114,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering",
     ],

@@ -4,18 +4,21 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
+
 # =============================================================================
 # DOCS
 # =============================================================================
 
+
 """Test utilities  galaxychop.preproc.pcenter"""
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from galaxychop.preproc import pcenter
 
+from galaxychop.preproc import pcenter
 
 import pytest
 
@@ -85,3 +88,42 @@ def test_is_centered(galaxy):
 
     assert not pcenter.is_centered(gal)
     assert pcenter.is_centered(cgal)
+
+
+# Bruno:
+# Para testear las clases, las inicializamos y comparamos
+# que sus métodos hagan lo mismo que las funciones aparte
+# ¿Como argumento tengo que poner a la clase?
+def test_centralizer_transformer(galaxy):
+    gal = galaxy(
+        seed=42,
+        stars_potential=True,
+        dm_potential=True,
+        gas_potential=True,
+    )
+
+    centralizer = pcenter.Centralizer()
+
+    # Bruno: ¿Está bien?
+    assert centralizer.transform(gal) == pcenter.center(gal)
+
+
+def test_centralizer_checker(galaxy):
+    gal = galaxy(
+        seed=42,
+        stars_potential=True,
+        dm_potential=True,
+        gas_potential=True,
+    )
+
+    centralizer = pcenter.Centralizer()
+    cgal = centralizer.transform(gal)
+
+    assert (centralizer.checker(gal)) == (pcenter.is_centered(gal))
+    assert (centralizer.checker(cgal)) == (pcenter.is_centered(cgal))
+
+
+# Bruno:
+# Entonces -> No toqué lo ciejo y me cercioré de que lo nuevo haga
+# lo mismo que lo viejo, así que debería estar todo ok... Repito
+# para salign.py

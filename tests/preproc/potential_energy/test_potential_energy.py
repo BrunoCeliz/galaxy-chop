@@ -4,15 +4,19 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
+
 # =============================================================================
 # DOCS
 # =============================================================================
 
+
 """Test utilities  galaxychop.preproc.potential_energy"""
+
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
+
 
 from galaxychop.core import data
 from galaxychop.preproc import potential_energy
@@ -39,6 +43,9 @@ def test_Galaxy_potential_energy_already_calculated(galaxy):
         potential_energy.potential(gal)
 
 
+# Bruno:
+# Supongo que a estos test sólo le importan que la galaxia
+# posea algún valor de potencial, sin importar si está bien o no...
 def test_Galaxy_potential_energy(galaxy):
     gal = galaxy(
         seed=42,
@@ -76,11 +83,11 @@ def test_Galaxy_potential_energy_fortran_backend(galaxy):
 
 
 # Bruno:
-# Acá, para no hacer un test que calcule con todos los métodos, \
-# hago varios que se comparen (marcándolos como lentos) que se \
-# comparen contra el de fortran (direct-sumation). ¿Debería \
-# cambiarle el nombre a este test, entonces? ¿En qué otro lado \
-# debo agregar los test? (e.g. una carpeta que lso llame a todos).
+# Acá, para no hacer un test que calcule con todos los métodos,
+# hago varios que se comparen (marcándolos como lentos) que se
+# comparen contra el de fortran (direct-sumation). ¿Debería
+# cambiarle el nombre a este test, entonces? ¿En qué otro lado
+# debo agregar los test?
 @pytest.mark.skipif(
     potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
     reason="apparently the potential fortran extension are not compiled",
@@ -147,10 +154,6 @@ def test_Galaxy_potential_energy_backend_consistency_grispy(galaxy):
 # Agregar para el Octree en cuanto lo integremos..
 
 
-# Bruno:
-# Entonces ¿Acá también debería agregar el grispy_pot o mejor
-# hago tests apartes? -> Opción 2, ya que debo probar el grid
-# y los NNS bubble/shell...
 @pytest.mark.xfail
 @pytest.mark.skipif(
     potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
@@ -176,3 +179,25 @@ def test_potential_recover(read_hdf5_galaxy):
     )
 
     np.testing.assert_allclose(original_potential, new_potential)
+
+
+# Bruno: La clase Potentializer...
+@pytest.mark.skipif(
+    potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
+    reason="apparently the potential fortran extension are not compiled",
+)
+@pytest.mark.slow
+def test_potentializer_transformer(galaxy):
+    gal = galaxy(
+        seed=42,
+        stars_potential=True,
+        dm_potential=True,
+        gas_potential=True,
+    )
+
+    potentializer = potential_energy.Potentializer()
+
+    # Bruno: ¿Está bien?
+    assert potentializer.transform(
+        gal, backend="fortran"
+    ) == potential_energy.potential(gal, backend="fortran")

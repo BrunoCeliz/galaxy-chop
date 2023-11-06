@@ -115,7 +115,7 @@ def grispy_potential(x, y, z, m, softening):
             grid=grid,
         )
     # Bruno:
-    # Está chanchísimo escrito esto. WIP; btw, le saqué el uso de \
+    # Está chanchísimo escrito esto. Btw, le saqué el uso de \
     # "G" adentro de la func y lo aplico desde acá directamente, \
     # apra unificar...
 
@@ -157,7 +157,7 @@ def numpy_potential(x, y, z, m, softening):
 
 
 # =============================================================================
-# POTENTIAL CLASS
+# POTENTIALIZER CLASS
 # =============================================================================
 
 POTENTIAL_BACKENDS = {
@@ -167,9 +167,9 @@ POTENTIAL_BACKENDS = {
 }
 
 
-class Potential(GalaxyTransformerABC):
+class Potentializer(GalaxyTransformerABC):
     """
-    Potential class.
+    Potentializer class.
 
     Given the positions and masses of particles, calculate
     their specific gravitational potential energy.
@@ -190,10 +190,8 @@ class Potential(GalaxyTransformerABC):
     """
 
     # Idea de implementacion
-    # pot = Potential(backend="frotran")
+    # pot = Potentializer(backend="frotran")
     # gal = pot.transform(gal)
-
-    # Bruno: Según Juan, esto debería ser ya el "default_backend" y \
 
     # D: saco hparam(
     # default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)

@@ -114,3 +114,41 @@ def test_is_star_aligned_fake_galaxy(galaxy):
 
     assert not salign.is_star_aligned(gal, r_cut=5)
     assert salign.is_star_aligned(agal, r_cut=5)
+
+
+# Bruno:
+# Las funcs privs no se testean...
+# Para testear las clases, las inicializamos y comparamos
+# que sus métodos hagan lo mismo que las funciones aparte
+def test_aligner_transformer(galaxy):
+    gal = galaxy(seed=42)
+    aligner = salign.Aligner()
+
+    assert aligner.transform(gal) == salign.star_align(gal)
+
+
+# Bruno:
+# Añado un test para saber si inicializa bien el r_cut:
+def test_aligner_default_r_cut(galaxy):
+    gal = galaxy("gal394242.h5")
+    aligner = salign.Aligner()
+
+    assert aligner.transform(gal) == salign.star_align(gal, r_cut=30)
+
+
+# Bruno:
+# Y otro para saber si pone bien un r_cut nuevo:
+def test_aligner_notdefault_r_cut(galaxy):
+    gal = galaxy("gal394242.h5")
+    aligner = salign.Aligner(r_cut=10)
+
+    assert aligner.transform(gal) == salign.star_align(gal, r_cut=10)
+
+
+def test_aligner_checker(galaxy):
+    gal = galaxy(seed=42)
+    aligner = salign.Aligner()
+    agal = aligner.transform(gal)
+
+    assert (aligner.checker(gal)) == (salign.is_star_aligned(gal))
+    assert (aligner.checker(agal)) == (salign.is_star_aligned(agal))

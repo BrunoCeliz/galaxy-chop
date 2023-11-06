@@ -58,7 +58,9 @@ $ pip -r requirements-dev
 - Antonela Taverna ([IATE-OAC-CONICET][]).
 - Juan Cabral ([IATE-OAC-CONICET][], [CONAE][]).
 - Federico Benelli ([IPQA-CONICET][], [FCEFyN-UNC][]).
-- - Bruno Sanchez ([Duke University][]).
+- Bruno Sanchez ([Duke University][]).
+- Bruno Celiz [bruno.celiz@mi.unc.edu.ar](bruno.celiz@mi.unc.edu.ar) ([IATE-OAC-CONICET][], [FaMAF-UNC][]).
+- Daniela Stauber ([FaMAF-UNC][]).
 
 
   [IATE-OAC-CONICET]: http://iate.oac.uncor.edu/

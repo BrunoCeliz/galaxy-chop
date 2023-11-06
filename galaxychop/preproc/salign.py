@@ -16,8 +16,8 @@
 
 import numpy as np
 
-from ..core import data
 from ._base import GalaxyTransformerABC, hparam
+from ..core import data
 from ..utils import doc_inherit
 
 # =============================================================================
@@ -29,7 +29,7 @@ from ..utils import doc_inherit
 def _make_mask(x, y, z, r_cut):
     # Bruno:
     # ¿No debería ser ~"aux_r = self.r_cut"?
-    r = np.sqrt(x**2 + y**2 + z**2)
+    r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
 
     if r_cut is None:
         return np.repeat(True, len(r))
@@ -77,8 +77,8 @@ def _get_rot_matrix(m, x, y, z, Jx, Jy, Jz, r_cut):
     rjy = np.sum(mjy[mask])
     rjz = np.sum(mjz[mask])
 
-    rjp = np.sqrt(rjx**2 + rjy**2)
-    rj = np.sqrt(rjx**2 + rjy**2 + rjz**2)
+    rjp = np.sqrt(rjx ** 2 + rjy ** 2)
+    rj = np.sqrt(rjx ** 2 + rjy ** 2 + rjz ** 2)
 
     e1x = rjy / rjp
     e1y = -rjx / rjp
@@ -112,17 +112,21 @@ class Aligner(GalaxyTransformerABC):
 
     """
 
-    r_cut = hparam(default=30)
+    def __init__(self, r_cut=hparam(default=30)):
+        self.r_cut = r_cut
+
+    # r_cut = hparam(default=30)
+    # D:
     # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
     # hay que tener cuidado...
 
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(self, galaxy, r_cut):
+    def transform(self, galaxy):
         # D: el transform no deberia ir adentro del argumento de la clase?
         # Bruno:
         # Falta acomodar/checkear que las velocidades estén corregidas por
         # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)
-        return star_align(galaxy, r_cut)  # Suponiendo que así queremos...
+        return star_align(galaxy, self.r_cut)  # Suponiendo que así queremos...
 
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
@@ -263,6 +267,6 @@ def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     Jxtot = np.sum(df.Jx.values[mask] * df.m.values[mask])
     Jytot = np.sum(df.Jy.values[mask] * df.m.values[mask])
     Jztot = np.sum(df.Jz.values[mask] * df.m.values[mask])
-    Jtot = np.sqrt(Jxtot**2 + Jytot**2 + Jztot**2)
+    Jtot = np.sqrt(Jxtot ** 2 + Jytot ** 2 + Jztot ** 2)
 
     return np.allclose(Jztot, Jtot, rtol=rtol, atol=atol)

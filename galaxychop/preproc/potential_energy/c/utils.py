@@ -1,3 +1,9 @@
+# This file is part of
+# the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
+# Copyright (c) Cristiani, et al. 2021, 2022, 2023
+# License: MIT
+# Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
+
 # Bruno:
 # Este archivo vino junto al potential.c, así que no me animé \
 # a tocar nada...; Falta integrarlo, ver cómo llamarlo en el \
@@ -8,16 +14,17 @@
 # Si bien lo voy a dejar en esta carpeta de momento, lo mejor \
 # es llevarlo a otra carpeta "potentials" junto con lo de \
 # fortran y lo de GriSPy...
+"""C implementations."""
+
+import os
+from ctypes import c_int
 
 import numpy as np
 import numpy.ctypeslib as npct
 
-from ctypes import c_int, c_float
-
-import os
-
 
 def check(exe, recompilar=True):
+    """Check function."""
     if not os.path.exists("%s.so" % exe) or recompilar:
         print("Compile %s.c" % exe)
         comando = "gcc -c -O3 -fPIC -Wall -lm -fopenmp %s.c -o %s.o" % (
@@ -40,10 +47,13 @@ def check(exe, recompilar=True):
 
 
 def calcula_potencial(Npart, mp, x, y, z):
+    """Calcula potential function."""
     array_1d_float = npct.ndpointer(
         dtype=np.float32, ndim=1, flags="C_CONTIGUOUS"
     )
-    array_1d_int = npct.ndpointer(dtype=np.int32, ndim=1, flags="C_CONTIGUOUS")
+    # D: no se usa
+    # array_1d_int = npct.ndpointer(dtype=np.int32, ndim=1,
+    #  flags="C_CONTIGUOUS")
 
     libcd = npct.load_library("potential.so", ".")
 

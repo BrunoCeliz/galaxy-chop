@@ -1,14 +1,14 @@
-# Bruno:
-# Supongo que uno de los scopes de este glow-up a GlxChop \
-# tiene que ver con repetir el procedimiento del _base.py \
-# de la carpeta /models. Así que acá debería ~recrear esa \
-# carpeta.
-
 # This file is part of
 # the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
 # Copyright (c) Cristiani, et al. 2021, 2022, 2023
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
+
+# Bruno:
+# Supongo que uno de los scopes de este glow-up a GlxChop \
+# tiene que ver con repetir el procedimiento del _base.py \
+# de la carpeta /models. Así que acá debería ~recrear esa \
+# carpeta.
 
 # =============================================================================
 # DOCS
@@ -60,7 +60,6 @@ def hparam(default, **kwargs):
     -----
     This function is a thin-wrapper over the attrs function ``attr.ib()``.
     """
-
     # D: Esto habria que usarlo para el r_cut
     metadata = kwargs.pop("metadata", {})
     metadata["__gchop_model_hparam__"] = True
@@ -75,7 +74,9 @@ def hparam(default, **kwargs):
 @attr.s(frozen=True, repr=False)
 class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     """
-    Abstract class to facilitate the creation of preprocessors
+
+    Abstract class to facilitate the creation of preprocessors.
+
     (a.k.a. Transformers).
 
     This class requests the redefinition of one method: transform.

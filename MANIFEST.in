@@ -6,6 +6,11 @@ include CMakeLists.txt
 recursive-include galaxychop *.dat
 recursive-include galaxychop *.npy
 recursive-include galaxychop *.f90
+recursive-include draft *.py
+recursive-include draft *.text
+recursive-include draft *.txt
+recursive-include galaxychop *.c
+recursive-include galaxychop *.py
 
 recursive-exclude docs *
 recursive-exclude legacy *
@@ -19,3 +24,5 @@ exclude pyproject.toml
 exclude requirements_dev.txt
 exclude .header-template
 exclude .readthedocs.yml
+
+  

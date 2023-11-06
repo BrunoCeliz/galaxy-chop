@@ -17,8 +17,8 @@
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
 # Acomodar todo con lo nuevo (Clases que llaman a func externas)...
-from .potential_energy import Potential  # D: aca no se si esta bien llamado
 from .pcenter import Centralizer
+from .potential_energy import Potential  # D: aca no se si esta bien llamado
 from .salign import Aligner
 from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase
 
@@ -29,25 +29,16 @@ from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase
 # gas y DM => ¡No serviría más para calc el potencial! => No nos interesa
 # como "preprocesador" (a.k.a. "Transformer")...
 
-# D: Esto como quedaria? que estructura se le da
-# D:
-# __all__ = [
-#    "Centralizer",
-#    "is_centered",
-#    "Potential",
-#    "Aligner",
-#    "is_star_aligned",
-#    "center_and_align",
-#    "half_star_mass_radius_crop",
-# ]
 
 __all__ = [
-    # pcenter
     "center",
     "is_centered",
+    "Centralizer",
     "potential",
+    "Potential",
     "star_align",
     "is_star_aligned",
+    "Aligner",
     "center_and_align",
     "half_star_mass_radius_crop",
 ]
@@ -57,9 +48,6 @@ __all__ = [
 # =============================================================================
 
 
-# Bruno:
-# Agregar el Octree + la integración de C (Cython u otro)...
-# ¡El r_cut puede ser un hparam!
 def center_and_align(galaxy, *, r_cut=None):
     """
     Sequentially performs centering and alignment.
@@ -82,26 +70,10 @@ def center_and_align(galaxy, *, r_cut=None):
         with the z-axis.
 
     """
-    # Bruno:
-    # ¿Para inicializarlo se le pone "()"? ¿Entonces debería darle de comer el
-    # "r_cut" acá?
-    # D: para mi esto irira como
-    # center = Centralizer()
-    # aling = Aligner()
-    # galaxy = center.transform(galaxy)
-    # galaxy = align.transform(galaxy, r_cut)
-    # inicializamos el objeto, sino me parece que asi va a tirar un error
-
-    center = Centralizer.transform()
-    align = Aligner.transform()
-    # D: esto tendria que ir asi segun entiendo
-    # aligned = Aling.transform(centered, r_cut=r_cut)
-
-    # Bruno: 1ro se inicializa el transform, y luego se le da de comer.
-    # Quizás haya otra forma, por ahora piso la variable galaxy que se come
-    # la func...
-    galaxy = center(galaxy)  # Centering
-    galaxy = align(galaxy, r_cut)  # Aligning
+    center = Centralizer()
+    align = Aligner(r_cut)
+    galaxy = center.transform(galaxy)  # Centering
+    galaxy = align.transform(galaxy)  # Aligning
 
     return galaxy
 

@@ -13,9 +13,8 @@
 # =============================================================================
 # IMPORTS
 # =============================================================================
-
-from .decorators import doc_inherit
 from .bunch import Bunch
+from .decorators import doc_inherit
 from .unames import unique_names
 
 __all__ = [

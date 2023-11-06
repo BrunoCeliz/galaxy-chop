@@ -1,3 +1,10 @@
+# This file is part of
+# the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
+# Copyright (c) Cristiani, et al. 2021, 2022, 2023
+# License: MIT
+# Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
+
+
 # Bruno:
 # Para comenzar a hacer algo, veamos la implementación \
 # del potencial con GriSPy (aunqeu ya esté testeado que \
@@ -19,12 +26,6 @@
 # que el método de GriSPy no difiera en más de ~5% (muy \
 # poco estricto) del método de fortran (driect-sumation)
 
-# This file is part of
-# the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
-# Copyright (c) 2021, Valeria Cristiani
-# License: MIT
-# Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
-
 # =============================================================================
 # DOCS
 # =============================================================================
@@ -44,7 +45,7 @@ import numpy as np
 # =============================================================================
 
 
-def make_grid(x, y, z, n_cells=2**4):
+def make_grid(x, y, z, n_cells=2 ** 4):
     """
     Space grid maker.
 
@@ -57,10 +58,11 @@ def make_grid(x, y, z, n_cells=2**4):
     n_cells : float
         Number of cells that makes the grid. Shape: (1,).
         #Bruno:
-        # Aclarar el valor default*
+        # Aclarar el valor default.
 
     Returns
-    ------- *Cambiar
+    -------
+    *Cambiar
     l_box : float
         Length of the size of the smalles cube
           that encloses all particles. Shape: (1,).
@@ -101,7 +103,8 @@ def potential_grispy(
     así que ojo con mi implementación naïve...
 
     Parameters
-    ---------- *Revisar
+    ----------
+    *Revisar
     centre : np.array
         3D spatial position of the particle to compute its potential.
         Shape: (1,3).

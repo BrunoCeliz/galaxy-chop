@@ -50,7 +50,7 @@ Please check the documentation of ``galaxychop.circ.stellar_dynamics()``.
 # =============================================================================
 
 #: GalaxyChop Gravitational unit
-G_UNIT = (u.km**2 * u.kpc) / (u.s**2 * u.solMass)
+G_UNIT = (u.km ** 2 * u.kpc) / (u.s ** 2 * u.solMass)
 
 #: Gravitational constant as float in G_UNIT
 G = c.G.to(G_UNIT).to_value()

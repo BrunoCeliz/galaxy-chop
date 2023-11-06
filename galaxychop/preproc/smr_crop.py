@@ -43,7 +43,7 @@ from ..utils import doc_inherit
 def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf = sdf[["x", "y", "z", "m"]].copy()
 
-    sdf["radius"] = np.sqrt(sdf.x**2 + sdf.y**2 + sdf.z**2)
+    sdf["radius"] = np.sqrt(sdf.x ** 2 + sdf.y ** 2 + sdf.z ** 2)
     sdf.drop(["x", "y", "z"], axis="columns", inplace=True)
 
     sdf.sort_values("radius", inplace=True)
@@ -209,7 +209,7 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
 
     # Distances of all stellar particles that "survives"
     distances = np.sqrt(
-        trim_stars_df.x**2 + trim_stars_df.y**2 + trim_stars_df.z**2
+        trim_stars_df.x ** 2 + trim_stars_df.y ** 2 + trim_stars_df.z ** 2
     )
 
     # maximum distance index of all particles

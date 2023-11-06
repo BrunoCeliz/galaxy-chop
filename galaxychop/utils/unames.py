@@ -32,16 +32,13 @@ def unique_names(*, names, elements):
         objects to be named
     names: iterable of size n
         names candidates
-
     Returns
     -------
     list of tuples:
         Returns a list where each element is a tuple.
         Each tuple contains two elements: The first element is the unique name
         of the second is the named object.
-
     """
-
     if len(names) != len(elements):
         raise ValueError("'names' and 'elements' must have the same length")
 

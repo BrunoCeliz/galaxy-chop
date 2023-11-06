@@ -4,6 +4,7 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
+<<<<<<< HEAD
 
 # =============================================================================
 # DOCS
@@ -13,10 +14,14 @@
 
 """
 
+=======
+# WIP
+>>>>>>> 9bcc48e43ed744e71ca9f65f6947d3f1606d7490
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
+<<<<<<< HEAD
 
 import pytest
 
@@ -134,3 +139,5 @@ def test_GchopMethodABC_copy():
     copy = foo.copy()
 
     assert foo.get_parameters() == copy.get_parameters()
+=======
+>>>>>>> 9bcc48e43ed744e71ca9f65f6947d3f1606d7490

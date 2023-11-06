@@ -22,7 +22,7 @@ from .utils import Bunch, unique_names
 # =============================================================================
 # CLASS
 # =============================================================================
-class GchopPipeline(GchopMethodABC):  
+class GchopPipeline(GchopMethodABC):
     """Pipeline of transforms with a final galaxy decomposition.
 
     Sequentially apply a list of transforms and a final decomposition.
@@ -133,11 +133,17 @@ class GchopPipeline(GchopMethodABC):
         r : Result
             Whatever the last step (decomposer) returns from their decompose
             method.
+            # D:
+            # En este momento el decompose devuelve componentes de una galaxia
+            # Tarea para mas adelante hacer que el decompose
+            # tenga la opcion de devolverte un objeto galaxia
+            # con esas componentes
 
         """
         galaxy = self.transform(galaxy)
         _, decomp = self.steps[-1]
         result = decomp.decompose(galaxy)
+        # D: decomposed galaxy  (TO DO)
         return result
 
     def transform(self, galaxy):

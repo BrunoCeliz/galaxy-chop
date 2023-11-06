@@ -26,7 +26,7 @@ import inspect
 
 
 class GchopMethodABC(metaclass=abc.ABCMeta):
-    """Base class for the pipeline of Galaxy-Chop
+    """Base class for the pipeline of Galaxy-Chop.
 
     Notes
     -----

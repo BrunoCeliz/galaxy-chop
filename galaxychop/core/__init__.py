@@ -15,7 +15,6 @@
 # =============================================================================
 
 from . import plot, sdynamics
-from .methods import GchopMethodABC
 from .data import (
     Galaxy,
     NoGravitationalPotentialError,
@@ -23,6 +22,7 @@ from .data import (
     ParticleSetType,
     mkgalaxy,
 )
+from .methods import GchopMethodABC
 
 
 __all__ = [

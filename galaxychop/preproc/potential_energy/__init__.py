@@ -23,14 +23,17 @@ from .grispy_calculation import (
     potential_grispy,
 )
 
+from .._base import GalaxyTransformerABC
 from ... import (
     constants as const,
     core,
 )
+from ...utils import doc_inherit
+
+# D: aplicacion relativa
+
 
 # Bruno: -> hparam not used (yet)
-from .._base import GalaxyTransformerABC
-from ...utils import doc_inherit
 
 try:
     from .fortran import potential as potential_f
@@ -73,7 +76,7 @@ def fortran_potential(x, y, z, m, softening):
 
 def grispy_potential(x, y, z, m, softening):
     """
-    GriSPy implementation of the gravitational potential energy calculation.
+    Grispy implementation of the gravitational potential energy calculation.
 
     Parameters
     ----------

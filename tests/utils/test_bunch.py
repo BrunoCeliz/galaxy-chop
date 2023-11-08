@@ -4,7 +4,6 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
-<<<<<<< HEAD
 # =============================================================================
 # DOCS
 # =============================================================================
@@ -13,20 +12,16 @@
 
 """
 
-=======
-# WIP
->>>>>>> 9bcc48e43ed744e71ca9f65f6947d3f1606d7490
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
-<<<<<<< HEAD
 
 import copy
 
-import pytest
-
 from galaxychop.utils import bunch
+
+import pytest
 
 
 # =============================================================================
@@ -90,5 +85,3 @@ def test_Bunch_copy():
     assert md is not md_c
     assert md._name == md_c._name
     assert md._data == md_c._data and md._data is md_c._data
-=======
->>>>>>> 9bcc48e43ed744e71ca9f65f6947d3f1606d7490

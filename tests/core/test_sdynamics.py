@@ -73,9 +73,9 @@ def test_stellar_dynamics_real_galaxy_with_infinite_energy(
     gal.dark_matter.total_energy_.setflags(write=True)
     gal.gas.total_energy_.setflags(write=True)
 
-    gal.stars.total_energy_[0] = -np.inf * u.km ** 2 / u.s ** 2
-    gal.dark_matter.total_energy_[0] = -np.inf * u.km ** 2 / u.s ** 2
-    gal.gas.total_energy_[0] = -np.inf * u.km ** 2 / u.s ** 2
+    gal.stars.total_energy_[0] = -np.inf * u.km**2 / u.s**2
+    gal.dark_matter.total_energy_[0] = -np.inf * u.km**2 / u.s**2
+    gal.gas.total_energy_[0] = -np.inf * u.km**2 / u.s**2
 
     gal.stars.total_energy_.setflags(write=False)
     gal.dark_matter.total_energy_.setflags(write=False)

@@ -17,6 +17,7 @@
 from galaxychop.preproc import smr_crop
 
 import numpy as np
+
 import pytest
 
 

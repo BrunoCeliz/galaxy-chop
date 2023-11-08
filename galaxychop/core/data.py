@@ -162,7 +162,7 @@ class ParticleSet:
     @kinetic_energy_.default
     def _kinetic_energy__default(self):
         arr = self.arr_
-        ke = 0.5 * (arr.vx ** 2 + arr.vy ** 2 + arr.vz ** 2)
+        ke = 0.5 * (arr.vx**2 + arr.vy**2 + arr.vz**2)
         return ke
 
     @total_energy_.default
@@ -435,10 +435,7 @@ class Galaxy:
         dm_repr = f"dark_matter={len(self.dark_matter)}"
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
-        return (
-            f"<Galaxy {stars_repr}, {dm_repr}, "
-            f"{gas_repr}, {has_pot}.>"
-        )
+        return f"<Galaxy {stars_repr}, {dm_repr}, " f"{gas_repr}, {has_pot}.>"
         # Bruno:
         # Cuando ocurra el caso de que haya partículas con y otras sin \
         # potencial -> Debería devolver un warning + un False en vez de \

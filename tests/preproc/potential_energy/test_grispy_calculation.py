@@ -21,6 +21,7 @@
 from galaxychop.preproc.potential_energy import grispy_calculation
 
 import grispy as gsp
+
 import numpy as np
 
 

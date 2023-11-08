@@ -18,7 +18,9 @@
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
 # Acomodar todo con lo nuevo (Clases que llaman a func externas)...
 from .pcenter import Centralizer
-from .potential_energy import Potential  # D: aca no se si esta bien llamado
+from .potential_energy import (
+    Potentializer,
+)  # D: aca no se si esta bien llamado
 from .salign import Aligner
 from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase
 
@@ -35,7 +37,7 @@ __all__ = [
     "is_centered",
     "Centralizer",
     "potential",
-    "Potential",
+    "Potentializer",
     "star_align",
     "is_star_aligned",
     "Aligner",

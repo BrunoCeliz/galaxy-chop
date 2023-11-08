@@ -45,7 +45,7 @@ import numpy as np
 # =============================================================================
 
 
-def make_grid(x, y, z, n_cells=2 ** 4):
+def make_grid(x, y, z, n_cells=2**4):
     """
     Space grid maker.
 

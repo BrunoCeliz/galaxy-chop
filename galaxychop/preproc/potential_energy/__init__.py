@@ -22,7 +22,6 @@ from .grispy_calculation import (
     make_grid,
     potential_grispy,
 )
-
 from .._base import GalaxyTransformerABC
 from ... import (
     constants as const,

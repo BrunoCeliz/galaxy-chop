@@ -130,7 +130,7 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
         attributes=["ptypev", "total_energy", "Jx", "Jy", "Jz"]
     )
 
-    Jr_part = np.sqrt(df.Jx.values ** 2 + df.Jy.values ** 2)
+    Jr_part = np.sqrt(df.Jx.values**2 + df.Jy.values**2)
     E_tot = df.total_energy.values
 
     # Remove the particles that are not bound: E > 0 and with E = -inf.
@@ -203,7 +203,7 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
 
     # Stars particles
     df_star = df[df.ptypev == ParticleSetType.STARS.value]
-    Jr_star = np.sqrt(df_star.Jx.values ** 2 + df_star.Jy.values ** 2)
+    Jr_star = np.sqrt(df_star.Jx.values**2 + df_star.Jy.values**2)
     Etot_s = df_star.total_energy.values
     # Bruno:
     # ¿Recién ahora se encarga de las estrellas? ¿De qué me

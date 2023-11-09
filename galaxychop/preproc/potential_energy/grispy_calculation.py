@@ -71,15 +71,13 @@ def make_grid(x, y, z, n_cells=2**4):
     grid : ``GriSPy`` object
         Grid populated with all the galaxy particles.
           Shape: (n,1).
-    #Bruno:
-    # ¿Por qué me corre 2 espacios en docs? Revsiar...
 
     """
     # Size of the box that contains all particles
     l_box = max(np.abs([max(x) - min(x), max(y) - min(y), max(z) - min(z)]))
 
     # Make the grid (n_cells ~ 2**4 works well for 1e+4 ~ 1e+5 particles)
-    grid = gsp.GriSPy(x, y, z, n_cells)
+    grid = gsp.GriSPy(np.column_stack((x, y, z)), n_cells)
 
     # Bruno:
     # No uso la masa "m", pero ojo con los procedures en relación a los

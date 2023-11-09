@@ -38,15 +38,17 @@ import numpy as np
 # ¿Algo más? ¿O como es un import de otra librería no hace falta hacer tests
 # más "grained"?
 
-
-def test_make_grid(galaxy):
-    gal = galaxy(
-        seed=42,
-        stars_potential=False,
-        dm_potential=False,
-        gas_potential=False,
-    )
-
+# Bruno:
+# Pruebo de otra forma para usar glxs reales...
+# def test_make_grid(galaxy):
+#     gal = galaxy(
+#         seed=42,
+#         stars_potential=False,
+#         dm_potential=False,
+#         gas_potential=False,
+#     )
+def test_make_grid(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
     df = gal.to_dataframe()
 
     # ¿Así? ¿O mejor me creo arrays de shape = (n,1)?
@@ -57,6 +59,7 @@ def test_make_grid(galaxy):
     l_box, grid = grispy_calculation.make_grid(x_sys, y_sys, z_sys)
 
     # Bruno: Que estén todas las partículas encerradas
+    # ¿Debería usar más los "and"?
     assert l_box > 0
     assert np.max(x_sys) < l_box
     assert np.min(x_sys) > -l_box
@@ -74,13 +77,8 @@ def test_make_grid(galaxy):
     assert isinstance(grid, gsp.GriSPy)
 
 
-def test_potential_grispy_one_particle(galaxy):
-    gal = galaxy(
-        seed=42,
-        stars_potential=False,
-        dm_potential=False,
-        gas_potential=False,
-    )
+def test_potential_grispy_one_particle(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
 
     df = gal.to_dataframe()
 
@@ -93,7 +91,7 @@ def test_potential_grispy_one_particle(galaxy):
 
     # Bruno: Mismo procedimiento para armar el grid, pero testeo
     # que funcione para 1 partícula (teniendo en cuenta el resto)
-    centre = np.array([x_sys[0], y_sys[0], z_sys[0]])
+    centre = np.column_stack((x_sys[0], y_sys[0], z_sys[0]))
     softening = 0.5
 
     epot = grispy_calculation.potential_grispy(
@@ -111,5 +109,5 @@ def test_potential_grispy_one_particle(galaxy):
 
     # Bruno: ¿Suficiente? Porque la "calidad" del cómputo
     # lo probamos en el init de potential_energy...
-    assert len(epot) == 1
+    assert isinstance(epot, float)
     assert epot < 0

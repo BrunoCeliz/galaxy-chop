@@ -25,7 +25,7 @@ from galaxychop import pipeline
 from galaxychop.models.gaussian_mixture import GaussianMixture
 from galaxychop.models.threshold import JThreshold
 from galaxychop.preproc.pcenter import Centralizer
-from galaxychop.preproc.potential_energy import Potential
+from galaxychop.preproc.potential_energy import Potentializer
 from galaxychop.preproc.salign import Aligner
 
 import pytest
@@ -78,7 +78,7 @@ def test_pipeline_slicing():
     steps = [
         Centralizer(),
         Aligner(),
-        Potential(),
+        Potentializer(),
         JThreshold(),
     ]
 

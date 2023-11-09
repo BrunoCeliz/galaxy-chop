@@ -228,7 +228,7 @@ def test_GalaxyDecomposerABC_repr():
 @pytest.mark.model
 def test_GalaxyDecomposerABC_attributes_matrix(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
-    gal = gchop.preproc.star_align(gchop.preproc.center(gal))
+    gal = gchop.preproc.salign.star_align(gchop.preproc.pcenter.center(gal))
 
     class Decomposer(gchop.models.GalaxyDecomposerABC):
         def get_attributes(self):
@@ -298,7 +298,7 @@ def test_GalaxyDecomposerABC_complete_labels():
 @pytest.mark.model
 def test_GalaxyDecomposerABC_decompose(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
-    gal = gchop.preproc.star_align(gchop.preproc.center(gal))
+    gal = gchop.preproc.salign.star_align(gchop.preproc.pcenter.center(gal))
 
     class Decomposer(gchop.models.GalaxyDecomposerABC):
         def get_attributes(self):

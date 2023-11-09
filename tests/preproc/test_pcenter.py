@@ -20,6 +20,8 @@
 
 from galaxychop.preproc import pcenter
 
+import numpy as np
+import pandas as pd
 import pytest
 
 
@@ -103,9 +105,15 @@ def test_centralizer_transformer(galaxy):
     )
 
     centralizer = pcenter.Centralizer()
+    class_cgal = centralizer.transform(gal)
+    class_df = class_cgal.to_dataframe()
 
-    # Bruno: ¿Está bien?
-    assert centralizer.transform(gal) == pcenter.center(gal)
+    func_cgal = pcenter.center(gal)
+    func_df = func_cgal.to_dataframe()
+    # Bruno: Las paso a df para compararlas
+    # (no le gusta al __eq__ de Galaxy...)
+    # Probamos con el método de pandas (!)
+    assert class_df.equals(func_df)
 
 
 def test_centralizer_checker(galaxy):

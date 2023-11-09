@@ -22,7 +22,7 @@ from .potential_energy import (
     Potentializer,
 )  # D: aca no se si esta bien llamado
 from .salign import Aligner
-from .smr_crop import half_star_mass_radius_crop  # D: Aun no lo hicimos clase
+from .smr_crop import Cutter  # Bruno: to do
 
 # Bruno:
 # Del smr_crop estaría interesante sacar la func "_get_half_smr_crop()", pero
@@ -73,9 +73,11 @@ def center_and_align(galaxy, *, r_cut=None):
 
     """
     center = Centralizer()
-    align = Aligner(r_cut)
     galaxy = center.transform(galaxy)  # Centering
-    galaxy = align.transform(galaxy)  # Aligning
+    galaxy = salign.star_align(galaxy, r_cut=r_cut)
+    # Bruno:
+    # Lo apago porque al init no le gusta que le pase r_cut (!)
+    # galaxy = align.transform(galaxy)  # Aligning
 
     return galaxy
 
@@ -107,8 +109,6 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-    check_center = Centralizer.is_centered()
-    check_align = Aligner.is_aligned()
-    return check_center(galaxy, rtol=rtol, atol=atol) and check_align(
-        galaxy, r_cut=r_cut, rtol=rtol, atol=atol
-    )
+    check_center = pcenter.is_centered(galaxy, rtol=rtol, atol=atol)
+    check_align = salign.is_star_aligned(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
+    return check_center and check_align

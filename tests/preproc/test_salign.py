@@ -124,25 +124,44 @@ def test_aligner_transformer(galaxy):
     gal = galaxy(seed=42)
     aligner = salign.Aligner()
 
-    assert aligner.transform(gal) == salign.star_align(gal)
+    # Bruno: Ídem que pcenter...
+    class_agal = aligner.transform(gal)
+    class_df = class_agal.to_dataframe()
+
+    func_agal = salign.star_align(gal)
+    func_df = func_agal.to_dataframe()
+    
+    assert class_df.equals(func_df)
 
 
 # Bruno:
 # Añado un test para saber si inicializa bien el r_cut:
-def test_aligner_default_r_cut(galaxy):
-    gal = galaxy("gal394242.h5")
+def test_aligner_default_r_cut(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
     aligner = salign.Aligner()
 
-    assert aligner.transform(gal) == salign.star_align(gal, r_cut=30)
+    class_agal = aligner.transform(gal)
+    class_df = class_agal.to_dataframe()
+
+    func_agal = salign.star_align(gal, r_cut=30)
+    func_df = func_agal.to_dataframe()
+
+    assert class_df.equals(func_df)
 
 
 # Bruno:
 # Y otro para saber si pone bien un r_cut nuevo:
-def test_aligner_notdefault_r_cut(galaxy):
-    gal = galaxy("gal394242.h5")
+def test_aligner_notdefault_r_cut(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
     aligner = salign.Aligner(r_cut=10)
 
-    assert aligner.transform(gal) == salign.star_align(gal, r_cut=10)
+    class_agal = aligner.transform(gal)
+    class_df = class_agal.to_dataframe()
+
+    func_agal = salign.star_align(gal, r_cut=10)
+    func_df = func_agal.to_dataframe()
+
+    assert class_df.equals(func_df)
 
 
 def test_aligner_checker(galaxy):

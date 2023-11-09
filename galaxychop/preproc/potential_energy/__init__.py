@@ -215,6 +215,10 @@ class Potentializer(GalaxyTransformerABC):
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
         return potential(galaxy, backend=self.backend)
+    
+    @doc_inherit(GalaxyTransformerABC.checker)
+    def checker(self, galaxy, **kwargs):
+        return galaxy.has_potential_
 
 
 # =============================================================================

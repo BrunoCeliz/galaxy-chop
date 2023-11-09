@@ -67,6 +67,10 @@ def test_pipeline_mkpipe(read_hdf5_galaxy):
     pipe = pipeline.mkpipe(*steps)
     result = pipe.decompose(gal)
 
+    # Bruno:
+    # Dice que no existe este "values_equals" para "Components"
+    # Solution (maybe): pasarlo a dataframe y usar e.g.
+    # "result_df.equals(expected_df)", como hice en preproc...
     assert result.values_equals(expected)
     assert len(pipe) == len(steps)
     assert steps == [s for _, s in pipe.steps]

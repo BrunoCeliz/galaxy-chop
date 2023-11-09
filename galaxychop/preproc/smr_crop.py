@@ -88,17 +88,14 @@ class Cutter(GalaxyTransformerABC):
     return only the stellar component inside of a multiple of it.
 
     """
-
-    # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
-    # hay que tener cuidado...
-    def __init__(self, num_radii=hparam(default=3)):
-        self.num_radii = num_radii
+    # Bruno: Cambio. Repito lo que funca en salign.py
+    num_radii = hparam(default=3)
 
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(self, galaxy, num_radii):
+    def transform(self, galaxy):
         # Bruno:
         # Esto returnea glx, pero el dato del r_half es más importante
-        return half_star_mass_radius_crop(galaxy, num_radii)
+        return half_star_mass_radius_crop(galaxy, num_radii=self.num_radii)
 
     # Bruno:
     # No un "checker" como tal, habría que hacerlo. Un buen test es que

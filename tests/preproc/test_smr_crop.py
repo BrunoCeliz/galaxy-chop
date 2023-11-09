@@ -59,27 +59,28 @@ def test_is_gal_cropped_real_galaxy(read_hdf5_galaxy):
 
 def test_cutter_transformer(galaxy):
     gal = galaxy(seed=42)
-    cutter = smr_crop.Cutter()
-
-    assert cutter.transform(gal) == smr_crop.half_star_mass_radius_crop(gal)
-
-
-def test_cutter_default_num_radii(galaxy):
-    gal = galaxy("gal394242.h5")
-    cutter = smr_crop.Cutter()
-
-    assert cutter.transform(gal) == smr_crop.half_star_mass_radius_crop(
-        gal, num_radii=3
-    )
-
-
-def test_cutter_notdefault_num_radii(galaxy):
-    gal = galaxy("gal394242.h5")
     cutter = smr_crop.Cutter(num_radii=1)
 
-    assert cutter.transform(gal) == smr_crop.half_star_mass_radius_crop(
-        gal, num_radii=1
-    )
+    class_cgal = cutter.transform(gal)
+    class_df = class_cgal.to_dataframe()
+
+    func_cgal = smr_crop.half_star_mass_radius_crop(gal, num_radii=1)
+    func_df = func_cgal.to_dataframe()
+
+    assert class_df.equals(func_df)
+
+
+def test_cutter_default_num_radii(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
+    cutter = smr_crop.Cutter()
+
+    class_cgal = cutter.transform(gal)
+    class_df = class_cgal.to_dataframe()
+
+    func_cgal = smr_crop.half_star_mass_radius_crop(gal, num_radii=3)
+    func_df = func_cgal.to_dataframe()
+
+    assert class_df.equals(func_df)
 
 
 def test_cutter_checker(galaxy):

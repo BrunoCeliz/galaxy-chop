@@ -22,7 +22,7 @@ import pytest
 # Ojo cómo resulta el match entre lo del test_base de models/...
 @pytest.mark.model
 def GalaxyTransformerABC_not_implemethed():
-    class Transformer(gchop.preproc.GalaxyTransformerABC):
+    class Transformer(gchop.preproc._base.GalaxyTransformerABC):
         def transform(self, galaxy):
             return super().transform(galaxy)
 
@@ -40,8 +40,8 @@ def GalaxyTransformerABC_not_implemethed():
 
 @pytest.mark.model
 def test_GalaxyTransformerABC_repr():
-    class Transformer(gchop.preproc.GalaxyTransformerABC):
-        other = gchop.preproc.hparam(default=1)
+    class Transformer(gchop.preproc._base.GalaxyTransformerABC):
+        other = gchop.preproc._base.hparam(default=1)
 
         def transform(self, galaxy):
             ...
@@ -64,13 +64,13 @@ def test_GalaxyTransformerABC_transform(read_hdf5_galaxy):
     # eso es lo que quiero. Así que CREAMOS un
     # transformador que, por ejemplo, "aplaste" la glx en
     # el plano z=0 (!)
-    center = gchop.preproc.Centralizer()
+    center = gchop.preproc.pcenter.Centralizer()
     gal = center.transform(gal)
 
     # Bruno: El test consiste en que un transf (no importa
     # cuál) devuelva una galaxia con la misma estructura que
     # la que se come (misma cant de parts, length, etc...).
-    class Transformer(gchop.preproc.GalaxyTransformerABC):
+    class Transformer(gchop.preproc._base.GalaxyTransformerABC):
         def transform(self, galaxy):
             df = galaxy.to_dataframe(attributes=["ptypev", "z"])
             df.loc[:, "z"] = np.zeros(len(df))
@@ -102,8 +102,8 @@ def test_GalaxyTransformerABC_transform(read_hdf5_galaxy):
     is_transf = transformer.checker(gal_transf)
 
     assert len(gal_transf.stars) == len(gal.stars)
-    assert len(gal_transf.stars) == len(gal.dark_matter)
-    assert len(gal_transf.stars) == len(gal.gas)
+    assert len(gal_transf.dark_matter) == len(gal.dark_matter)
+    assert len(gal_transf.gas) == len(gal.gas)
     # Bruno: Ojo con esto. igual está bien que el "checker" debe dar True
     # para cuando al galaxia sea tranformada...
     assert is_transf

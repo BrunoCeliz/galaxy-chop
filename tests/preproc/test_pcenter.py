@@ -20,8 +20,9 @@
 
 from galaxychop.preproc import pcenter
 
-import numpy as np
-import pandas as pd
+# D: sin uso
+# import numpy as np
+# import pandas as pd
 import pytest
 
 

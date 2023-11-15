@@ -17,12 +17,17 @@
 # Bruno:
 # Cuando agregue (nuevamente) el Octree de C, volver a acá...
 # Acomodar todo con lo nuevo (Clases que llaman a func externas)...
-from .pcenter import Centralizer
+from .pcenter import Centralizer, center, is_centered
 from .potential_energy import (
     Potentializer,
+    potential,
 )  # D: aca no se si esta bien llamado
-from .salign import Aligner
-from .smr_crop import Cutter  # Bruno: to do
+from .salign import Aligner, is_star_aligned, star_align
+from .smr_crop import Cutter, half_star_mass_radius_crop
+
+
+# from .smr_crop import Cutter  # Bruno: to do
+# D: lo comiteo asi no llora flake
 
 # Bruno:
 # Del smr_crop estaría interesante sacar la func "_get_half_smr_crop()", pero
@@ -42,8 +47,10 @@ __all__ = [
     "is_star_aligned",
     "Aligner",
     "center_and_align",
+    "Cutter",
     "half_star_mass_radius_crop",
 ]
+
 
 # =============================================================================
 # FUNCTIONS
@@ -74,7 +81,9 @@ def center_and_align(galaxy, *, r_cut=None):
     """
     center = Centralizer()
     galaxy = center.transform(galaxy)  # Centering
-    galaxy = salign.star_align(galaxy, r_cut=r_cut)
+    align = Aligner(r_cut)  # D: asi funcionaria ahpra no?
+    galaxy = align.transform(galaxy)
+    # galaxy = salign.star_align(galaxy, r_cut=r_cut)
     # Bruno:
     # Lo apago porque al init no le gusta que le pase r_cut (!)
     # galaxy = align.transform(galaxy)  # Aligning
@@ -109,6 +118,12 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-    check_center = pcenter.is_centered(galaxy, rtol=rtol, atol=atol)
-    check_align = salign.is_star_aligned(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
+    # D:Creo que esto habria que cambiarlo con los checkers nuevos
+    check_center = is_centered(galaxy, rtol=rtol, atol=atol)
+    # check_center = pcenter.is_centered(galaxy, rtol=rtol, atol=atol)
+    check_align = is_star_aligned(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
+
+    # check_align = salign.is_star_aligned(
+    #    galaxy, r_cut=r_cut, rtol=rtol, atol=atol
+    # )
     return check_center and check_align

@@ -115,7 +115,7 @@ class Aligner(GalaxyTransformerABC):
     # Bruno:
     # Cambio esto porque no le gustó...
     r_cut = hparam(default=30)
-    #def __init__(self, r_cut=hparam(default=30)):
+    # def __init__(self, r_cut=hparam(default=30)):
     #    self.r_cut = r_cut
 
     # r_cut = hparam(default=30)
@@ -129,7 +129,9 @@ class Aligner(GalaxyTransformerABC):
         # Bruno:
         # Falta acomodar/checkear que las velocidades estén corregidas por
         # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)
-        return star_align(galaxy, r_cut=self.r_cut)  # Suponiendo que así queremos...
+        return star_align(
+            galaxy, r_cut=self.r_cut
+        )  # Suponiendo que así queremos...
 
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):

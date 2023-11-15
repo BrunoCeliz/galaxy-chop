@@ -38,6 +38,7 @@ import numpy as np
 # ¿Algo más? ¿O como es un import de otra librería no hace falta hacer tests
 # más "grained"?
 
+
 # Bruno:
 # Pruebo de otra forma para usar glxs reales...
 # def test_make_grid(galaxy):

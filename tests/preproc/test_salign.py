@@ -130,7 +130,7 @@ def test_aligner_transformer(galaxy):
 
     func_agal = salign.star_align(gal)
     func_df = func_agal.to_dataframe()
-    
+
     assert class_df.equals(func_df)
 
 

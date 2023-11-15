@@ -88,6 +88,7 @@ class Cutter(GalaxyTransformerABC):
     return only the stellar component inside of a multiple of it.
 
     """
+
     # Bruno: Cambio. Repito lo que funca en salign.py
     num_radii = hparam(default=3)
 

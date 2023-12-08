@@ -34,7 +34,7 @@ execute_process(
 # Compíling potential module
 message(STATUS "Compiling fortran potential...")
 set(f2py_module_name "potential")
-set(f2py_module_dir "galaxychop/preproc/fortran")
+set(f2py_module_dir "galaxychop/preproc/potential_energy/fortran")
 set(
     fortran_src_file 
     "${CMAKE_SOURCE_DIR}/galaxychop/preproc/potential_energy/fortran/potential.f90"
@@ -45,6 +45,8 @@ set(
 )
 message(STATUS "Module_file: ${generated_module_file}")
 add_custom_target(${f2py_module_name}_mod ALL DEPENDS ${generated_module_file})
+
+message(STATUS "Franco destinatiojn: ${f2py_module_dir}")
 add_custom_command(
   OUTPUT ${generated_module_file}
   COMMAND ${PYTHON_EXECUTABLE}  -m "numpy.f2py"
@@ -55,6 +57,8 @@ add_custom_command(
   WORKING_DIRECTORY ${f2py_module_dir}
   DEPENDS ${fortran_src_file}
 )
+
+
 install(
   FILES ${generated_module_file} 
   DESTINATION ${f2py_module_dir}

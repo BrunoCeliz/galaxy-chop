@@ -114,9 +114,9 @@ class Aligner(GalaxyTransformerABC):
 
     # Bruno:
     # Cambio esto porque no le gustó...
-    r_cut = hparam(default=30)
-    # def __init__(self, r_cut=hparam(default=30)):
-    #    self.r_cut = r_cut
+    # r_cut = hparam(default=30)
+    def __init__(self, r_cut=hparam(default=30)):
+        self.r_cut = r_cut
 
     # r_cut = hparam(default=30)
     # D:

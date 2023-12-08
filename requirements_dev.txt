@@ -9,3 +9,4 @@ https://github.com/quatrope/qafan/archive/refs/heads/master.zip
 
 -r docs/requirements.txt
 sphinx-autobuild
+matplotlib

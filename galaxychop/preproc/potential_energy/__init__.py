@@ -192,16 +192,14 @@ class Potentializer(GalaxyTransformerABC):
     # pot = Potentializer(backend="frotran")
     # gal = pot.transform(gal)
 
-    # D: saco hparam(
-    # default=POTENTIAL_BACKENDS, validator=attr.validators.instance_of(dict)
-    # )
-    # D: puse como default numpy
-    # tendríamos que validar si es una llave del dict de backends...
-    # D: de esta forma podria ser?
+    # D: no nos toma los init para mi por tener de
+    # alguna forma los atter el ABC congelados,
+    # pasa aca y pasaba con el aligner
+
     def __init__(self, backend=DEFAULT_POTENTIAL_BACKEND):
         self.backend = backend
 
-        if self.backend in POTENTIAL_BACKENDS:
+        if self.backend not in POTENTIAL_BACKENDS:
             raise TypeError(
                 "The backend entered is not in the possible Backends"
             )
@@ -210,7 +208,11 @@ class Potentializer(GalaxyTransformerABC):
                 "An implementation has not yet been provided"
             )
         else:
+            print("CREATED POTENCIALIZER WITH BACKEND  " + self.backend)
             pass
+
+    #  D: esto tampoco me funciono
+    # backend = hparam(default= DEFAULT_POTENTIAL_BACKEND )
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):

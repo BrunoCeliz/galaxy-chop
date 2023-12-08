@@ -70,3 +70,13 @@ $ pip -r requirements-dev
   [Duke University]: https://duke.edu/
   [IPQA-CONICET]: https://ipqa.unc.edu.ar/en/
   [FCEFyN-UNC]: https://fcefyn.unc.edu.ar/
+
+
+
+
+# D: (consideraciones para la instalacion
+# , que me tope al correr tox)
+# dpkg -l python3*-dev
+#  si no tiene el paquete  python3.*-dev
+# instalarlo sudo apt-get install python3.*-dev
+# para que el Cmake ande easy peace

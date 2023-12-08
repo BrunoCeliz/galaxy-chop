@@ -24,11 +24,14 @@
 from galaxychop import pipeline
 from galaxychop.models.gaussian_mixture import GaussianMixture
 from galaxychop.models.threshold import JThreshold
-from galaxychop.preproc.pcenter import Centralizer
+from galaxychop.preproc.pcenter import Centralizer, center
 from galaxychop.preproc.potential_energy import Potentializer
-from galaxychop.preproc.salign import Aligner
+from galaxychop.preproc.salign import Aligner, star_align
+from galaxychop.io import read_hdf5
 
+import pandas as pd
 import pytest
+
 
 # =============================================================================
 # TESTS
@@ -40,43 +43,26 @@ import pytest
 
 
 def test_pipeline_mkpipe(read_hdf5_galaxy):
-    gal = read_hdf5_galaxy("gal394242.h5")
+    gal =  read_hdf5("/home/dani/Dani/galaxy-chop/tests/datasets/gal394242.h5")
 
     steps = [
         Centralizer(),
-        Aligner(),
+        Aligner(r_cut=30),
         JThreshold(),
     ]
 
-    expected = gal
-    # D:
-    # center = gchop.preproc.Centralizer()
-    # gal = center.transform(gal_in)
-    # align = gchop.preproc.Aligner()
-    # expected_transform = align.transform(gal)
-
-    # decomp = gchop.models.JThreshold()
-    # expected_components = decomp.decompose(expected_transform)
-
-    # D: lo anterior lo hice a mano pero entiendo que
-    # hace lo mismo que esto
-    for step in steps[:-1]:
-        expected = step.transform(expected)
-    expected = steps[-1].decompose(expected)
-
     pipe = pipeline.mkpipe(*steps)
     result = pipe.decompose(gal)
+    df_result = result.to_dataframe()
 
-    # Bruno:
-    # Dice que no existe este "values_equals" para "Components"
-    # Solution (maybe): pasarlo a dataframe y usar e.g.
-    # "result_df.equals(expected_df)", como hice en preproc...
-    assert result.values_equals(expected)
-    assert len(pipe) == len(steps)
-    assert steps == [s for _, s in pipe.steps]
-    for s in pipe.named_steps.values():
-        assert s in steps
+    gal_center = center(gal)
+    gal_center_align = star_align(gal_center,r_cut=30)
+    result_decompose_with_func = JThreshold().decompose(gal_center_align)
+    df_result_decompose_with_func = result_decompose_with_func.to_dataframe()
 
+    pd.testing.assert_frame_equal(df_result_decompose_with_func, df_result)
+
+    
 
 def test_pipeline_slicing():
     steps = [

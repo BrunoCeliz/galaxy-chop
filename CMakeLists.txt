@@ -22,6 +22,10 @@ find_package(PythonExtensions)
 find_package(OpenMP)
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
+include_directories(
+    ${Python3_INCLUDE_DIRS}
+    ${Python3_NumPy_INCLUDE_DIRS})
+
 # F2PY headers
 execute_process(
   COMMAND "${Python_EXECUTABLE}"

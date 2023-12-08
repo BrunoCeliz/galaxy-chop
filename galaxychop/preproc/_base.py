@@ -71,7 +71,7 @@ def hparam(default, **kwargs):
 # =============================================================================
 
 
-@attr.s(frozen=True, repr=False)
+@attr.s(frozen=False, repr=False)  # True, repr=False)
 class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     """
 
@@ -88,7 +88,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     # A center, align y potential le interesan únicamente que las partículas \
     # tengan potencial, pero nada de si son estrellas o no... Por lo menos \
     # en común, porque no se alinean las partículas de DM...
-    __gchop_method_cls_config__ = {"repr": False, "frozen": True}
+    __gchop_method_cls_config__ = {"repr": False, "frozen": False}  # True}
 
     # block meta checks =======================================================
     def __init_subclass__(cls):
@@ -108,8 +108,10 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
                 pass
 
         """
-        method_config = getattr(cls, "__gchop_method_cls_config__")
-        attr.s(maybe_cls=cls, **method_config)
+        # D: esto es lo que no permite a las clases que heredan
+        # poder redefinir el __init__
+        # method_config = getattr(cls, "__gchop_method_cls_config__")
+        # attr.s(maybe_cls=cls, **method_config)
 
     # block  to implement in every method =====================================
 
@@ -140,8 +142,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def checker(self, galaxy):
-        # Bruno:
-        # ¿Me faltarían los **kwargs que utilizo en cada caso?
         """
         Checker method.
 
@@ -160,8 +160,8 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
             False otherwise.
 
         """
-        # D: aca iria el checheo de que los atributos sea lo que tiene que ser?
-
+    # Bruno:
+    # ¿Me faltarían los **kwargs que utilizo en cada caso?
         raise NotImplementedError()
 
     # internal ================================================================

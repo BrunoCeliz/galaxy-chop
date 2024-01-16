@@ -28,6 +28,7 @@ import pandas as pd
 import uttr
 
 from .. import constants as const
+from ..models import Components
 
 # =============================================================================
 # EXCEPTIONS
@@ -356,8 +357,6 @@ class ParticleSet:
 # =============================================================================
 
 
-# Bruno:
-# Si me gustaría dejar los checkers de center y align (!)
 @uttr.s(frozen=True, repr=False)
 class Galaxy:
     """
@@ -392,8 +391,6 @@ class Galaxy:
     dark_matter = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
     gas = uttr.ib(validator=attr.validators.instance_of(ParticleSet))
 
-    # Bruno:
-    # ¡Hay que (además) checkear que haya sido centrada, alineada, etc!
     has_potential_ = attr.ib(init=False)
 
     @has_potential_.default
@@ -499,9 +496,9 @@ class Galaxy:
 
         """
         # Bruno:
-        # Todo lo que sea, pero por lo gral cuando alguien pide \
-        # un .hdf5 creo que es mejor que tenga la mayor cantidad \
-        # de info posible (véase todos los datos del post-procesado \
+        # Todo lo que sea, pero por lo gral cuando alguien pide
+        # un .hdf5 creo que es mejor que tenga la mayor cantidad
+        # de info posible (véase todos los datos del post-proc
         # que ofrecen los cutouts.hdf5 de IllustrisTNG...)
         from .. import io
 
@@ -638,6 +635,7 @@ class Galaxy:
             self.gas.kinetic_energy_,
         )
 
+    # Bruno: ¡Cambiar docs! (para explicar cómo calcular el potencial...)
     @property
     def potential_energy_(self):
         """
@@ -645,7 +643,8 @@ class Galaxy:
 
         This property doesn't compute the potential energy, only returns its
         value if it is already computed, i.e. ``has_potential_`` is True. To
-        compute the potential use the ``galaxychop.potential`` function.
+        compute the potential use the ``galaxychop.preproc.potential``
+        function.
 
         Returns
         -------
@@ -660,7 +659,7 @@ class Galaxy:
 
         >>> import galaxychop as gchop
         >>> galaxy = gchop.Galaxy(...)
-        >>> galaxy_with_potential = gchop.potential(galaxy)
+        >>> galaxy_with_potential = gchop.preproc.potential(galaxy)
         >>> p_s, p_dm, p_g = galaxy_with_potential.potential_energy_
         """
         if self.has_potential_:
@@ -704,12 +703,12 @@ class Galaxy:
                 self.dark_matter.total_energy_,
                 self.gas.total_energy_,
             )
-        # Bruno: Repito...
         else:
             raise NoGravitationalPotentialError(
                 "Galaxy does not have the potential energy calculated"
             )
 
+    # Bruno: Again, habría que checkear que las velocidades estén centradas...
     @property
     def angular_momentum_(self):
         """
@@ -779,17 +778,11 @@ class Galaxy:
             jcirc=0. By default the function decides to ignore these warnings.
             `runtime_warnings` can be set to any valid "action" in the python
             warnings module.
-            #Bruno:
-            # ¿Se pueden poner mayúsculas dentro de ese paréntesis?
 
         Return
         ------
         GalaxyStellarDynamics :
             Circularity attributes of the star components of the galaxy
-        #Bruno:
-        # No me gustó (aunque creo que no entendí qué hace sdynamics.py)
-        # ¿Por qué no poner bien qué devuelve, en vez de este nombre que
-        # aparenta ser una clase?
 
         Notes
         -----
@@ -839,6 +832,14 @@ class Galaxy:
 # =============================================================================
 
 
+# Bruno:
+# As said, es sólo crear una clase que englobe a la "Galaxia" y a sus
+# "Componentes" una vez se aplique un método de descomposición dinámica.
+# Cómo Hasta ahora se manejan de forma independiente, los mezclemos en
+# una clase que herede de Galaxy y de Component -> ¡Importar esta última!
+# *¿Se ahce con herencia? Debería rehacer el __repr__ y demases...
+# Debe heredar de Galaxy si o si imo, ¿Pero de Component?
+# Tiene el "describe", pero no mucho más... Lo probemos sin herencia:
 @uttr.s(frozen=True, repr=False)
 class DecomposedGalaxy:
     """
@@ -852,7 +853,7 @@ class DecomposedGalaxy:
     Galaxy : ``Galaxy``
         Instance of ``Galaxy``.
     Component : ``Component``
-        Instance of ``Component`` with dark matter particles.
+        Instance of ``Component``.
 
     Attributes
     ----------
@@ -861,7 +862,46 @@ class DecomposedGalaxy:
     """
 
     # Bruno:
-    # def __getattr__ y __repr__
+    # *Quiero que esta clase no sólo contenga la info de la
+    # galaxia y de las componentes, sino que se comporte como ambas.
+    # Luego, esta debería guardar la info de lo que se come, y mantener
+    # los métodos def en c/u... ¿Cómo le digo para que guarde la info?
+    # (=/= a heredar props de las superclases...)
+
+    # Me "inspiro" en la relación Galaxy-ParticleSet...
+    galaxy = uttr.ib(validator=attr.validators.instance_of(Galaxy))
+    components = uttr.ib(validator=attr.validators.instance_of(Components))
+
+    # Que la long sea la cant de partículas...
+    def __len__(self):
+        """len(x) <=> x.__len__()."""
+        return len(self.galaxy)
+
+    # ...y que el repr explique las props de las componentes,
+    # linkeando ambas repr (if possible).
+    def __repr__(self):
+        """repr(x) <=> x.__repr__()."""
+        # Try...
+        galaxy_repr = galaxy.__repr__()
+        components_repr = components.__repr__()
+        return galaxy_repr + "\n" + components_repr
+
+    # Bruno:
+    # ¿Para el __getattr__ necesito si o si haber definido un
+    # "__setattr__"? Vamos a suponer que sí: ¿No debería ponerlo
+    # en el __init__ (como el ej del NB 01_03 de clase)?
+    # En todo caso, ¿Cómo lo hago?
+    # Sé que lo que quiero es que esta clase me "redirija" a
+    # la galaxia/componentes que se comió (¡getattr!)
+
+    # def __setattr__(self):
+    #    """len(x) <=> x.__len__()."""
+    #    return len(self.galaxy)
+
+    # def __getattr__(self):
+    #    """len(x) <=> x.__len__()."""
+    #    return len(self.galaxy)
+
     pass
 
 
@@ -878,11 +918,6 @@ class DecomposedGalaxy:
 # puedo calcular J y alinear sin drama...
 
 
-# Bruno:
-# Ese asterisco en la mitad me jode ¿Por qué está ahí?
-# Rta: Es para que lo que siga SI O SI DEBA SER DECLARADO CON NOMBRE
-# i.e. no puedo pasarle un array en la posición del potencial sin
-# decirle que es el potencial.
 def mkgalaxy(
     m_s: np.ndarray,
     x_s: np.ndarray,
@@ -998,9 +1033,3 @@ def mkgalaxy(
     )
     galaxy = Galaxy(stars=stars, dark_matter=dark_matter, gas=gas)
     return galaxy
-
-
-# Bruno:
-# Ojo con todo. No me gustó que también deba definir los "labels" de
-# todas las pariculas (DM y gas, que no tiene sentido. Por ahora lo
-# dejo así, pero es chanchísimo...

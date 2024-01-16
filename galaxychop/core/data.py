@@ -872,6 +872,12 @@ class DecomposedGalaxy:
     galaxy = uttr.ib(validator=attr.validators.instance_of(Galaxy))
     components = uttr.ib(validator=attr.validators.instance_of(Components))
 
+    # ¿O así? Lo commentareo porque no hicimos ninguna clase así...
+    # def __init__(self, galaxy, components):
+    #       self.galaxy = galaxy
+    #       self.components = components
+    #       return
+
     # Que la long sea la cant de partículas...
     def __len__(self):
         """len(x) <=> x.__len__()."""
@@ -881,28 +887,26 @@ class DecomposedGalaxy:
     # linkeando ambas repr (if possible).
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""
-        # Try...
-        galaxy_repr = galaxy.__repr__()
-        components_repr = components.__repr__()
+        # Trying...
+        galaxy_repr = self.galaxy.__repr__()
+        components_repr = self.components.__repr__()
         return galaxy_repr + "\n" + components_repr
 
     # Bruno:
     # ¿Para el __getattr__ necesito si o si haber definido un
     # "__setattr__"? Vamos a suponer que sí: ¿No debería ponerlo
     # en el __init__ (como el ej del NB 01_03 de clase)?
-    # En todo caso, ¿Cómo lo hago?
+    # En todo caso, ¿Cómo lo hago? ¿Lo quiero/necesito?
     # Sé que lo que quiero es que esta clase me "redirija" a
     # la galaxia/componentes que se comió (¡getattr!)
 
-    # def __setattr__(self):
-    #    """len(x) <=> x.__len__()."""
-    #    return len(self.galaxy)
-
-    # def __getattr__(self):
-    #    """len(x) <=> x.__len__()."""
-    #    return len(self.galaxy)
-
-    pass
+    # Digo, si no hereda se pueden llamar como
+    # "DecomposedGalaxy.galaxy. ___" o "Decomp _.components. ___".
+    # Pero si heredase debería hacer un handling más cautious
+    # de los métodos que se pisen (si es que hay, además de los
+    # dunders)...
+    # e.g. quiero hacer un "describe" -> Decomp.components.describe
+    # (!)
 
 
 # =============================================================================

@@ -26,6 +26,13 @@ import seaborn as sns
 
 from .. import models
 
+# Bruno:
+# TO DO: 
+# - Hacer que los métodos sean boludos-proof, porque resulta que por default
+# NO hace plots CUADRADOS i.e. fixear los settings de los plots e.g. lims,
+# colormaps (if any), size, etc...
+# => Buscar qué opciones te deja tocar seaborn (Zzz pls)
+
 # =============================================================================
 # ACCESSOR
 # =============================================================================

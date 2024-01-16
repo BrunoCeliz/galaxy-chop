@@ -352,7 +352,7 @@ def stellar_dynamics(
     if not galaxy.has_potential_:
         raise NoGravitationalPotentialError(
             "Galaxy does not have the potential energy calculated"
-        )  # Bruno: En una de esas esto no sirve/no es necesario
+        )  # Bruno: En una de esas esto no es necesario
 
     with warnings.catch_warnings():
         warnings.simplefilter(runtime_warnings, category=RuntimeWarning)

@@ -27,11 +27,11 @@ import seaborn as sns
 from .. import models
 
 # Bruno:
-# TO DO: 
+# TO DO:
 # - Hacer que los métodos sean boludos-proof, porque resulta que por default
 # NO hace plots CUADRADOS i.e. fixear los settings de los plots e.g. lims,
 # colormaps (if any), size, etc...
-# => Buscar qué opciones te deja tocar seaborn (Zzz pls)
+# => Buscar qué opciones te deja tocar seaborn (Zzz)
 
 # =============================================================================
 # ACCESSOR
@@ -206,6 +206,13 @@ class GalaxyPlotter:
         ax = sns.pairplot(data=df, hue=hue, **kwargs)
         return ax
 
+    # Bruno:
+    # ¿Supongo que acá vienen los problemas? Claro, como scatter come
+    # cualesquiera atributos de la galaxia, exigir que sea cuadrado no
+    # tiene sentido según qué propiedades. Sólo nos interesa que sea
+    # tal en caso de plotear posiciones (!). Entonces, debe quedar
+    # delegado a los **kwargs (I guess), o meter un if/switch en caso
+    # de que los ejes sean las posiciones, idk...
     def scatter(self, x, y, *, ptypes=None, labels=None, lmap=None, **kwargs):
         """Draw a scatter plot of galaxy properties.
 

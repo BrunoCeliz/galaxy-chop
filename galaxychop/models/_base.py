@@ -24,6 +24,8 @@ import numpy as np
 
 import pandas as pd
 
+import uttr
+
 from .. import (
     constants as consts,
     core,
@@ -73,6 +75,9 @@ class Components:
        Otherwise it adopts the value None.
     """
 
+    # Bruno:
+    # "ptypes" y "m" se repiten dentro de "DecompGlx"...
+    # *Queda para un trabajo futuro...
     labels = attr.ib(validator=vldt.instance_of(np.ndarray))
     ptypes = attr.ib(validator=vldt.instance_of(np.ndarray))
     m = attr.ib(validator=vldt.instance_of(np.ndarray))
@@ -95,8 +100,7 @@ class Components:
             lens.add(len(self.probabilities))
         if len(lens) > 1:
             raise ValueError("All length must be the same")
-        # Bruno:
-        # El sms de error puede ser mejor, ¿no?
+        
 
     def map_labels(self, lmap=None):
         """
@@ -469,21 +473,12 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         # GAS
         gas_rows = len(galaxy.gas)
         gas_nans = np.full(gas_rows, np.nan)
-        # Bruno:
-        # Si el gas no interesa en la descomposición dinámica \
-        # ¿Por qué se normaliza según la partícula de mayor energía/ \
-        # momento angular y no según la ESTRELLA de mayor E/Jz? Rev...
 
         gas_columns = {attr: gas_nans for attr in attributes}
         gas_columns["ptypev"] = core.ParticleSetType.GAS.value
 
         gas_df = pd.DataFrame(gas_columns)
 
-        # Bruno:
-        # Entonces, este método hace que cualquier descomponedor \
-        # calcule la stellar dynamics de la galaxia, ¿no? Luego, \
-        # ¿Para qué agregar DM y gas entonces? ¿O es por completitud \
-        # y unificación de outputs de los descomponedores?
         return pd.concat([stars_df, dm_df, gas_df], ignore_index=True)
 
     def attributes_matrix(self, galaxy, attributes):
@@ -539,8 +534,6 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
                 ptypes=_PTYPES_ORDER, attributes=df_attrs
             )
             result.append(dfgal)
-        # Bruno:
-        # ¿Dónde está el "df_attrs"?
 
         # If we have JCIRC attributes =========================================
         #     I'm going to need a lot of NANs that represent that gas and dm
@@ -700,11 +693,8 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             ptypes=_PTYPES_ORDER, attributes=["m"]
         ).m.to_numpy()
 
-        # Bruno:
-        # Acá supongo que debería ir la actualización del estado
-        # de la Galaxia decompuesta: updatear los "label" de la
-        # galaxia en cuestión y que pase a "is_decomposed == True"
-
+        # we make the components and wrap they with the galaxy
+        # in a "DecomposedGalaxy" class.
         components = Components(
             labels=final_labels,
             ptypes=final_y,
@@ -713,7 +703,6 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             lmap=self.get_lmap().copy(),
         )
 
-        # Emprolijar
         return DecomposedGalaxy(galaxy,components)
 
 
@@ -744,3 +733,59 @@ class DynamicStarsDecomposerMixin:
         only_stars = np.equal(y, core.ParticleSetType.STARS.value)
         finite_values = np.isfinite(X).all(axis=1)
         return only_stars & finite_values
+
+
+# =============================================================================
+# DECOMPOSEDGALAXY CLASS (WIP)
+# =============================================================================
+
+# Remember los test pls:
+# - El repr de la DecomposedGalaxy debe contener info de Galaxy y 
+# Components (rev bien qué es lo que quiero e.g. "Glx de X_i,j,k
+# partículas de gas, dm y stars, con fracción B/T = Y").
+# - DecompGlx.galaxy == la Galaxy que se come.
+# - DecompGlx.components == los Components que se come.
+# - ¿Probar métodos? -> Al vicio porque para eso ya están los
+# de c/ clase por separado (si es que los hereda)...
+
+@uttr.s(frozen=True, repr=False)
+class DecomposedGalaxy:
+    """
+    DecomposedGalaxy class.
+
+    Builds an object from a ``Galaxy`` and its ``Components`` obtained
+    after applying a dynamical decomposition method to it.
+
+    Parameters
+    ----------
+    Galaxy : ``Galaxy``
+        Instance of ``Galaxy``.
+    Component : ``Component``
+        Instance of ``Component``.
+
+    Attributes
+    ----------
+    WIP
+
+    """
+    # Me "inspiro" en la relación Galaxy-ParticleSet...
+    galaxy = uttr.ib(validator=attr.validators.instance_of(core.data.Galaxy))
+    components = uttr.ib(validator=attr.validators.instance_of(Components))
+
+    # Dunders que comparte con "Galaxy"
+    def __len__(self):
+        """len(x) <=> x.__len__()."""
+        return len(self.galaxy)
+
+    # ...y que el repr explique las props de las componentes,
+    # linkeando ambas repr (if possible).
+    def __repr__(self):
+        """repr(x) <=> x.__repr__()."""
+        # Trying...
+        galaxy_repr = repr(self.galaxy)
+        components_repr = repr(self.components)
+        return galaxy_repr + "\n" + components_repr
+
+    # Bruno:
+    # ¿Quiero redefinir el __getattr__? Por ahora se ingresa a las
+    # partes como e.g. "decompglx.galaxy" o "decompglx.components".

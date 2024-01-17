@@ -28,7 +28,6 @@ import pandas as pd
 import uttr
 
 from .. import constants as const
-from ..models import Components
 
 # =============================================================================
 # EXCEPTIONS
@@ -825,100 +824,7 @@ class Galaxy:
             reassign=reassign,
             runtime_warnings=runtime_warnings,
         )
-
-
-# =============================================================================
-# DECOMPOSEDGALAXY CLASS (WIP)
-# =============================================================================
-
-
-# Bruno:
-# As said, es sólo crear una clase que englobe a la "Galaxia" y a sus
-# "Componentes" una vez se aplique un método de descomposición dinámica.
-# Cómo hasta ahora se manejan de forma independiente, los mezclemos en
-# una clase que herede de Galaxy y de Component -> ¡Importar esta última!
-# *¿Se ahce con herencia? Debería rehacer el __repr__ y demases...
-# Debe heredar de Galaxy si o si imo, ¿Pero de Component?
-# Tiene el "describe", pero no mucho más... Lo probemos sin herencia:
     
-# Bruno:
-# Ojo con las importaciones cíclicas de Components...
-
-# Remember los test pls:
-# - El repr de la DecomposedGalaxy debe contener info de Galaxy y 
-# Components (rev bien qué es lo que quiero e.g. "Glx de X_i,j,k
-# partículas de gas, dm y stars, con fracción B/T = Y").
-# - DecompGlx.galaxy == la Galaxy que se come.
-# - DecompGlx.components == los Components que se come.
-# - ¿Probar métodos? -> Al vicio porque para eso ya están los
-# de c/ clase por separado (si es que los hereda)...
-# - ¿Algo más?
-    
-# Juan:
-# Tema "acoplamiento" -> Llevar la clase "DecomposedGlx" a 
-# models/_base.py
-@uttr.s(frozen=True, repr=False)
-class DecomposedGalaxy:
-    """
-    DecomposedGalaxy class.
-
-    Builds an object from a ``Galaxy`` and its ``Component`` obtained after
-    applying a dynamical decomposition method to it.
-
-    Parameters
-    ----------
-    Galaxy : ``Galaxy``
-        Instance of ``Galaxy``.
-    Component : ``Component``
-        Instance of ``Component``.
-
-    Attributes
-    ----------
-    cosas (WIP)
-
-    """
-
-    # Bruno:
-    # *Quiero que esta clase no sólo contenga la info de la
-    # galaxia y de las componentes, sino que se comporte como ambas.
-    # Luego, esta debería guardar la info de lo que se come, y mantener
-    # los métodos def en c/u... ¿Cómo le digo para que guarde la info?
-    # (=/= a heredar props de las superclases...)
-
-    # Me "inspiro" en la relación Galaxy-ParticleSet...
-    galaxy = uttr.ib(validator=attr.validators.instance_of(Galaxy))
-    components = uttr.ib(validator=attr.validators.instance_of(Components))
-
-    # Que la long sea la cant de partículas...
-    def __len__(self):
-        """len(x) <=> x.__len__()."""
-        return len(self.galaxy)
-
-    # ...y que el repr explique las props de las componentes,
-    # linkeando ambas repr (if possible).
-    def __repr__(self):
-        """repr(x) <=> x.__repr__()."""
-        # Trying...
-        galaxy_repr = repr(self.galaxy)
-        components_repr = repr(self.components)
-        return galaxy_repr + "\n" + components_repr
-
-    # Bruno:
-    # ¿Para el __getattr__ necesito si o si haber definido un
-    # "__setattr__"? Vamos a suponer que sí: ¿No debería ponerlo
-    # en el __init__ (como el ej del NB 01_03 de clase)?
-    # En todo caso, ¿Cómo lo hago? ¿Lo quiero/necesito?
-    # Sé que lo que quiero es que esta clase me "redirija" a
-    # la galaxia/componentes que se comió (¡getattr!)
-
-    # Digo, si no hereda se pueden llamar como
-    # "DecomposedGalaxy.galaxy. ___" o "Decomp _.components. ___".
-    # Pero si heredase debería hacer un handling más cautious
-    # de los métodos que se pisen (si es que hay, además de los
-    # dunders)...
-    # e.g. quiero hacer un "describe" -> Decomp.components.describe
-    # (!)
-
 
 # =============================================================================
 # API FUNCTIONS

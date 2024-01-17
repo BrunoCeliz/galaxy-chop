@@ -10,13 +10,16 @@
 
 """Utilities to center a galaxy."""
 
+# Bruno:
+# Falta terminar la documentación del nuevo center (!!!)
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
 import numpy as np
 
-from ._base import GalaxyTransformerABC  # , hparam -> # Bruno: Unused (yet)
+from ._base import GalaxyTransformerABC
 from ..core import data
 from ..utils import doc_inherit
 
@@ -26,14 +29,9 @@ from ..utils import doc_inherit
 
 
 # Bruno:
-# Algo importantísimo que me parece que falta es que, si la galaxia NO
-# tiene calculado el potencial, que centre según la media de las posiciones
-# en cada eje (y, claro, que se lo haga saber al usuario) i.e. si no quiero
-# calcular el potencial y soy confianzudo, hacé x_i = x_i - prom(x) para
-# todas las partículas...
-# Más aún ¡Que también haga lo mismo para las velocidades! (no es obvio,
-# pero si está centrado a datos de simulaciones es obligatorio que el
-# v_cm = 0 por los cálculos de Jx, Jym Jz...) (!!!)
+# Agregar que acomode las velocidades (no es obvio, pero si está centrado
+# a datos de simulaciones es obligatorio que el v_cm = 0 por los
+# cálculos de Jx, Jym Jz...) (!!!)
 class Centralizer(GalaxyTransformerABC):
     # Bruno:
     # Ojo con la doc...
@@ -47,10 +45,6 @@ class Centralizer(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy, **kwargs):
-        # Bruno: Cosa -> Así como para el cálculo de potencial,
-        # esto "desarma" galaxias y manipula sus atributos...
-        # En una pipeline no queremos ese behaviour ¿Vale la pena
-        # cambiarlo?
         return center(galaxy, **kwargs)
 
     @doc_inherit(GalaxyTransformerABC.checker)
@@ -83,11 +77,9 @@ def center(galaxy, with_potential=True):
     """
 
     # Bruno:
-    # Acá en una de esas estaría bueno que tire un warning y que, ya sea
-    # mediante un input del usuario o como argumento de la func (e.g.
-    # "surpass_potential", o algo así...) para que, en caso de no tener
-    # definido el potencial centre según el centro geométrico (o CM si vamos
-    # al caso...). ¡Probemos! -> Remember hacer los tests...
+    # Agrego la opción de centrar según centroide =/= partícula de min pot
+    # TO DO: Que acomode las velocidades (al mismo tiempo o por separado,
+    # ver cómo implementar...)
     if not galaxy.has_potential_ and with_potential:
         raise ValueError(
             "Galaxy must has the potential energy. Otherwise, use \
@@ -97,7 +89,7 @@ def center(galaxy, with_potential=True):
     if with_potential:
         # We extract only the needed column to centrer the galaxy
         df = galaxy.to_dataframe(
-            attributes=["ptypev", "x", "y", "z", "potential"]
+            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "potential"]
         )
 
         # minimum potential index of all particles and we extract data
@@ -112,7 +104,9 @@ def center(galaxy, with_potential=True):
 
     else:
         # We use only positions
-        df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z"])
+        df = galaxy.to_dataframe(
+            attributes=["ptypev","x", "y", "z", "vx", "vy", "vz"]
+            )
 
         # Compute the geometric center
         x_cm = np.mean(df["x"].values)
@@ -124,6 +118,19 @@ def center(galaxy, with_potential=True):
         df.loc[:, "x"] -= x_cm
         df.loc[:, "y"] -= y_cm
         df.loc[:, "z"] -= z_cm
+
+    # Bruno:
+    # Nuevo -> Acomodo según el v_CM (con promedios en realidad...)
+
+    # Compute the velocity of the galaxy within the cosmological box
+    vx_cm = np.mean(df["vx"].values)
+    vy_cm = np.mean(df["vy"].values)
+    vz_cm = np.mean(df["vz"].values)
+
+    # And modify the dataframe
+    df.loc[:, "vx"] -= vx_cm
+    df.loc[:, "vy"] -= vy_cm
+    df.loc[:, "vz"] -= vz_cm
 
     # We split the dataframe by particle type.
     stars = df[df.ptypev == data.ParticleSetType.STARS.value]
@@ -144,7 +151,7 @@ def center(galaxy, with_potential=True):
         y_g=gas.y.to_numpy(),
         z_g=gas.z.to_numpy(),
     )
-    # ¿Por qué los "**" antes del "new"?
+    
     return data.mkgalaxy(**new)
 
 
@@ -175,11 +182,24 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     if not galaxy.has_potential_:
         raise ValueError("Galaxy must has the potential energy.")
 
-    # We extract only the needed column to centrer the galaxy
-    df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])
+    # We extract only the needed column to center the galaxy
+    # Bruno: ¡Agrego lo de las velocidades!
+    df = galaxy.to_dataframe(
+        attributes=["x", "y", "z","vx", "vy", "vz", "potential"]
+        )
 
     # minimum potential index of all particles and we extract data frame row
     minpot_idx = df.potential.argmin()
     min_values = df.iloc[minpot_idx]
 
-    return np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
+    # mean velocity of the particles
+    vx_cm = np.mean(df["vx"].values)
+    vy_cm = np.mean(df["vy"].values)
+    vz_cm = np.mean(df["vz"].values)
+
+    # Bruno: Ojo... Testear que funque
+    return (
+        np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
+    ) and (
+        np.isclose(np.sqrt(vx_cm**2+vy_cm**2+vz_cm**2), 0, rtol=rtol, atol=atol)
+    )

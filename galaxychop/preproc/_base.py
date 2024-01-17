@@ -75,10 +75,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     This class requests the redefinition of one method: transform.
     """
 
-    # Bruno:
-    # A center, align y potential le interesan únicamente que las partículas
-    # tengan potencial, pero nada de si son estrellas o no... Por lo menos
-    # en común, porque no se alinean las partículas de DM...
     __gchop_method_cls_config__ = {"repr": False, "frozen": False}  # True}
 
     # block meta checks =======================================================
@@ -127,7 +123,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
             preprocessing manipulation.
 
         """
-        # D: aca iria el checheo de que los atributos sea lo que tiene que ser?
+        # D: aca iría el checkeo de que los atributos sea lo que tiene que ser?
 
         raise NotImplementedError()
 

@@ -25,10 +25,6 @@ from .potential_energy import (
 from .salign import Aligner, is_star_aligned, star_align
 from .smr_crop import Cutter, half_star_mass_radius_crop
 
-
-# from .smr_crop import Cutter  # Bruno: to do
-# D: lo comiteo asi no llora flake
-
 # Bruno:
 # Del smr_crop estaría interesante sacar la func "_get_half_smr_crop()", pero
 # está mencionada como privada. Como "cortador" de la galaxia (efectivamente

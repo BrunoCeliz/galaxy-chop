@@ -23,8 +23,6 @@ from ..utils import doc_inherit
 # =============================================================================
 # INTERNALS
 # =============================================================================
-# Bruno: ¿?; btw: esta func debería ser pública/calcular métricas de la galaxia
-# y anexarla a la misma...
 
 # Bruno:
 # "smr" == "Stellar Mass Radius". Esta función no debería ser privada, ya que
@@ -35,10 +33,6 @@ from ..utils import doc_inherit
 # también le podemos devolver el valor de la MASA (no sólo el radio)
 # encerrada, como para evitar que el usuario escriba esas líneas de código
 # aparte, sin usar GlxChop.
-# Otra cosa, aunque quizá sea innecesario, debería existir una columna de
-# "r" para las partículas: si bien ya existe "x, y, z", usamos para muchas
-# cosas la distancia galac tocéntrica "r" que debería incorporarse a la clase
-# Galaxy (o dentro del mismo ParticleSet) (!).
 def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf = sdf[["x", "y", "z", "m"]].copy()
 
@@ -46,13 +40,8 @@ def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf.drop(["x", "y", "z"], axis="columns", inplace=True)
 
     sdf.sort_values("radius", inplace=True)
-    # Bruno:
-    # Por esto mismo lo digo, acá ya calculaste el "r", ¿Por qué no
-    # agregárselo a la Galaxia?
 
     sdf["m_cumsum"] = sdf.m.cumsum()
-    # Más aún, acá calculaste la masa -> podría guardarse y devolverla
-    # como dato de la galaxia al usuario...
     sdf.drop(["m"], axis="columns", inplace=True)
 
     half_m_cumsum = sdf.iloc[-1].m_cumsum / 2
@@ -73,11 +62,7 @@ def _get_half_smr_crop(sdf, cut_radius_factor):
 # CUTTER CLASS
 # =============================================================================
 
-# Bruno:
-# Una cosa, ¿El Cutter debería chequear que la galaxia está centrada? "Cortar"
-# sólo vale si la galaxia está centrada, pero eso debería pasar por el usuario
-# (o no, se puede agregar algo para que sea "boludo-proof") -> ¿Agregar
-# warning? ¿raise an error?
+
 class Cutter(GalaxyTransformerABC):
     """
     Cutter class.
@@ -88,13 +73,13 @@ class Cutter(GalaxyTransformerABC):
     return only the stellar component inside of a multiple of it.
 
     """
-
     num_radii = hparam(default=3)
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
         # Bruno:
-        # Esto returnea glx, pero el dato del r_half es más importante
+        # Esto returnea glx, pero agregar un sms de que el dato
+        # del r_half se obtiene de otra forma...
         return half_star_mass_radius_crop(galaxy, num_radii=self.num_radii)
 
     # Bruno:
@@ -211,3 +196,50 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
     # a mayor distancia que el corte (y como test también agregar que
     # las cortadas deben estar más lejos que el corte (!!!))
     return np.all(np.less([max_values, cut_radius]))
+
+
+# Bruno:
+# Agrego esto por completitud. No debería estar tan escondido
+# del usuario...
+# ¿Cuál es la mejor forma de hacer al usuario elegir el tipo 
+# de partícula? Revisar "ParticleSetType"...
+def get_radius_half_mass(galaxy, particle='stars'):
+    """
+    Compute the radii that encloses half of the mass of the
+    selected type of particle.
+    For the complete galaxy, set particle = 'all' (also 
+    admitted False or '').
+
+    Parameters
+    ----------
+    galaxy : galaxychop.Galaxy
+        The galaxy object for which to determine half of the
+        mass-enclosing radii.
+    particle : galaxychop.ParticleSetType
+        The type of particle to determine a half mass radii.
+        e.g. 'stars', 'gas', 'DM' or 'all'
+
+    Returns
+    -------
+    r_half_star : float
+        Radii of the sphere that encloses half of the stellar mass.
+
+    """
+    # Copiamos de core/data.py; ¿Así estaría bien 
+    # checkeado/corregido? Ojo...
+    if particle in ['', 'all', None, False]:
+        # We convert the stars into a dataframe
+        df = galaxy.to_dataframe()
+    else:
+        particle_type = data.ParticleSetType.mktype(particle)
+        particle_type = data.ParticleSetType.humanize(particle_type)
+
+        df = galaxy.particle_type.to_dataframe()
+
+    # We check which rows to delete and what cutoff radius it gives us
+    _, r_half = _get_half_smr_crop(df, cut_radius_factor=1)
+    
+    return r_half
+
+# Bruno:
+# Y claro, hacer tests... (Zzz)

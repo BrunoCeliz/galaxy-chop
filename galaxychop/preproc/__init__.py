@@ -83,10 +83,6 @@ def center_and_align(galaxy, *, r_cut=None):
     galaxy = center.transform(galaxy)  # Centering
     align = Aligner(r_cut)  # D: asi funcionaria ahpra no?
     galaxy = align.transform(galaxy)
-    # galaxy = salign.star_align(galaxy, r_cut=r_cut)
-    # Bruno:
-    # Lo apago porque al init no le gusta que le pase r_cut (!)
-    # galaxy = align.transform(galaxy)  # Aligning
 
     return galaxy
 

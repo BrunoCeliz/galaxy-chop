@@ -705,13 +705,16 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         # de la Galaxia decompuesta: updatear los "label" de la
         # galaxia en cuestión y que pase a "is_decomposed == True"
 
-        return Components(
+        components = Components(
             labels=final_labels,
             ptypes=final_y,
             probabilities=final_probs,
             m=mass,
             lmap=self.get_lmap().copy(),
         )
+
+        # Emprolijar
+        return DecomposedGalaxy(galaxy,components)
 
 
 # =============================================================================

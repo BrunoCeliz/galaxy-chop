@@ -4,11 +4,6 @@
 # License: MIT
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
-# Bruno:
-# Supongo que uno de los scopes de este glow-up a GlxChop \
-# tiene que ver con repetir el procedimiento del _base.py \
-# de la carpeta /models. Así que acá debería ~recrear esa \
-# carpeta.
 
 # =============================================================================
 # DOCS
@@ -74,19 +69,15 @@ def hparam(default, **kwargs):
 @attr.s(frozen=False, repr=False)  # True, repr=False)
 class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     """
-
-    Abstract class to facilitate the creation of preprocessors.
-
+    Abstract class to facilitate the creation of preprocessors
     (a.k.a. Transformers).
 
     This class requests the redefinition of one method: transform.
-
     """
 
     # Bruno:
-    # Si nos interesan estas cosas ¿Qué nos interesa para los preprocesadores?
-    # A center, align y potential le interesan únicamente que las partículas \
-    # tengan potencial, pero nada de si son estrellas o no... Por lo menos \
+    # A center, align y potential le interesan únicamente que las partículas
+    # tengan potencial, pero nada de si son estrellas o no... Por lo menos
     # en común, porque no se alinean las partículas de DM...
     __gchop_method_cls_config__ = {"repr": False, "frozen": False}  # True}
 
@@ -160,8 +151,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
             False otherwise.
 
         """
-    # Bruno:
-    # ¿Me faltarían los **kwargs que utilizo en cada caso?
+
         raise NotImplementedError()
 
     # internal ================================================================
@@ -177,6 +167,3 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
         )
         attrs_str = ", ".join([f"{k}={repr(v)}" for k, v in selfd.items()])
         return f"{clsname}({attrs_str})"
-
-
-# Bruno: Todo lo demás sobra(ba).

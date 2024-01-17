@@ -23,12 +23,9 @@ from ..utils import doc_inherit
 # =============================================================================
 # INTERNALS
 # =============================================================================
-# Bruno: ¿?
 
 
 def _make_mask(x, y, z, r_cut):
-    # Bruno:
-    # ¿No debería ser ~"aux_r = self.r_cut"?
     r = np.sqrt(x**2 + y**2 + z**2)
 
     if r_cut is None:
@@ -119,13 +116,9 @@ class Aligner(GalaxyTransformerABC):
         self.r_cut = r_cut
 
     # r_cut = hparam(default=30)
-    # D:
-    # Bruno: Nos suelen gustar ~30 kpc. Pero si 3 r_half es mucho menor,
-    # hay que tener cuidado...
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
-        # D: el transform no deberia ir adentro del argumento de la clase?
         # Bruno:
         # Falta acomodar/checkear que las velocidades estén corregidas por
         # v_CM para volver a calcular el Jx, Jy y Jz como corresponde (!)
@@ -135,15 +128,12 @@ class Aligner(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
-        # Bruno:
-        # ¿Mejor forma que no sea con el "**"? ¿Aclarar? Ojo...
         return is_star_aligned(galaxy, **kwargs)
 
 
 # =============================================================================
 # API FUNCTIONS
 # =============================================================================
-# Bruno: Rev como dejar este título de sec como en otros módulos...
 
 
 def star_align(galaxy, *, r_cut=None):
@@ -187,6 +177,27 @@ def star_align(galaxy, *, r_cut=None):
     )
     gas_df = galaxy.gas.to_dataframe(attributes=pos_columns + vel_columns)
 
+    # Bruno:
+    # ¿Hacer acá un "velocity-checker"? Probemos...
+    # El aproach a orden 0 (y bastante naïve) es pedir que la velocidad
+    # media (o del CM en todo caso) no sea "muy distinta" de 0 (i.e.
+    # el sistema de referencia es la galaxia y no un punto arbitrario
+    # del box; Usemos sólo estrellas...):
+    vx_cm = np.mean(stars_df["vx"].values)
+    vy_cm = np.mean(stars_df["vy"].values)
+    vz_cm = np.mean(stars_df["vz"].values)
+
+    if np.sqrt(vx_cm**2 + vy_cm**2 + vz_cm**2) > 50:
+        raise ValueError(
+            "The galaxy is not corrected by its \
+                         velocity within the cosmological box"
+        )
+    # Bruno:
+    # Muy liindo el error, pero le tenemos que dar al usuario
+    # la opción para que se lo acomodemos nosotros! (ya sea con
+    # el Centralizer o con el Aligner (!!))
+    # *Again, remember los tests...
+
     # now we can calculate the rotation matrix
     A = _get_rot_matrix(
         m=stars_df["m"].values,
@@ -209,7 +220,7 @@ def star_align(galaxy, *, r_cut=None):
     pos_rot_g = np.dot(A, gas_df[pos_columns].T.values)
     vel_rot_g = np.dot(A, gas_df[vel_columns].T.values)
 
-    # recreate the valaxy
+    # recreate the galaxy
     new = galaxy.disassemble()
 
     new.update(

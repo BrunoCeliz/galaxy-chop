@@ -26,19 +26,18 @@ from ..utils import doc_inherit
 # Bruno: ¿?; btw: esta func debería ser pública/calcular métricas de la galaxia
 # y anexarla a la misma...
 
-
 # Bruno:
 # "smr" == "Stellar Mass Radius". Esta función no debería ser privada, ya que
 # esta forma de medir el tamaño de la galaxia es re útil y el usuario puede
 # requerirla en caso de que no tenga el dato de la simulación.
-# Dicho sea de paso, exsiten otras formas de medir la galaxia e.g. "Half Mass
+# Dicho sea de paso, existen otras formas de medir la galaxia e.g. "Half Mass
 # Radius" (considerando TODAS las partículas (gas, DM y stars)); y más aún,
 # también le podemos devolver el valor de la MASA (no sólo el radio)
 # encerrada, como para evitar que el usuario escriba esas líneas de código
 # aparte, sin usar GlxChop.
 # Otra cosa, aunque quizá sea innecesario, debería existir una columna de
 # "r" para las partículas: si bien ya existe "x, y, z", usamos para muchas
-# cosas la distancia galactocéntrica "r" que debería incorporarse a la clase
+# cosas la distancia galac tocéntrica "r" que debería incorporarse a la clase
 # Galaxy (o dentro del mismo ParticleSet) (!).
 def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf = sdf[["x", "y", "z", "m"]].copy()
@@ -73,11 +72,12 @@ def _get_half_smr_crop(sdf, cut_radius_factor):
 # =============================================================================
 # CUTTER CLASS
 # =============================================================================
+
 # Bruno:
-# "Cropper" ~> granjero; "Chopper" ~> Helicóptero o Moto;
-# "Cutter" ~> re de nene; lpm
-
-
+# Una cosa, ¿El Cutter debería chequear que la galaxia está centrada? "Cortar"
+# sólo vale si la galaxia está centrada, pero eso debería pasar por el usuario
+# (o no, se puede agregar algo para que sea "boludo-proof") -> ¿Agregar
+# warning? ¿raise an error?
 class Cutter(GalaxyTransformerABC):
     """
     Cutter class.
@@ -89,7 +89,6 @@ class Cutter(GalaxyTransformerABC):
 
     """
 
-    # Bruno: Cambio. Repito lo que funca en salign.py
     num_radii = hparam(default=3)
 
     @doc_inherit(GalaxyTransformerABC.transform)
@@ -104,16 +103,12 @@ class Cutter(GalaxyTransformerABC):
     # num_radii*r_half...
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
-        # Bruno:
-        # ¿Mejor forma que no sea con el "**"? ¿Aclarar? Ojo...
         return is_star_cutted(galaxy, **kwargs)
 
 
 # =============================================================================
 # API FUNCTIONS
 # =============================================================================
-# Bruno: Rev como dejar este título de sec como en otros módulos...
-
 
 def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     """
@@ -135,9 +130,6 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
         enclosing various fractions of the stellar mass.
 
     """
-    # Bruno:
-    # Acá realmente hay que agregar que si "num_radii <= 0" => error...
-    # ¡Copio!
     if num_radii is not None and num_radii <= 0.0:
         raise ValueError("num_radii must not be lower than 0.")
 
@@ -165,16 +157,9 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     del trim_stars_df
 
     # Bruno:
-    # Si cortamos las estrellas hasta 3r_half, ¿Por qué no al gas? ;
-    # Además, también se podrían agregar otros cortes (e.g. Einasto, \
-    # NFW, half light radii (!, aunque para ello debería considerarse \
-    # la magnitud/luminosidad de cada partícula, que si bien no es \
-    # imposible pero estira el scope de esto y habría que retocar \
-    # muchas otras varias cosas...))
+    # Si cortamos las estrellas hasta 3r_half, ¿Por qué no al gas?
     dm = galaxy.dark_matter.copy()
     gas = galaxy.gas.copy()
-
-    # D: aca es cuando hace una copia/ crea una galaxia no?
 
     trim_galaxy = data.Galaxy(stars=trim_stars, dark_matter=dm, gas=gas)
 

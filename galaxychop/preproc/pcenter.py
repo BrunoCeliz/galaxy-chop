@@ -16,8 +16,6 @@
 
 import numpy as np
 
-# Bruno:
-# Me falta importar de las otras carpetas...
 from ._base import GalaxyTransformerABC  # , hparam -> # Bruno: Unused (yet)
 from ..core import data
 from ..utils import doc_inherit
@@ -28,18 +26,17 @@ from ..utils import doc_inherit
 
 
 # Bruno:
-# Algo importantísimo que me parece que falta es que, si la galaxia NO \
-# tiene calculado el potencial, que centre según la media de las posiciones \
-# en cada eje (y, calro, que se lo haga saber al usuario) i.e. si no quiero \
-# calcular el potencial y soy confianzudo, hacé x_i = x_i - prom(x) para \
+# Algo importantísimo que me parece que falta es que, si la galaxia NO
+# tiene calculado el potencial, que centre según la media de las posiciones
+# en cada eje (y, claro, que se lo haga saber al usuario) i.e. si no quiero
+# calcular el potencial y soy confianzudo, hacé x_i = x_i - prom(x) para
 # todas las partículas...
-# Más aún ¡Que también haga lo mismo para las velocidades! (no es obvio, \
-# pero si está centrado a datos de simulaciones es obligatorio que el \
+# Más aún ¡Que también haga lo mismo para las velocidades! (no es obvio,
+# pero si está centrado a datos de simulaciones es obligatorio que el
 # v_cm = 0 por los cálculos de Jx, Jym Jz...) (!!!)
 class Centralizer(GalaxyTransformerABC):
     # Bruno:
-    # Ojo con la doc. NO sé cuál es el resultado final
-    # (y/o qué correspondería a la clase/método (!)).
+    # Ojo con la doc...
     """
     Centralizer class.
 
@@ -48,37 +45,25 @@ class Centralizer(GalaxyTransformerABC):
 
     """
 
-    # Bruno:
-    # Este método sólo llama a la func (priv) externa
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(self, galaxy):
+    def transform(self, galaxy, **kwargs):
         # Bruno: Cosa -> Así como para el cálculo de potencial,
         # esto "desarma" galaxias y manipula sus atributos...
-        # En una pipeline no queremos ese behaviour (futurísimo work)...
-        return center(galaxy)  # Así no más?
+        # En una pipeline no queremos ese behaviour ¿Vale la pena
+        # cambiarlo?
+        return center(galaxy, **kwargs)
 
-    # Bruno:
-    # ¿Esta func la quiero como método? Como es un "centralizer",
-    # lo dejemos adentro...
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
-        # Bruno:
-        # Again, quizás como warning, pero que no
-        # corte la línea de producción...
-        # (el cómputo del potencial suele molestar mucho para una muestra \
-        # grande de galaxias...)
-        # El asterisco acá adentro es lo que le molesta...
-        # ¿Mejor forma que no sea con el "**"? ¿Aclarar? Ojo...
         return is_centered(galaxy, **kwargs)
 
 
 # =============================================================================
 # API FUNCTIONS
 # =============================================================================
-# Bruno: Rev como dejar este título de sec como en otros módulos...
 
 
-def center(galaxy):
+def center(galaxy, with_potential=True):
     """
     Galaxy particle centering.
 
@@ -96,20 +81,49 @@ def center(galaxy):
         the lowest potential particle.
 
     """
-    if not galaxy.has_potential_:
-        raise ValueError("galaxy must has the potential energy")
 
-    # We extract only the needed column to centrer the galaxy
-    df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z", "potential"])
+    # Bruno:
+    # Acá en una de esas estaría bueno que tire un warning y que, ya sea
+    # mediante un input del usuario o como argumento de la func (e.g.
+    # "surpass_potential", o algo así...) para que, en caso de no tener
+    # definido el potencial centre según el centro geométrico (o CM si vamos
+    # al caso...). ¡Probemos! -> Remember hacer los tests...
+    if not galaxy.has_potential_ and with_potential:
+        raise ValueError(
+            "Galaxy must has the potential energy. Otherwise, use \
+            with_potential = False"
+        )
 
-    # minimum potential index of all particles and we extract data frame row
-    minpot_idx = df.potential.argmin()
-    min_values = df.iloc[minpot_idx]
+    if with_potential:
+        # We extract only the needed column to centrer the galaxy
+        df = galaxy.to_dataframe(
+            attributes=["ptypev", "x", "y", "z", "potential"]
+        )
 
-    # We subtract all position columns by the position with the lowest
-    # potential value and replace this new position columns on dataframe
-    columns = ["x", "y", "z"]
-    df[columns] = df[columns] - min_values[columns]
+        # minimum potential index of all particles and we extract data
+        # frame row
+        minpot_idx = df.potential.argmin()
+        min_values = df.iloc[minpot_idx]
+
+        # We subtract all position columns by the position with the lowest
+        # potential value and replace this new position columns on dataframe
+        columns = ["x", "y", "z"]
+        df[columns] = df[columns] - min_values[columns]
+
+    else:
+        # We use only positions
+        df = galaxy.to_dataframe(attributes=["ptypev", "x", "y", "z"])
+
+        # Compute the geometric center
+        x_cm = np.mean(df["x"].values)
+        y_cm = np.mean(df["y"].values)
+        z_cm = np.mean(df["z"].values)
+
+        # We subtract all position columns by the new origin
+        # and replace on dataframe
+        df.loc[:, "x"] -= x_cm
+        df.loc[:, "y"] -= y_cm
+        df.loc[:, "z"] -= z_cm
 
     # We split the dataframe by particle type.
     stars = df[df.ptypev == data.ParticleSetType.STARS.value]
@@ -134,6 +148,11 @@ def center(galaxy):
     return data.mkgalaxy(**new)
 
 
+# Bruno:
+# Claro, ahora el chekcer también debería diferenciar si
+# tiene o no tiene el potencial... Vamos a patearlo por ahora
+# porque en una de esas no vale la pena considerar el caso de
+# Galaxia sin potencial...
 def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     """
     Validate if the galaxy is centered.
@@ -154,7 +173,7 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
 
     """
     if not galaxy.has_potential_:
-        raise ValueError("galaxy must has the potential energy")
+        raise ValueError("Galaxy must has the potential energy.")
 
     # We extract only the needed column to centrer the galaxy
     df = galaxy.to_dataframe(attributes=["x", "y", "z", "potential"])

@@ -835,11 +835,14 @@ class Galaxy:
 # Bruno:
 # As said, es sólo crear una clase que englobe a la "Galaxia" y a sus
 # "Componentes" una vez se aplique un método de descomposición dinámica.
-# Cómo Hasta ahora se manejan de forma independiente, los mezclemos en
+# Cómo hasta ahora se manejan de forma independiente, los mezclemos en
 # una clase que herede de Galaxy y de Component -> ¡Importar esta última!
 # *¿Se ahce con herencia? Debería rehacer el __repr__ y demases...
 # Debe heredar de Galaxy si o si imo, ¿Pero de Component?
 # Tiene el "describe", pero no mucho más... Lo probemos sin herencia:
+    
+# Bruno:
+# Ojo con las importaciones cíclicas de Components...
 
 # Remember los test pls:
 # - El repr de la DecomposedGalaxy debe contener info de Galaxy y 
@@ -850,6 +853,10 @@ class Galaxy:
 # - ¿Probar métodos? -> Al vicio porque para eso ya están los
 # de c/ clase por separado (si es que los hereda)...
 # - ¿Algo más?
+    
+# Juan:
+# Tema "acoplamiento" -> Llevar la clase "DecomposedGlx" a 
+# models/_base.py
 @uttr.s(frozen=True, repr=False)
 class DecomposedGalaxy:
     """
@@ -882,12 +889,6 @@ class DecomposedGalaxy:
     galaxy = uttr.ib(validator=attr.validators.instance_of(Galaxy))
     components = uttr.ib(validator=attr.validators.instance_of(Components))
 
-    # ¿O así? Lo commentareo porque no hicimos ninguna clase así...
-    # def __init__(self, galaxy, components):
-    #       self.galaxy = galaxy
-    #       self.components = components
-    #       return
-
     # Que la long sea la cant de partículas...
     def __len__(self):
         """len(x) <=> x.__len__()."""
@@ -898,8 +899,8 @@ class DecomposedGalaxy:
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""
         # Trying...
-        galaxy_repr = self.galaxy.__repr__()
-        components_repr = self.components.__repr__()
+        galaxy_repr = repr(self.galaxy)
+        components_repr = repr(self.components)
         return galaxy_repr + "\n" + components_repr
 
     # Bruno:

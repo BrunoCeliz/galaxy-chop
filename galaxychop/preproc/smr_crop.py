@@ -24,6 +24,7 @@ from ..utils import doc_inherit
 # INTERNALS
 # =============================================================================
 
+
 # Bruno:
 # "smr" == "Stellar Mass Radius". Esta función no debería ser privada, ya que
 # esta forma de medir el tamaño de la galaxia es re útil y el usuario puede
@@ -73,6 +74,7 @@ class Cutter(GalaxyTransformerABC):
     return only the stellar component inside of a multiple of it.
 
     """
+
     num_radii = hparam(default=3)
 
     @doc_inherit(GalaxyTransformerABC.transform)
@@ -94,6 +96,7 @@ class Cutter(GalaxyTransformerABC):
 # =============================================================================
 # API FUNCTIONS
 # =============================================================================
+
 
 def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     """
@@ -201,13 +204,13 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
 # Bruno:
 # Agrego esto por completitud. No debería estar tan escondido
 # del usuario...
-# ¿Cuál es la mejor forma de hacer al usuario elegir el tipo 
+# ¿Cuál es la mejor forma de hacer al usuario elegir el tipo
 # de partícula? Revisar "ParticleSetType"...
-def get_radius_half_mass(galaxy, particle='stars'):
+def get_radius_half_mass(galaxy, particle="stars"):
     """
     Compute the radii that encloses half of the mass of the
     selected type of particle.
-    For the complete galaxy, set particle = 'all' (also 
+    For the complete galaxy, set particle = 'all' (also
     admitted False or '').
 
     Parameters
@@ -225,9 +228,9 @@ def get_radius_half_mass(galaxy, particle='stars'):
         Radii of the sphere that encloses half of the stellar mass.
 
     """
-    # Copiamos de core/data.py; ¿Así estaría bien 
+    # Copiamos de core/data.py; ¿Así estaría bien
     # checkeado/corregido? Ojo...
-    if particle in ['', 'all', None, False]:
+    if particle in ["", "all", None, False]:
         # We convert the stars into a dataframe
         df = galaxy.to_dataframe()
     else:
@@ -238,8 +241,9 @@ def get_radius_half_mass(galaxy, particle='stars'):
 
     # We check which rows to delete and what cutoff radius it gives us
     _, r_half = _get_half_smr_crop(df, cut_radius_factor=1)
-    
+
     return r_half
+
 
 # Bruno:
 # Y claro, hacer tests... (Zzz)

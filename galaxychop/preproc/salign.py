@@ -27,6 +27,7 @@ from ..utils import doc_inherit
 # INTERNALS
 # =============================================================================
 
+
 def _make_mask(x, y, z, r_cut):
     r = np.sqrt(x**2 + y**2 + z**2)
 
@@ -119,9 +120,7 @@ class Aligner(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
-        return star_align(
-            galaxy, r_cut=self.r_cut
-        ) 
+        return star_align(galaxy, r_cut=self.r_cut)
 
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
@@ -159,14 +158,16 @@ def star_align(galaxy, *, r_cut=None):
     """
     if r_cut is not None and r_cut <= 0.0:
         raise ValueError("r_cut must not be lower than 0.")
-    
+
     # Bruno:
     # Antes que anda, ¡Tirar warning si es que no está previamente
     # centrada!
     if not is_centered(galaxy):
-        warnings.warn("Input Galaxy is not centered. Please, center it \
+        warnings.warn(
+            "Input Galaxy is not centered. Please, center it \
                       with Centralizer.transform(galaxy) or proceed with \
-                      caution.")
+                      caution."
+        )
 
     # declare all the different groups of columns
     pos_columns = ["x", "y", "z"]

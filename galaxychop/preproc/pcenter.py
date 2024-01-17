@@ -62,11 +62,16 @@ def center(galaxy, with_potential=True):
     Galaxy particle centering.
 
     Centers the position of all galaxy particles respect to the position of the
-    lowest potential particle.
+    lowest potential particle. If with_potential is True, it subtracts the
+    position columns of the galaxy dataframe by the position with the lowest
+    potential value. If with_potential is False, it subtracts the position
+    columns of the galaxy dataframe by the geometric center of the positions.
 
     Parameters
     ----------
     galaxy : ``Galaxy class`` object
+
+    with_potential : boolean. True by default
 
     Returns
     -------
@@ -105,8 +110,8 @@ def center(galaxy, with_potential=True):
     else:
         # We use only positions
         df = galaxy.to_dataframe(
-            attributes=["ptypev","x", "y", "z", "vx", "vy", "vz"]
-            )
+            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz"]
+        )
 
         # Compute the geometric center
         x_cm = np.mean(df["x"].values)
@@ -151,7 +156,7 @@ def center(galaxy, with_potential=True):
         y_g=gas.y.to_numpy(),
         z_g=gas.z.to_numpy(),
     )
-    
+
     return data.mkgalaxy(**new)
 
 
@@ -185,8 +190,8 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     # We extract only the needed column to center the galaxy
     # Bruno: ¡Agrego lo de las velocidades!
     df = galaxy.to_dataframe(
-        attributes=["x", "y", "z","vx", "vy", "vz", "potential"]
-        )
+        attributes=["x", "y", "z", "vx", "vy", "vz", "potential"]
+    )
 
     # minimum potential index of all particles and we extract data frame row
     minpot_idx = df.potential.argmin()
@@ -201,5 +206,10 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     return (
         np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
     ) and (
-        np.isclose(np.sqrt(vx_cm**2+vy_cm**2+vz_cm**2), 0, rtol=rtol, atol=atol)
+        np.isclose(
+            np.sqrt(vx_cm**2 + vy_cm**2 + vz_cm**2),
+            0,
+            rtol=rtol,
+            atol=atol,
+        )
     )

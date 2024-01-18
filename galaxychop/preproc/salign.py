@@ -10,6 +10,9 @@
 
 """Utilities for align the galaxies."""
 
+# Bruno:
+# Revisar la doc de todo!
+
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -111,10 +114,6 @@ class Aligner(GalaxyTransformerABC):
     i.e. make the "face-on" projection the new XY plane.
 
     """
-
-    # Bruno:
-    # Cambio esto porque no le gustó...
-    # r_cut = hparam(default=30)
     def __init__(self, r_cut=hparam(default=30)):
         self.r_cut = r_cut
 
@@ -161,12 +160,14 @@ def star_align(galaxy, *, r_cut=None):
 
     # Bruno:
     # Antes que anda, ¡Tirar warning si es que no está previamente
-    # centrada!
+    # centrada! -> Esto es por el cálculo de los momentos
+    # angulares con velocidades con respecto al origen del box
+    # cosmológico =/= galaxia como sistema aislado (!)
     if not is_centered(galaxy):
         warnings.warn(
             "Input Galaxy is not centered. Please, center it \
-                      with Centralizer.transform(galaxy) or proceed with \
-                      caution."
+            with Centralizer.transform(galaxy, with_potential) \
+            or proceed with caution."
         )
 
     # declare all the different groups of columns

@@ -141,8 +141,16 @@ class ParticleSet:
     # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
     # el potencial calculado?
     # Tampoco hay que obligar a calcular el potencial...
-
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
+    # La otra opción sería que se comporte igual que el potencial:
+    # softening: float = uttr.ib(
+    #     unit=u.kpc,
+    #     validator=attr.validators.optional(
+    #         attr.validators.instance_of(float)
+    #     ),
+    #     converter=(lambda v: np.copy(v) if v is not None else v),
+    #     repr=False,
+    # )
     has_potential_: bool = uttr.ib(init=False)
 
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
@@ -177,11 +185,7 @@ class ParticleSet:
         return kenergy + penergy
 
     # angular momentum
-    # Bruno:
-    # Ojo con esto, porque si la galaxia no tiene las velocidades
-    # acomodadas al centro de masa me devuelve valores erróneos.
-    # -> De eso se tiene que encargar el Aligner, no el init de
-    # las partículas...
+
     @Jx_.default
     def _Jx__default(self):
         arr = self.arr_
@@ -271,10 +275,6 @@ class ParticleSet:
 
         """
         arr = self.arr_
-        # Bruno:
-        # Ojo, hay drama con el "softening" -> lo paso como valor
-        # Cambio el orden del if por comprensión porque no le gustó
-        # el del potential (!?)
         value_makers = {
             "ptype": lambda: np.full(len(self), self.ptype.humanize()),
             "ptypev": lambda: np.full(len(self), self.ptype.value),
@@ -432,12 +432,6 @@ class Galaxy:
         gas_repr = f"gas={len(self.gas)}"
         has_pot = f"potential={self.has_potential_}"
         return f"<Galaxy {stars_repr}, {dm_repr}, " f"{gas_repr}, {has_pot}.>"
-        # Bruno:
-        # Cuando ocurra el caso de que haya partículas con y otras sin \
-        # potencial -> Debería devolver un warning + un False en vez de \
-        # un error (como que "hubo un error con el potencial, así que lo \
-        # ignoramos y te lo seteamos en False). Así de paso no se corta \
-        # el proceso...
 
     # UTILITIES ===============================================================
 
@@ -494,11 +488,6 @@ class Galaxy:
             ``astropy.io.misc.hdf5.write_table_hdf5()``
 
         """
-        # Bruno:
-        # Todo lo que sea, pero por lo gral cuando alguien pide
-        # un .hdf5 creo que es mejor que tenga la mayor cantidad
-        # de info posible (véase todos los datos del post-proc
-        # que ofrecen los cutouts.hdf5 de IllustrisTNG...)
         from .. import io
 
         return io.to_hdf5(
@@ -580,9 +569,7 @@ class Galaxy:
 
         disassembled = dict(**stars_kws, **dark_matter_kws, **gas_kws)
         return disassembled
-        # Bruno:
-        # Acá *quizás* estaría bueno retornar 3 dics separados en vez \
-        # de uno con todo mezclado, si no, ¿Para qué la desarmé?
+    
 
     def copy(self):
         """Make a copy of the Galaxy."""
@@ -634,7 +621,7 @@ class Galaxy:
             self.gas.kinetic_energy_,
         )
 
-    # Bruno: ¡Cambiar docs! (para explicar cómo calcular el potencial...)
+
     @property
     def potential_energy_(self):
         """
@@ -642,8 +629,8 @@ class Galaxy:
 
         This property doesn't compute the potential energy, only returns its
         value if it is already computed, i.e. ``has_potential_`` is True. To
-        compute the potential use the ``galaxychop.preproc.potential``
-        function.
+        compute the potential use the
+        ``galaxychop.preproc.potential_energy`` module.
 
         Returns
         -------
@@ -658,7 +645,9 @@ class Galaxy:
 
         >>> import galaxychop as gchop
         >>> galaxy = gchop.Galaxy(...)
-        >>> galaxy_with_potential = gchop.preproc.potential(galaxy)
+        >>> pot = gchop.preproc.potential_energy.Potentializer(
+            backend="frotran")
+        >>> galaxy_with_potential = pot.transform(galaxy)
         >>> p_s, p_dm, p_g = galaxy_with_potential.potential_energy_
         """
         if self.has_potential_:
@@ -670,7 +659,7 @@ class Galaxy:
         else:
             raise NoGravitationalPotentialError(
                 "Galaxy does not have the potential energy calculated"
-            )  # Bruno: ¿Así? Probar...
+            )
 
     @property
     def total_energy_(self):
@@ -707,7 +696,7 @@ class Galaxy:
                 "Galaxy does not have the potential energy calculated"
             )
 
-    # Bruno: Again, habría que checkear que las velocidades estén centradas...
+    
     @property
     def angular_momentum_(self):
         """
@@ -901,11 +890,11 @@ def mkgalaxy(
         Specific potential energy of dark matter particles. Shape: (n,1).
     potential_g : np.ndarray, default value = None
         Specific potential energy of gas particles. Shape: (n,1).
-    softening_s : float, default value = 0
+    softening_s : float, default value = 0.
         Softening radius of stellar particles. Shape: (1,).
-    softening_dm : float, default value = 0
+    softening_dm : float, default value = 0.
         Softening radius of dark matter particles. Shape: (1,).
-    softening_g : float, default value = 0
+    softening_g : float, default value = 0.
         Softening radius of gas particles. Shape: (1,).
 
     Return

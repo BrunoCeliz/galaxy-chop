@@ -10,9 +10,6 @@
 
 """Utilities to center a galaxy."""
 
-# Bruno:
-# Falta terminar la documentación del nuevo center (!!!)
-
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -28,18 +25,12 @@ from ..utils import doc_inherit
 # =============================================================================
 
 
-# Bruno:
-# Agregar que acomode las velocidades (no es obvio, pero si está centrado
-# a datos de simulaciones es obligatorio que el v_cm = 0 por los
-# cálculos de Jx, Jym Jz...) (!!!)
 class Centralizer(GalaxyTransformerABC):
-    # Bruno:
-    # Ojo con la doc...
     """
     Centralizer class.
 
     Given the positions and potential energy of particles, check and
-    center their positions relative to the system.
+    center their positions and velocities relative to the system.
 
     """
 
@@ -61,17 +52,21 @@ def center(galaxy, with_potential=True):
     """
     Galaxy particle centering.
 
-    Centers the position of all galaxy particles respect to the position of the
-    lowest potential particle. If with_potential is True, it subtracts the
-    position columns of the galaxy dataframe by the position with the lowest
-    potential value. If with_potential is False, it subtracts the position
-    columns of the galaxy dataframe by the geometric center of the positions.
+    Centers the position and velocities of all galaxy particles.
+    If with_potential is True, it subtracts the position columns of the
+    galaxy dataframe by the position with the lowest potential value.
+    If with_potential is False, it subtracts the position of the geometric
+    center of the galaxy.
+    To correct velocities, it computes the mean velocity of all particles.
 
     Parameters
     ----------
     galaxy : ``Galaxy class`` object
-
-    with_potential : boolean. True by default
+        A galaxy object to correct its position and velocities.
+    with_potential : boolean, default value = True
+        If True, set the particle with lowest potential as the origin
+        (requires the potential of all particles). Otherwise,
+        correct by the geometric center of all particles.
 
     Returns
     -------
@@ -80,21 +75,17 @@ def center(galaxy, with_potential=True):
         the lowest potential particle.
 
     """
-
-    # Bruno:
-    # Agrego la opción de centrar según centroide =/= partícula de min pot
-    # TO DO: Que acomode las velocidades (al mismo tiempo o por separado,
-    # ver cómo implementar...)
-    if not galaxy.has_potential_ and with_potential:
+    if with_potential and not galaxy.has_potential_:
         raise ValueError(
-            "Galaxy must has the potential energy. Otherwise, use \
+            "Galaxy must has the potential energy. Use \
             with_potential = False"
         )
 
     if with_potential:
         # We extract only the needed column to centrer the galaxy
         df = galaxy.to_dataframe(
-            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "potential"]
+            attributes=["ptypev",
+                        "x", "y", "z", "vx", "vy", "vz", "potential"]
         )
 
         # minimum potential index of all particles and we extract data
@@ -124,9 +115,7 @@ def center(galaxy, with_potential=True):
         df.loc[:, "y"] -= y_cm
         df.loc[:, "z"] -= z_cm
 
-    # Bruno:
-    # Nuevo -> Acomodo según el v_CM (con promedios en realidad...)
-
+    
     # Compute the velocity of the galaxy within the cosmological box
     vx_cm = np.mean(df["vx"].values)
     vy_cm = np.mean(df["vy"].values)
@@ -161,7 +150,7 @@ def center(galaxy, with_potential=True):
 
 
 # Bruno:
-# Claro, ahora el chekcer también debería diferenciar si
+# Claro, ahora el checker también debería diferenciar si
 # tiene o no tiene el potencial... Vamos a patearlo por ahora
 # porque en una de esas no vale la pena considerar el caso de
 # Galaxia sin potencial...

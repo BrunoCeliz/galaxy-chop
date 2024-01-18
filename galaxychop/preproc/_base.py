@@ -55,7 +55,6 @@ def hparam(default, **kwargs):
     -----
     This function is a thin-wrapper over the attrs function ``attr.ib()``.
     """
-    # D: Esto habria que usarlo para el r_cut
     metadata = kwargs.pop("metadata", {})
     metadata["__gchop_model_hparam__"] = True
     return attr.ib(default=default, metadata=metadata, kw_only=True, **kwargs)
@@ -78,6 +77,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     __gchop_method_cls_config__ = {"repr": False, "frozen": False}  # True}
 
     # block meta checks =======================================================
+    # Bruno: ¿Entonces esto está al vicio? ¿Quitar?
     def __init_subclass__(cls):
         """
         Initiate of subclasses.

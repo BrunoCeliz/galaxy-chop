@@ -114,6 +114,7 @@ class Aligner(GalaxyTransformerABC):
     i.e. make the "face-on" projection the new XY plane.
 
     """
+
     def __init__(self, r_cut=hparam(default=30)):
         self.r_cut = r_cut
 

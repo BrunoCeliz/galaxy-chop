@@ -5,27 +5,6 @@
 # Full Text: https://github.com/vcristiani/galaxy-chop/blob/master/LICENSE.txt
 
 
-# Bruno:
-# Para comenzar a hacer algo, veamos la implementación \
-# del potencial con GriSPy (aunqeu ya esté testeado que \
-# no es el algoirtmo más rápido ni más preciso...).
-
-# Bruno:
-# OJO que el copy de esto es sobre la branch "master" \
-# =/= "dev", así que puede que algo esté desfazado...
-
-# Bruno:
-# Estaría bueno tener una clase que abarque los métodos \
-# para calcular potencial, así como los descomponedores \
-# Gausseanos, etc...; Por ahora, me limito a copiar la \
-# metodología de las funciones anteriores de cálculo de \
-# potencial ('numpy' y 'fortran')...
-
-# Bruno:
-# Idea de test: Para ~1000 partículas distribuidas random \
-# que el método de GriSPy no difiera en más de ~5% (muy \
-# poco estricto) del método de fortran (driect-sumation)
-
 # =============================================================================
 # DOCS
 # =============================================================================
@@ -55,22 +34,17 @@ def make_grid(x, y, z, n_cells=2**4):
     ----------
     x, y, z : np.ndarray
         Positions of particles. Shape: (n,1).
-    n_cells : float
+    n_cells : float, default=2^4
         Number of cells that makes the grid. Shape: (1,).
-        #Bruno:
-        # Aclarar el valor default.
 
     Returns
     -------
-    *Cambiar
     l_box : float
-        Length of the size of the smalles cube
-          that encloses all particles. Shape: (1,).
-    #Bruno:
-    # ¿Cómo se pone bien? Revisar...
-    grid : ``GriSPy`` object
+        Length of the size of the smallest cube that
+        encloses all particles. Shape: (1,).
+    grid : ``GriSPy class`` object
         Grid populated with all the galaxy particles.
-          Shape: (n,1).
+        Shape: (n,1).
 
     """
     # Size of the box that contains all particles
@@ -79,35 +53,25 @@ def make_grid(x, y, z, n_cells=2**4):
     # Make the grid (n_cells ~ 2**4 works well for 1e+4 ~ 1e+5 particles)
     grid = gsp.GriSPy(np.column_stack((x, y, z)), n_cells)
 
-    # Bruno:
-    # No uso la masa "m", pero ojo con los procedures en relación a los
-    # demás métodos...
-
     return l_box, grid
 
 
 def potential_grispy(
-    centre, x, y, z, m, softening, bubble_size, shell_width, l_box, grid
+    centre, m, softening, bubble_size, shell_width, l_box, grid
 ):
     """
-    Compute the potential of a particle given the grid and the particles.
+    Compute the potential of a particle given the grid and the system
+    of particles.
 
     Given the particle to compute its potential energy, iteratively
     make shells to aproximate their monopole contribution to the total
     potential energy.
-    #Bruno:
-    # Pero claro, todas las otras funciones vienen comiéndose "galaxias",
-    ¿Debería mantenerme con eso acá? Estas funciones van de la mano,
-    así que ojo con mi implementación naïve...
 
     Parameters
     ----------
-    *Revisar
     centre : np.array
         3D spatial position of the particle to compute its potential.
         Shape: (1,3).
-    x,y,z : np.array
-        3D spatial position of all the galaxy particles. Shape: (n,3).
     m : np.array
         Individual masses of all the galaxy particles. Shape: (n,1).
     bubble_size : float
@@ -121,24 +85,16 @@ def potential_grispy(
     l_box : float
         Size of the box that contains all particles. This defines the upper
         limit value of the shells to implement the GriSPy's NNS. Shape: (1,).
-    grid : ``GriSPy`` object
-        Spatial grid populated by the galaxy particles, needed to do the NNS.
+    grid : ``GriSPy class`` object
+        Spatial grid populated by the galaxy particles, to perform the NNS.
 
     Returns
     -------
     pot_shells : float
-        Potential of the given particle through the shells' monopole
-        aproximation. Shape: (1,).
+        Potential of the given particle through the monopole
+        aproximation of the shells. Shape: (1,).
 
     """
-    # Bruno:
-    # En este caso no hace falta el potencial ¿O sí?
-    # Lo cambié para que, si ya tiene potencial, largue error
-    # if galaxy.has_potential_:
-    #    raise ValueError("galaxy already has the potential energy")
-    # Bruno:
-    # Entonces sí debería comer galaxias...
-
     # Use the bubble method to find the closest particles
     bubble_dist, bubble_ind = grid.bubble_neighbors(
         centre, distance_upper_bound=bubble_size
@@ -152,7 +108,6 @@ def potential_grispy(
             pot_shells -= m[bubble_ind[0][idx]] / distance
         else:
             continue
-
         # Bruno:
         # Otra versión de esto (mucho más lenta, pero creo que correcta)
         # d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
@@ -171,7 +126,6 @@ def potential_grispy(
         for idx, distance in enumerate(shell_dist[0]):
             # Due to non-periodicity, distance > 0 always
             pot_shells -= m[shell_ind[0][idx]] / distance
-
             # Otra versión de esto (mucho más lenta, pero creo que correcta)
             # d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
             # pot_shells -= m[shell_ind[0][idx]]/d_and_soft

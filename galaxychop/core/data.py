@@ -569,7 +569,6 @@ class Galaxy:
 
         disassembled = dict(**stars_kws, **dark_matter_kws, **gas_kws)
         return disassembled
-    
 
     def copy(self):
         """Make a copy of the Galaxy."""
@@ -620,7 +619,6 @@ class Galaxy:
             self.dark_matter.kinetic_energy_,
             self.gas.kinetic_energy_,
         )
-
 
     @property
     def potential_energy_(self):
@@ -696,7 +694,6 @@ class Galaxy:
                 "Galaxy does not have the potential energy calculated"
             )
 
-    
     @property
     def angular_momentum_(self):
         """
@@ -813,7 +810,7 @@ class Galaxy:
             reassign=reassign,
             runtime_warnings=runtime_warnings,
         )
-    
+
 
 # =============================================================================
 # API FUNCTIONS

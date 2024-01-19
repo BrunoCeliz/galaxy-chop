@@ -25,15 +25,6 @@ from ..utils import doc_inherit
 # =============================================================================
 
 
-# Bruno:
-# "smr" == "Stellar Mass Radius". Esta función no debería ser privada, ya que
-# esta forma de medir el tamaño de la galaxia es re útil y el usuario puede
-# requerirla en caso de que no tenga el dato de la simulación.
-# Dicho sea de paso, existen otras formas de medir la galaxia e.g. "Half Mass
-# Radius" (considerando TODAS las partículas (gas, DM y stars)); y más aún,
-# también le podemos devolver el valor de la MASA (no sólo el radio)
-# encerrada, como para evitar que el usuario escriba esas líneas de código
-# aparte, sin usar GlxChop.
 def _get_half_smr_crop(sdf, cut_radius_factor):
     sdf = sdf[["x", "y", "z", "m"]].copy()
 
@@ -79,18 +70,11 @@ class Cutter(GalaxyTransformerABC):
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
-        # Bruno:
-        # Esto returnea glx, pero agregar un sms de que el dato
-        # del r_half se obtiene de otra forma...
         return half_star_mass_radius_crop(galaxy, num_radii=self.num_radii)
 
-    # Bruno:
-    # No un "checker" como tal, habría que hacerlo. Un buen test es que
-    # la distancia galactocéntica máxima no sea mayor a
-    # num_radii*r_half...
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):
-        return is_star_cutted(galaxy, **kwargs)
+        return is_star_cutted(galaxy, num_radii=self.num_radii, **kwargs)
 
 
 # =============================================================================
@@ -194,11 +178,7 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
     maxdist_idx = np.argmin(distances)[0]
     max_values = distances[maxdist_idx]
 
-    # Bruno:
-    # Probando cómo checkear ~> todas las no cortadas no deben estar
-    # a mayor distancia que el corte (y como test también agregar que
-    # las cortadas deben estar más lejos que el corte (!!!))
-    return np.all(np.less([max_values, cut_radius]))
+    return np.all(np.less_equal([max_values, cut_radius]))
 
 
 # Bruno:
@@ -215,25 +195,30 @@ def get_radius_half_mass(galaxy, particle="stars"):
 
     Parameters
     ----------
-    galaxy : galaxychop.Galaxy
+    galaxy : ``Galaxy class`` object.
         The galaxy object for which to determine half of the
         mass-enclosing radii.
-    particle : galaxychop.ParticleSetType
-        The type of particle to determine a half mass radii.
-        e.g. 'stars', 'gas', 'DM' or 'all'
+    particle : str, default="star"
+        ParticleSetType instance. Defines the type of
+        particle to determine a half mass radii e.g.
+        'stars', 'gas', 'DM' or 'all'.
 
     Returns
     -------
     r_half_star : float
-        Radii of the sphere that encloses half of the stellar mass.
+        Radii of the sphere that encloses half of the mass for
+        the selected type of particles.
 
     """
     # Copiamos de core/data.py; ¿Así estaría bien
     # checkeado/corregido? Ojo...
     if particle in ["", "all", None, False]:
-        # We convert the stars into a dataframe
+        # We convert the particles into a dataframe
         df = galaxy.to_dataframe()
     else:
+        # Bruno:
+        # en "mktype" ya viene incluida una excepción por un
+        # mal input (!)
         particle_type = data.ParticleSetType.mktype(particle)
         particle_type = data.ParticleSetType.humanize(particle_type)
 

@@ -100,7 +100,6 @@ class Components:
             lens.add(len(self.probabilities))
         if len(lens) > 1:
             raise ValueError("All length must be the same")
-        
 
     def map_labels(self, lmap=None):
         """
@@ -703,7 +702,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             lmap=self.get_lmap().copy(),
         )
 
-        return DecomposedGalaxy(galaxy,components)
+        return DecomposedGalaxy(galaxy, components)
 
 
 # =============================================================================
@@ -740,13 +739,14 @@ class DynamicStarsDecomposerMixin:
 # =============================================================================
 
 # Remember los test pls:
-# - El repr de la DecomposedGalaxy debe contener info de Galaxy y 
+# - El repr de la DecomposedGalaxy debe contener info de Galaxy y
 # Components (rev bien qué es lo que quiero e.g. "Glx de X_i,j,k
 # partículas de gas, dm y stars, con fracción B/T = Y").
 # - DecompGlx.galaxy == la Galaxy que se come.
 # - DecompGlx.components == los Components que se come.
 # - ¿Probar métodos? -> Al vicio porque para eso ya están los
 # de c/ clase por separado (si es que los hereda)...
+
 
 @uttr.s(frozen=True, repr=False)
 class DecomposedGalaxy:
@@ -768,6 +768,7 @@ class DecomposedGalaxy:
     WIP
 
     """
+
     # Me "inspiro" en la relación Galaxy-ParticleSet...
     galaxy = uttr.ib(validator=attr.validators.instance_of(core.data.Galaxy))
     components = uttr.ib(validator=attr.validators.instance_of(Components))

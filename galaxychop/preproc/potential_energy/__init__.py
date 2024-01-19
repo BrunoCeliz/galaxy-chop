@@ -18,6 +18,8 @@ import astropy.units as u
 
 import numpy as np
 
+import warnings
+
 from .grispy_calculation import (
     make_grid,
     potential_grispy,
@@ -30,10 +32,6 @@ from ... import (
 from ...utils import doc_inherit
 
 # D: aplicacion relativa
-
-
-# Bruno: -> hparam not used (yet)
-
 try:
     from .fortran import potential as potential_f
 except ImportError:  # pragma: no cover
@@ -96,16 +94,12 @@ def grispy_potential(x, y, z, m, softening):
     l_box, grid = make_grid(x, y, z)
 
     # For each particle, compute its potential energy
-    # Bruno:
-    # Juan no me matés pls. Rev como hacer más lindo el loop.
+    # Bruno: Rev como hacer más lindo el loop.
     epot = np.empty(len(m))
     for idx, particle in enumerate(m):
         centre = np.array([x[idx], y[idx], z[idx]])
         epot[idx] = potential_grispy(
             centre,
-            x,
-            y,
-            z,
             m,
             softening,
             bubble_size=5 * softening,
@@ -113,10 +107,6 @@ def grispy_potential(x, y, z, m, softening):
             l_box=l_box,
             grid=grid,
         )
-    # Bruno:
-    # Está chanchísimo escrito esto. Btw, le saqué el uso de \
-    # "G" adentro de la func y lo aplico desde acá directamente, \
-    # apra unificar...
 
     return epot * const.G, np.asarray
 
@@ -188,10 +178,6 @@ class Potentializer(GalaxyTransformerABC):
 
     """
 
-    # Idea de implementacion
-    # pot = Potentializer(backend="frotran")
-    # gal = pot.transform(gal)
-
     # D: no nos toma los init para mi por tener de
     # alguna forma los atter el ABC congelados,
     # pasa aca y pasaba con el aligner
@@ -226,7 +212,6 @@ class Potentializer(GalaxyTransformerABC):
 # =============================================================================
 # API FUNCTIONS
 # =============================================================================
-# Bruno: ¿?
 
 
 def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
@@ -247,8 +232,13 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
         calculated.
 
     """
+    # Bruno: Más que error debería ser warning. En una de esas se requiere
+    # re-calcular el potencial.
     if galaxy.has_potential_:
-        raise ValueError("Galaxy potential is already calculated")
+        warnings.warn(
+            "Galaxy potential is already calculated. \
+                      Continuing..."
+        )
 
     # extract the implementation
     backend_function = POTENTIAL_BACKENDS[backend]

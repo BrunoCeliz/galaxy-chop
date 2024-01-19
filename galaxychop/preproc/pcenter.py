@@ -84,8 +84,7 @@ def center(galaxy, with_potential=True):
     if with_potential:
         # We extract only the needed column to centrer the galaxy
         df = galaxy.to_dataframe(
-            attributes=["ptypev",
-                        "x", "y", "z", "vx", "vy", "vz", "potential"]
+            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "potential"]
         )
 
         # minimum potential index of all particles and we extract data
@@ -115,7 +114,6 @@ def center(galaxy, with_potential=True):
         df.loc[:, "y"] -= y_cm
         df.loc[:, "z"] -= z_cm
 
-    
     # Compute the velocity of the galaxy within the cosmological box
     vx_cm = np.mean(df["vx"].values)
     vy_cm = np.mean(df["vy"].values)

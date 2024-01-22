@@ -6,14 +6,8 @@
 
 # Bruno:
 # Este archivo vino junto al potential.c, así que no me animé \
-# a tocar nada...; Falta integrarlo, ver cómo llamarlo en el \
-# "pot_nrg.py" y testearlo, claro. ¿Hace falta que lo "haga \
-# lindo", o es mejor rehacerlo todo?
+# a tocar nada...; Falta integrarlo.
 
-# Bruno:
-# Si bien lo voy a dejar en esta carpeta de momento, lo mejor \
-# es llevarlo a otra carpeta "potentials" junto con lo de \
-# fortran y lo de GriSPy...
 """C implementations."""
 
 import os
@@ -40,8 +34,8 @@ def check(exe, recompilar=True):
             )
             os.system(comando)
         else:
-            print("Error!!!\n")
-            exit(0)
+            raise UserWarning("Error, compiled file does not exist")
+            #exit(0)
 
     return
 

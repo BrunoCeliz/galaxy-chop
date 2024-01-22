@@ -105,6 +105,10 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     if num_radii is not None and num_radii <= 0.0:
         raise ValueError("num_radii must not be lower than 0.")
 
+    # Bruno:
+    # ¿Debería agregar, así como en star_align, un warning de que
+    # la galaxia no está centrada? Por ahora NO lo digo...
+
     # We convert the stars into a dataframe
     stars_df = galaxy.stars.to_dataframe()
 
@@ -224,11 +228,7 @@ def get_radius_half_mass(galaxy, particle="stars"):
 
         df = galaxy.particle_type.to_dataframe()
 
-    # We check which rows to delete and what cutoff radius it gives us
+    # cut_radius_factor = 1 to get the "half mass radius"
     _, r_half = _get_half_smr_crop(df, cut_radius_factor=1)
 
     return r_half
-
-
-# Bruno:
-# Y claro, hacer tests... (Zzz)

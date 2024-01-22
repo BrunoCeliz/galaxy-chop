@@ -27,7 +27,7 @@ def test_KMeans(read_hdf5_galaxy):
 
     decomposer = gchop.models.KMeans(random_state=42)
 
-    components = decomposer.decompose(gal)
+    components = decomposer.decompose(gal).components
 
     assert len(components) == len(gal)
     assert len(gal.stars) == np.sum(components.ptypes == "stars")

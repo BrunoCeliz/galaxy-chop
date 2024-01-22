@@ -30,7 +30,7 @@ import numpy as np
 # =============================================================================
 
 # Bruno:
-# Probemos:
+# Probamos
 # i) si l_box (tamaño del grid) encierra a todas las partículas;
 # ii) si el grid generado es un objeto de GriSPy;
 # iii) (revisar los métodos de otros test) si el return de la func es un
@@ -39,20 +39,10 @@ import numpy as np
 # más "grained"?
 
 
-# Bruno:
-# Pruebo de otra forma para usar glxs reales...
-# def test_make_grid(galaxy):
-#     gal = galaxy(
-#         seed=42,
-#         stars_potential=False,
-#         dm_potential=False,
-#         gas_potential=False,
-#     )
 def test_make_grid(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
     df = gal.to_dataframe()
 
-    # ¿Así? ¿O mejor me creo arrays de shape = (n,1)?
     x_sys = df.x.values
     y_sys = df.y.values
     z_sys = df.z.values
@@ -60,7 +50,6 @@ def test_make_grid(read_hdf5_galaxy):
     l_box, grid = grispy_calculation.make_grid(x_sys, y_sys, z_sys)
 
     # Bruno: Que estén todas las partículas encerradas
-    # ¿Debería usar más los "and"?
     assert l_box > 0
     assert np.max(x_sys) < l_box
     assert np.min(x_sys) > -l_box
@@ -97,9 +86,6 @@ def test_potential_grispy_one_particle(read_hdf5_galaxy):
 
     epot = grispy_calculation.potential_grispy(
         centre,
-        x_sys,
-        y_sys,
-        z_sys,
         m_sys,
         softening,
         5 * softening,

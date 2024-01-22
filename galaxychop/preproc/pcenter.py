@@ -63,7 +63,7 @@ def center(galaxy, with_potential=True):
     ----------
     galaxy : ``Galaxy class`` object
         A galaxy object to correct its position and velocities.
-    with_potential : boolean, default value = True
+    with_potential : bool, default value = True
         If True, set the particle with lowest potential as the origin
         (requires the potential of all particles). Otherwise,
         correct by the geometric center of all particles.
@@ -149,9 +149,9 @@ def center(galaxy, with_potential=True):
 
 # Bruno:
 # Claro, ahora el checker también debería diferenciar si
-# tiene o no tiene el potencial... Vamos a patearlo por ahora
-# porque en una de esas no vale la pena considerar el caso de
-# Galaxia sin potencial...
+# tiene o no tiene el potencial...
+# Primero habría que ver si vale la pena considerar el caso
+# de Galaxia sin potencial...
 def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     """
     Validate if the galaxy is centered.

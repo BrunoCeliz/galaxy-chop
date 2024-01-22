@@ -20,9 +20,6 @@
 
 from galaxychop.preproc import pcenter
 
-# D: sin uso
-# import numpy as np
-# import pandas as pd
 import pytest
 
 
@@ -31,15 +28,34 @@ import pytest
 # =============================================================================
 
 
-def test_center_without_potential_energy(galaxy):
+@pytest.mark.parametrize("with_potential", [True, False])
+def test_center_without_potential_energy(galaxy, with_potential):
     gal = galaxy(
         seed=42,
         stars_potential=False,
         dm_potential=False,
         gas_potential=False,
     )
-    with pytest.raises(ValueError):
-        pcenter.center(gal)
+    if with_potential:
+        with pytest.raises(ValueError):
+            pcenter.center(gal)
+    else:
+        cgal = pcenter.center(gal)
+
+        df = gal.to_dataframe()
+        cdf = cgal.to_dataframe()
+
+        changed = ["x", "y", "z", "vx", "vy", "vz", "Jx", "Jy", "Jz"]
+
+        for colname in df.columns[~df.columns.isin(changed)]:
+            ocol = df[colname]
+            ccol = cdf[colname]
+            assert (ocol == ccol).all()
+
+        for colname in changed:
+            ocol = df[colname]
+            ccol = cdf[colname]
+            assert not (ocol == ccol).all()
 
 
 def test_center(galaxy):
@@ -55,7 +71,7 @@ def test_center(galaxy):
     df = gal.to_dataframe()
     cdf = cgal.to_dataframe()
 
-    changed = ["x", "y", "z", "Jx", "Jy", "Jz"]
+    changed = ["x", "y", "z", "vx", "vy", "vz", "Jx", "Jy", "Jz"]
 
     for colname in df.columns[~df.columns.isin(changed)]:
         ocol = df[colname]
@@ -111,9 +127,7 @@ def test_centralizer_transformer(galaxy):
 
     func_cgal = pcenter.center(gal)
     func_df = func_cgal.to_dataframe()
-    # Bruno: Las paso a df para compararlas
-    # (no le gusta al __eq__ de Galaxy...)
-    # Probamos con el método de pandas (!)
+
     assert class_df.equals(func_df)
 
 
@@ -130,9 +144,3 @@ def test_centralizer_checker(galaxy):
 
     assert (centralizer.checker(gal)) == (pcenter.is_centered(gal))
     assert (centralizer.checker(cgal)) == (pcenter.is_centered(cgal))
-
-
-# Bruno:
-# Entonces -> No toqué lo ciejo y me cercioré de que lo nuevo haga
-# lo mismo que lo viejo, así que debería estar todo ok... Repito
-# para salign.py

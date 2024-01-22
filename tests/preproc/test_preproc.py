@@ -28,10 +28,6 @@ import pandas as pd
 # =============================================================================
 
 
-# Bruno:
-# Aunque esto sea por completitud. Hay que deprecar estas funcs.
-# *Como las funcs viejas siguen existiendo, no hace falta
-# usar los transform ¿O sería lo mejor?
 def test_center_and_align(galaxy):
     gal = galaxy(
         seed=42,

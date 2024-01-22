@@ -27,7 +27,9 @@ def test_GaussianMixture(read_hdf5_galaxy):
 
     decomposer = gchop.models.GaussianMixture(random_state=42, n_init=1)
 
-    components = decomposer.decompose(gal)
+    # Bruno: A ver si no le importa que el atributo se llame igual que
+    # la variable donde se guarde...
+    components = decomposer.decompose(gal).components
 
     assert len(components) == len(gal)
     assert len(gal.stars) == np.sum(components.ptypes == "stars")
@@ -77,7 +79,7 @@ def test_AutoGaussianMixture(read_hdf5_galaxy):
 
     decomposer = gchop.models.AutoGaussianMixture(random_state=42, n_init=1)
 
-    components = decomposer.decompose(gal)
+    components = decomposer.decompose(gal).components
 
     assert len(components) == len(gal)
     assert len(gal.stars) == np.sum(components.ptypes == "stars")

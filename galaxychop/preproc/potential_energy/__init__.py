@@ -178,10 +178,6 @@ class Potentializer(GalaxyTransformerABC):
 
     """
 
-    # D: no nos toma los init para mi por tener de
-    # alguna forma los atter el ABC congelados,
-    # pasa aca y pasaba con el aligner
-
     def __init__(self, backend=DEFAULT_POTENTIAL_BACKEND):
         self.backend = backend
 
@@ -237,7 +233,8 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
     if galaxy.has_potential_:
         warnings.warn(
             "Galaxy potential is already calculated. \
-                      Continuing..."
+            Resuming...",
+            UserWarning,
         )
 
     # extract the implementation

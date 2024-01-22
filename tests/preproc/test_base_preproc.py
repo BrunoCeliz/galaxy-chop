@@ -18,8 +18,6 @@ import pytest
 # =============================================================================
 
 
-# Bruno:
-# Ojo cómo resulta el match entre lo del test_base de models/...
 @pytest.mark.model
 def GalaxyTransformerABC_not_implemethed():
     class Transformer(gchop.preproc._base.GalaxyTransformerABC):
@@ -107,6 +105,3 @@ def test_GalaxyTransformerABC_transform(read_hdf5_galaxy):
     # Bruno: Ojo con esto. igual está bien que el "checker" debe dar True
     # para cuando al galaxia sea tranformada...
     assert is_transf
-
-
-# Bruno: ¿Y hparam()?

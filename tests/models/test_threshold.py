@@ -26,7 +26,7 @@ def test_JThreshold(read_hdf5_galaxy):
 
     decomposer = gchop.models.JThreshold()
 
-    components = decomposer.decompose(gal)
+    components = decomposer.decompose(gal).components
 
     assert len(components) == len(gal)
     assert len(gal.stars) == np.sum(components.ptypes == "stars")

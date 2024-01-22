@@ -735,7 +735,7 @@ class DynamicStarsDecomposerMixin:
 
 
 # =============================================================================
-# DECOMPOSEDGALAXY CLASS (WIP)
+# DECOMPOSEDGALAXY CLASS
 # =============================================================================
 
 # Remember los test pls:

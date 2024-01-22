@@ -39,8 +39,6 @@ def test_half_star_mass_radius_crop(read_hdf5_galaxy):
     )
 
 
-# Bruno:
-# Me "inspiro" de lo que hice en smr_crop.py
 def test_gal_crop_invalid_num_radii(galaxy):
     gal = galaxy(seed=42)
 
@@ -90,3 +88,27 @@ def test_cutter_checker(galaxy):
 
     assert (cutter.checker(gal)) == (smr_crop.is_star_cutted(gal))
     assert (cutter.checker(cgal)) == (smr_crop.is_star_cutted(cgal))
+
+
+@pytest.mark.parametrize("particle", ["stars", "gas", "dm", "all"])
+def test_get_radius_half_mass(read_hdf5_galaxy, particle):
+    gal = read_hdf5_galaxy("gal394242.h5")
+
+    half_mass_radius = smr_crop.get_radius_half_mass(gal, particle)
+
+    # Bruno:
+    # Lo que debería hacer sería pre-calcular estos valores
+    # aparte y exigir que sean lo mismo que a mano (que el
+    # "expected_radius"), como para tener control total de
+    # lo que está haciendo la función.
+    # Como WIP, lo único que voy a pedir es que el radio
+    # de cualquier tipo sea > 0, y después otro test para
+    # un bad input (catcheando el error de ParticleSetType)
+    assert half_mass_radius > 0.0
+
+
+def test_get_radius_half_mass_badinput(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
+
+    with pytest.raises(ValueError):
+        smr_crop.get_radius_half_mass(gal, "zaraza")

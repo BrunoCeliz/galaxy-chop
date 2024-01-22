@@ -10,9 +10,6 @@
 
 """Utilities for align the galaxies."""
 
-# Bruno:
-# Revisar la doc de todo!
-
 # =============================================================================
 # IMPORTS
 # =============================================================================
@@ -168,7 +165,8 @@ def star_align(galaxy, *, r_cut=None):
         warnings.warn(
             "Input Galaxy is not centered. Please, center it \
             with Centralizer.transform(galaxy, with_potential) \
-            or proceed with caution."
+            or proceed with caution.",
+            UserWarning,
         )
 
     # declare all the different groups of columns

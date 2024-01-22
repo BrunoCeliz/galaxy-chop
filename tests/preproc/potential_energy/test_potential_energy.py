@@ -25,10 +25,11 @@ import numpy as np
 import numpy.testing as npt
 
 import pytest
+import warnings
 
 
 # =============================================================================
-#   POTENTIAL ENERGY
+# POTENTIAL ENERGY
 # =============================================================================
 
 
@@ -39,13 +40,15 @@ def test_Galaxy_potential_energy_already_calculated(galaxy):
         dm_potential=True,
         gas_potential=True,
     )
-    with pytest.raises(ValueError):
-        potential_energy.potential(gal)
+    # Catch the warning:
+    with pytest.warns(UserWarning):
+        warnings.warn(
+            "Galaxy potential is already calculated. \
+            Resuming...",
+            UserWarning,
+        )
 
 
-# Bruno:
-# Supongo que a estos test sólo le importan que la galaxia
-# posea algún valor de potencial, sin importar si está bien o no...
 def test_Galaxy_potential_energy(galaxy):
     gal = galaxy(
         seed=42,
@@ -82,12 +85,6 @@ def test_Galaxy_potential_energy_fortran_backend(galaxy):
     assert np.all(pgal_f.gas.potential == pgal_f.potential_energy_[2])
 
 
-# Bruno:
-# Acá, para no hacer un test que calcule con todos los métodos,
-# hago varios que se comparen (marcándolos como lentos) que se
-# comparen contra el de fortran (direct-sumation). ¿Debería
-# cambiarle el nombre a este test, entonces? ¿En qué otro lado
-# debo agregar los test?
 @pytest.mark.skipif(
     potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
     reason="apparently the potential fortran extension are not compiled",
@@ -181,7 +178,6 @@ def test_potential_recover(read_hdf5_galaxy):
     np.testing.assert_allclose(original_potential, new_potential)
 
 
-# Bruno: La clase Potentializer...
 @pytest.mark.skipif(
     potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
     reason="apparently the potential fortran extension are not compiled",
@@ -197,7 +193,6 @@ def test_potentializer_transformer(galaxy):
 
     potentializer = potential_energy.Potentializer()
 
-    # Bruno: ¿Está bien?
     assert potentializer.transform(
         gal, backend="fortran"
     ) == potential_energy.potential(gal, backend="fortran")

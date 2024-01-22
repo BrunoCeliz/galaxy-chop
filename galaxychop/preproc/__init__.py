@@ -25,13 +25,6 @@ from .potential_energy import (
 from .salign import Aligner, is_star_aligned, star_align
 from .smr_crop import Cutter, half_star_mass_radius_crop
 
-# Bruno:
-# Del smr_crop estaría interesante sacar la func "_get_half_smr_crop()", pero
-# está mencionada como privada. Como "cortador" de la galaxia (efectivamente
-# devuelve una galaxia cortada a 3 r_half), le falta aplicar ese corte para
-# gas y DM => ¡No serviría más para calc el potencial! => No nos interesa
-# como "preprocesador" (a.k.a. "Transformer")...
-
 
 __all__ = [
     "center",

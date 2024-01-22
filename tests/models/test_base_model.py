@@ -312,11 +312,52 @@ def test_GalaxyDecomposerABC_decompose(read_hdf5_galaxy):
 
     decomposer = Decomposer()
 
-    components = decomposer.decompose(gal)
+    # Bruno: Cambio, ahora decompose devuelve una
+    # "DecomposedGalaxy" (mini-envoltura) -> la "desarmo"
+    gal_decomp = decomposer.decompose(gal)
+    gal_components = gal_decomp.components
 
-    assert (components.ptypes == "stars").sum() == len(gal.stars)
-    assert (components.ptypes == "dark_matter").sum() == len(gal.dark_matter)
-    assert (components.ptypes == "gas").sum() == len(gal.gas)
+    assert (gal_components.ptypes == "stars").sum() == len(gal.stars)
+    assert (gal_components.ptypes == "dark_matter").sum() == len(
+        gal.dark_matter
+    )
+    assert (gal_components.ptypes == "gas").sum() == len(gal.gas)
 
-    assert np.all(components.labels[components.ptypes == "gas"] == 100)
-    assert np.all(np.isnan(components.labels[components.ptypes != "gas"]))
+    assert np.all(gal_components.labels[gal_components.ptypes == "gas"] == 100)
+    assert np.all(
+        np.isnan(gal_components.labels[gal_components.ptypes != "gas"])
+    )
+
+
+# =============================================================================
+# DECOMPOSEDGALAXY
+# =============================================================================
+
+
+@pytest.mark.model
+def test_Decomposedgalaxy(read_hdf5_galaxy):
+    gal = read_hdf5_galaxy("gal394242.h5")
+    gal = gchop.preproc.salign.star_align(gchop.preproc.pcenter.center(gal))
+
+    class Decomposer(gchop.models.GalaxyDecomposerABC):
+        def get_attributes(self):
+            return ["x"]
+
+        def split(self, X, y, attributes):
+            return np.full(len(X), 100), None
+
+        def get_rows_mask(self, X, y, attributes):
+            return y == 2
+
+    decomposer = Decomposer()
+
+    # Bruno: Ya no la desarmo, sino que comparo que
+    # el contenido sea el mismo quelas partes por separado
+    gal_decomp = decomposer.decompose(gal)
+    gal_components = gal_decomp.components
+
+    assert len(gal_decomp) == len(gal)
+
+    expected_repr = repr(gal) + "\n" + repr(gal_components)
+
+    assert repr(gal_decomp) == expected_repr

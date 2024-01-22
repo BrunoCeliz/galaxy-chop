@@ -27,7 +27,7 @@ def test_JHistogram(read_hdf5_galaxy):
 
     decomposer = gchop.models.JHistogram()
 
-    components = decomposer.decompose(gal)
+    components = decomposer.decompose(gal).components
 
     assert len(components) == len(gal)
     assert len(gal.stars) == np.sum(components.ptypes == "stars")
@@ -57,7 +57,7 @@ def test_JEHistogram(read_hdf5_galaxy):
 
     decomposer = gchop.models.JEHistogram()
 
-    components = decomposer.decompose(gal)
+    components = decomposer.decompose(gal).components
 
     assert len(components) == len(gal)
     assert len(gal.stars) == np.sum(components.ptypes == "stars")

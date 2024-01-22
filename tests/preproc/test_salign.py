@@ -19,6 +19,8 @@ from galaxychop.preproc import salign
 
 import pytest
 
+import warnings
+
 
 # =============================================================================
 # ALIGN
@@ -29,6 +31,15 @@ def test_star_align_rcur0dot9(galaxy):
     gal = galaxy(seed=42)
 
     agal = salign.star_align(gal, r_cut=0.9)
+
+    # Catch the warning:
+    with pytest.warns(UserWarning):
+        warnings.warn(
+            "Input Galaxy is not centered. Please, center it \
+            with Centralizer.transform(galaxy, with_potential) \
+            or proceed with caution.",
+            UserWarning,
+        )
 
     df = gal.to_dataframe()
     adf = agal.to_dataframe()
@@ -62,6 +73,15 @@ def test_star_align(galaxy):
     gal = galaxy(seed=42)
 
     agal = salign.star_align(gal)
+
+    # Catch the warning:
+    with pytest.warns(UserWarning):
+        warnings.warn(
+            "Input Galaxy is not centered. Please, center it \
+            with Centralizer.transform(galaxy, with_potential) \
+            or proceed with caution.",
+            UserWarning,
+        )
 
     df = gal.to_dataframe()
     adf = agal.to_dataframe()
@@ -98,6 +118,7 @@ def test_star_align_invalid_rcut(galaxy):
         salign.star_align(gal, r_cut=-1)
 
 
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_is_star_aligned_real_galaxy(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
 
@@ -107,6 +128,7 @@ def test_is_star_aligned_real_galaxy(read_hdf5_galaxy):
     assert salign.is_star_aligned(agal, r_cut=5)
 
 
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_is_star_aligned_fake_galaxy(galaxy):
     gal = galaxy(seed=42)
 
@@ -116,15 +138,11 @@ def test_is_star_aligned_fake_galaxy(galaxy):
     assert salign.is_star_aligned(agal, r_cut=5)
 
 
-# Bruno:
-# Las funcs privs no se testean...
-# Para testear las clases, las inicializamos y comparamos
-# que sus métodos hagan lo mismo que las funciones aparte
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_aligner_transformer(galaxy):
     gal = galaxy(seed=42)
     aligner = salign.Aligner()
 
-    # Bruno: Ídem que pcenter...
     class_agal = aligner.transform(gal)
     class_df = class_agal.to_dataframe()
 
@@ -134,8 +152,7 @@ def test_aligner_transformer(galaxy):
     assert class_df.equals(func_df)
 
 
-# Bruno:
-# Añado un test para saber si inicializa bien el r_cut:
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_aligner_default_r_cut(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
     aligner = salign.Aligner()
@@ -149,8 +166,7 @@ def test_aligner_default_r_cut(read_hdf5_galaxy):
     assert class_df.equals(func_df)
 
 
-# Bruno:
-# Y otro para saber si pone bien un r_cut nuevo:
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_aligner_notdefault_r_cut(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
     aligner = salign.Aligner(r_cut=10)
@@ -164,6 +180,7 @@ def test_aligner_notdefault_r_cut(read_hdf5_galaxy):
     assert class_df.equals(func_df)
 
 
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_aligner_checker(galaxy):
     gal = galaxy(seed=42)
     aligner = salign.Aligner()

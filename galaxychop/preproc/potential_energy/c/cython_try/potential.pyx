@@ -1,10 +1,12 @@
 # Desde acá, reescribo el Octree de C en Cython (!!!)
 
+cimport cython
+
 # Para variables globales:
 cdef float Thetamax = 0.45
 cdef float GCONS = 6.67300e-20  # Constante de Gravitación [km³ / kg / seg²]
 cdef float Msol = 1.9891e30  # Masa del Sol [Kg]
-cdef float Kpc = 3.08568025e16  # Kiloparsec -> Kilometro
+cdef float Kpc = 3.08568025e16  # Kiloparsec . Kilometro
 cdef int KERNEL_LENGTH = 10000
 cdef int SOFT = 3
 
@@ -64,7 +66,6 @@ cdef void add_particle_props_to_node(struct NODE *no, float *pos, float mp):
     cdef float delta;
 
     for i in range(3):
-        
         delta = pos[i] - no.center[i]
         no.s[i] += mp * delta
 
@@ -167,19 +168,19 @@ cdef int tree_potential(
     cdef float pmass
     cdef float length;
     cdef float dx,dy,dz;
-    cdef float[3] xmin[3]
-    cdef float[3] xmax[3];
+    cdef float[3] xmin
+    cdef float[3] xmax;
     cdef struct NODE *nodes, *last, *nfree,*th,*nn,*ff;
     cdef int MaxNodes, numnodestotal;
     cdef float *knlrad, *knlpot; 
-    cdef knlrad = <float *> malloc((KERNEL_LENGTH+1) * sizeof(float));
-    cdef knlpot = <float *> malloc((KERNEL_LENGTH+1) * sizeof(float));
+    cdef knlrad = <float*> malloc((KERNEL_LENGTH+1) * sizeof(float));
+    cdef knlpot = <float*> malloc((KERNEL_LENGTH+1) * sizeof(float));
 
     for i in range(npart):
         Ep[i] = 0.0;
 
     MaxNodes = 2 * npart + 200;
-    nodes = <struct NODE *> malloc(MaxNodes*sizeof(struct NODE));
+    nodes = <struct NODE*> malloc(MaxNodes*sizeof(struct NODE));
     assert nodes != NULL;
 
     force_setkernel(knlrad, knlpot);
@@ -200,243 +201,232 @@ cdef int tree_potential(
         xmax[1] = y[i] if y[i] > xmax[1] else xmax[1]
         xmax[2] = z[i] if z[i] > xmax[2] else xmax[2]
     
-##
-# Hasta acá llegué... ¿Seguir? ¿Tiene sentido? ¿Cómo saber si está funcando?
-##
-    for(j = 1 , length = xmax[0]-xmin[0] ; j < 3 ; j++)  /* determine maxmimum extension */
-        if((xmax[j]-xmin[j]) > length)
-        length = xmax[j]-xmin[j];
-    length *= 1.01;
-    assert(length > 0);
+    length = xmax[0]-xmin[0]
+    for j in range(3):  # determine maxmimum extension
+        if (xmax[j]-xmin[j]) > xmax[0]-xmin[0]:
+            length = xmax[j]-xmin[j];
 
-    /* insert first particle in root node */
-    for(j = 0 ; j < 3 ; j++)
-        nfree->center[j] = (xmax[j]+xmin[j])/2;
-    nfree->len = length;
+    length *= 1.01
+    assert length > 0
+
+    # insert first particle in root node
+    for j in range(3):
+        nfree.center[j] = (xmax[j]+xmin[j])/2;
+
+    nfree.len = length;
     
-    /*inicializa variables*/
-    nfree->father = 0;
-    for(j = 0 ; j < 8 ; j++)
-        nfree->suns[j] = 0;
+    # inicializa variables
+    nfree.father = 0;
+    for j in range(8):
+        nfree.suns[j] = 0;
 
-    nfree->partind = 0;
-    nfree->mass = mp[0];
+    nfree.partind = 0;
+    nfree.mass = mp[0];
     pcoord[0] = x[0];
     pcoord[1] = y[0];
     pcoord[2] = z[0];
-    for(j = 0 ; j < 3 ; j++)
-        nfree->s[j] = nfree->mass*(pcoord[j] - nfree->center[j]);
+    for j in range(3):
+        nfree.s[j] = nfree.mass*(pcoord[j] - nfree.center[j]);
     
-    /*inicializa la variable que apunta al hermano*/
-    nfree->sibling = 0;
+    # inicializa la variable que apunta al hermano
+    nfree.sibling = 0;
 
-    numnodestotal++; nfree++;
+    numnodestotal += 1
+    nfree += 1
     
-    if(numnodestotal >= MaxNodes)
-    {
-        fprintf(stderr,"Maximum number %d of tree-nodes reached. file: %s line: %d\n",
+    if (numnodestotal >= MaxNodes):
+        print(stderr,"Maximum number %d of tree-nodes reached. file: %s line: %d\n",
                 numnodestotal,__FILE__,__LINE__);
         free(nodes);
         free(knlrad);
         free(knlpot);
-    }
 
-    /* insert all other particles */
-    for(i = 1 ; i < npart; i++)
-    {
+    # insert all other particles
+    for i in range(npart):
         th        = nodes;
         icoord[0] = x[i];
         icoord[1] = y[i];
         icoord[2] = z[i];
         imass     = mp[i];
     
-        while(1)
-        {
-        add_particle_props_to_node(th,icoord,imass);
+        while True:
+            add_particle_props_to_node(th,icoord,imass);
 
-        if(th->partind >= 0)
-            break;
-        
-        for(j = 0 , subnode = 0 , fak = 1 ; j < 3 ; j++ , fak <<= 1)
-            if(icoord[j] > th->center[j])
-            subnode += fak;
-
-        nn = th->suns[subnode];
-        if(nn != NULL)
-            th = nn;
-        else
-            break;
-        }
-        
-        if(th->partind >= 0)  /* cell is occcupied with one particle */
-        {
-        while(1)
-        {
-            p         = th->partind;
-            pmass     = mp[p];
-            pcoord[0] = x[p];
-            pcoord[1] = y[p];
-            pcoord[2] = z[p];
-
-            for(j = 0 , subp = 0 , fak = 1 ; j < 3 ; j++ , fak <<= 1)
-            if(pcoord[j] > th->center[j])
-                subp += fak;
-
-            nfree->father = th;
+            if th.partind >= 0:
+                break;
             
-            for(j = 0 ; j < 8 ; j++)
-            nfree->suns[j] = 0;
+            subnode = 0
+            fak = 1
+            for j in range(3):
+                if icoord[j] > th.center[j]:
+                    subnode += fak;
+                fak <<= 1
 
-            nfree->sibling = 0;
+            nn = th.suns[subnode];
+            if nn != NULL:
+                th = nn;
+            else:
+                break;
+        
+        if th.partind >= 0:  # cell is occcupied with one particle
+            while True:
+                p         = th.partind;
+                pmass     = mp[p];
+                pcoord[0] = x[p];
+                pcoord[1] = y[p];
+                pcoord[2] = z[p];
+
+                subp = 0
+                fak = 1
+                for j in range(3):
+                    if pcoord[j] > th.center[j]:
+                        subp += fak;
+                    fak <<= 1
+
+                nfree.father = th;
+                
+                for j in range(8):
+                    nfree.suns[j] = 0;
+
+                nfree.sibling = 0;
+                
+                nfree.len = th.len/2;
             
-            nfree->len = th->len/2;
-        
-            for(j = 0 ; j < 3 ; j++)
-            nfree->center[j] = th->center[j];
+                for j in range(3):
+                    nfree.center[j] = th.center[j];
 
-            for(j = 0 ; j < 3 ; j++)
-            if(pcoord[j] > nfree->center[j])
-                nfree->center[j] += nfree->len/2;
-            else
-                nfree->center[j] -= nfree->len/2;
+                for j in range(3):
+                    if (pcoord[j] > nfree.center[j]):
+                        nfree.center[j] += nfree.len/2;
+                    else:
+                        nfree.center[j] -= nfree.len/2;
 
-            nfree->partind = p;
-            nfree->mass    = pmass;
-            for(j = 0 ; j < 3 ; j++)
-            {
-            nfree->s[j]  = (pcoord[j] - nfree->center[j]);
-            nfree->s[j] *= pmass;
-            }
-            th->partind = -1;
-            th->suns[subp] = nfree;
+                nfree.partind = p;
+                nfree.mass    = pmass;
+                for j in range(3):
+                    nfree.s[j]  = (pcoord[j] - nfree.center[j]);
+                    nfree.s[j] *= pmass;
+
+                th.partind = -1;
+                th.suns[subp] = nfree;
+            
+                numnodestotal += 1 
+                nfree += 1
+                if numnodestotal >= MaxNodes:
+                    print(stderr,"Maximum number %d of tree-nodes reached. i=%d, npart=%d. file: %s line: %d\n",
+                            numnodestotal,i,npart,__FILE__,__LINE__);
+                    free(nodes);
+                    free(knlrad);
+                    free(knlpot);
+                    return False; 
+
+                subi = 0
+                fak = 1
+                for j in range(3):
+                    if icoord[j] > th.center[j]:
+                        subi += fak;
+                    fak <<= 1
+
+                if subi == subp:  # the new particle lies in the same sub-cube
+                    th = nfree-1;
+                    add_particle_props_to_node(th,icoord,imass);
+                else:
+                    break;
+
+        subi = 0
+        fak = 1
+        for j in range(3):
+            if icoord[j] > th.center[j]:
+                subi += fak;
+            fak <<= 1
         
-            numnodestotal++; nfree++;
-            if(numnodestotal >= MaxNodes)
-            {
-            fprintf(stderr,"Maximum number %d of tree-nodes reached. i=%d, npart=%d. file: %s line: %d\n",
+        nfree.father = th;
+        
+        for j in range(8):
+            nfree.suns[j] = 0;
+
+        nfree.sibling = 0;
+
+        nfree.len = th.len/2;
+
+        for j in range(3):
+            nfree.center[j] = th.center[j];
+
+        for j in range(3):
+            if icoord[j] > nfree.center[j]:
+                nfree.center[j] += nfree.len/2;
+            else:
+                nfree.center[j] -= nfree.len/2;
+
+        nfree.partind = i;
+        nfree.mass = imass;
+        for j in range(3):
+            nfree.s[j]  = (icoord[j] - nfree.center[j]);
+            nfree.s[j] *= nfree.mass;
+
+        th.suns[subi] = nfree;
+        
+        numnodestotal += 1
+        nfree += 1
+
+        if numnodestotal >= MaxNodes:
+            print(stderr,"Maximum number %d of tree-nodes reached. i=%d, npart=%d. file: %s line: %d\n",
                     numnodestotal,i,npart,__FILE__,__LINE__);
             free(nodes);
             free(knlrad);
             free(knlpot);
-            return 0; 
-            }
+            return False; 
 
-            for(j = 0 , subi = 0 , fak = 1 ; j < 3 ; j++ , fak <<= 1)
-            if(icoord[j] > th->center[j])
-                subi += fak;
-
-            if(subi == subp)   /* the new particle lies in the same sub-cube */
-            {
-            th = nfree-1;
-            add_particle_props_to_node(th,icoord,imass);
-            }
-            else
-            break;
-        }
-        }
+    # now finish-up center-of-mass and quadrupol computation
+    th = nodes
+    for i in range(numnodestotal):
+        for j in range(3):
+            th.s[j] /= th.mass;
         
-        for(j = 0 , subi = 0 , fak = 1 ; j < 3 ; j++ , fak <<= 1)
-        if(icoord[j] > th->center[j])
-            subi += fak;
-        
-        nfree->father = th;
-        
-        for(j = 0 ; j < 8 ; j++)
-        nfree->suns[j] = 0;
+        if th.partind < 0:  # cell contains more than one particle
+            dx = th.s[0];
+            dy = th.s[1];
+            dz = th.s[2];
+            
+            th.oc  = <float>sqrt(dx*dx + dy*dy + dz*dz);
+            th.oc += th.len/(Thetamax); 
+            th.oc *= th.oc;  # used in cell-opening criterion
 
-        nfree->sibling = 0;
-
-        nfree->len = th->len/2;
-
-        for(j = 0 ; j < 3 ; j++)
-        nfree->center[j] = th->center[j];
-
-        for(j = 0 ; j < 3 ; j++)
-        if(icoord[j] > nfree->center[j])
-            nfree->center[j] += nfree->len/2;
-        else
-            nfree->center[j] -= nfree->len/2;
-
-        nfree->partind = i;
-        nfree->mass = imass;
-        for(j = 0 ; j < 3 ; j++)
-        {
-        nfree->s[j]  = (icoord[j] - nfree->center[j]);
-
-        nfree->s[j] *= nfree->mass;
-        }
-        th->suns[subi] = nfree;
-        
-        numnodestotal++; nfree++;
-
-        if(numnodestotal >= MaxNodes)
-        {
-        fprintf(stderr,"Maximum number %d of tree-nodes reached. i=%d, npart=%d. file: %s line: %d\n",
-                numnodestotal,i,npart,__FILE__,__LINE__);
-        free(nodes);
-        free(knlrad);
-        free(knlpot);
-        return 0; 
-        }
-    }
-
-    /* now finish-up center-of-mass and quadrupol computation */
+        th.s[0] += th.center[0];
+        th.s[1] += th.center[1];
+        th.s[2] += th.center[2];
     
-    for(i = 0, th = nodes; i < numnodestotal; i++, th++)
-    {
-        for(j = 0; j < 3; j++)
-        th->s[j] /= th->mass;
-        
-        if(th->partind < 0)   /* cell contains more than one particle */
-        {
-        dx = th->s[0];
-        dy = th->s[1];
-        dz = th->s[2];
-        
-        th->oc  = (float)sqrt(dx*dx + dy*dy + dz*dz);
-        th->oc += th->len/(Thetamax); 
-        th->oc *= th->oc;     /* used in cell-opening criterion */
-        }
+        # (j = 7, ; j >= 0; j--)
+        for j in reversed(range(8)):  # preparations for non-recursive walk
+            if th.suns[j]:
+                th.suns[j].sibling = nn;
+                nn = th.suns[j];
+            
+            if nn == 0:
+                break
 
-        th->s[0] += th->center[0];
-        th->s[1] += th->center[1];
-        th->s[2] += th->center[2];
-    
-        for(j = 7, nn = 0; j >= 0; j--)    /* preparations for non-recursive walk */
-        {
-        if(th->suns[j])
-        {
-            th->suns[j]->sibling = nn;
-            nn = th->suns[j];
-        }
-        }
-    }
+        th += 1
 
     last = 0;
-    force_setupnonrecursive(nodes, &last);    /* set up non-recursive walk */
-    last->next = 0;
+    force_setupnonrecursive(nodes, &last);  # set up non-recursive walk
+    last.next = 0;
     
-    for(i = 0, th = nodes; i < numnodestotal; i++, th++)
-    {
-        if(!(th->sibling))
-        {
-        ff = th;
-        nn = ff->sibling;
+    th = nodes
+    for i in range(numnodestotal):
+        if (~th.sibling):
+            ff = th;
+            nn = ff.sibling;
 
-        while(!nn)
-        {
-            ff = ff->father;
-            if(!ff)
-            break;
-            nn = ff->sibling;
-        }
-    
-        th->sibling = nn;
-        }
-    }
+            while ~nn:
+                ff = ff.father;
+                if ~ff:
+                    break;
+                nn = ff.sibling;
+        
+            th.sibling = nn;
+        th += 1
 
-    for(i = 0; i < npart; i++)
-    {
+    for i in range(npart):
         pcoord[0] = x[i];
         pcoord[1] = y[i];
         pcoord[2] = z[i];
@@ -445,12 +435,14 @@ cdef int tree_potential(
 
         Ep[i] *= GCONS*Msol/Kpc;
 
-        assert(Ep[i]<0.0);
-    }
+        assert Ep[i] < 0.0;
 
     free(nodes);
     free(knlrad);
     free(knlpot);
 
-    return 1;
-}
+    return True;
+
+# Bruno:
+# 1er intetno de transcribir el código de C a un .pyx de Cython.
+# Dios y la Virgen sabrán si está bien y qué puede llegar a fallar...

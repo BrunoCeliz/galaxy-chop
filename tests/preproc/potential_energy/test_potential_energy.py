@@ -33,6 +33,10 @@ import warnings
 # =============================================================================
 
 
+@pytest.mark.skipif(
+    potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
+    reason="apparently the potential fortran extension are not compiled",
+)
 def test_Galaxy_potential_energy_already_calculated(galaxy):
     gal = galaxy(
         seed=42,
@@ -40,6 +44,9 @@ def test_Galaxy_potential_energy_already_calculated(galaxy):
         dm_potential=True,
         gas_potential=True,
     )
+
+    potential_energy.potential(gal)
+
     # Catch the warning:
     with pytest.warns(UserWarning):
         warnings.warn(
@@ -49,6 +56,10 @@ def test_Galaxy_potential_energy_already_calculated(galaxy):
         )
 
 
+@pytest.mark.skipif(
+    potential_energy.DEFAULT_POTENTIAL_BACKEND == "numpy",
+    reason="apparently the potential fortran extension are not compiled",
+)
 def test_Galaxy_potential_energy(galaxy):
     gal = galaxy(
         seed=42,

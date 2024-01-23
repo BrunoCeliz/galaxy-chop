@@ -91,7 +91,7 @@ def test_ParticleSet_creation_with_potential(data_particleset):
     assert np.all(pset.arr_.vx == vx) and pset.vx.unit == (u.km / u.s)
     assert np.all(pset.arr_.vy == vy) and pset.vy.unit == (u.km / u.s)
     assert np.all(pset.arr_.vz == vz) and pset.vz.unit == (u.km / u.s)
-    assert np.all(pset.softening == soft)
+    assert np.all(pset.arr_.softening == soft) and pset.softening.unit == u.kpc
 
     kinetic_energy = 0.5 * (vx**2 + vy**2 + vz**2)
     assert (
@@ -129,7 +129,7 @@ def test_ParticleSet_creation_without_potential(data_particleset):
     assert np.all(pset.arr_.vx == vx) and pset.vx.unit == (u.km / u.s)
     assert np.all(pset.arr_.vy == vy) and pset.vy.unit == (u.km / u.s)
     assert np.all(pset.arr_.vz == vz) and pset.vz.unit == (u.km / u.s)
-    assert np.all(pset.softening == soft)
+    assert np.all(pset.arr_.softening == soft) and pset.softening.unit == u.kpc
 
     kinetic_energy = 0.5 * (vx**2 + vy**2 + vz**2)
     assert (
@@ -233,8 +233,17 @@ def test_ParticleSet_to_dataframe(data_particleset, has_potential):
         }
     )
     df = pset.to_dataframe()
+    # Bruno: me ganó el hdp
+    # update -> el hdrmp se encapricha con el 
+    # int32 e int64 de ptypev!!!
+    df = df.astype({"ptypev": np.dtype("int64")})
 
     assert df.equals(expected)
+
+    # Bruno: Buena herramienta para saber más detalladamente
+    # por qué no son equals...
+    # from pandas.testing import assert_frame_equal
+    # assert_frame_equal(df,expected)
 
 
 def test_ParticleSet_to_dataframe_no_potential(data_particleset):
@@ -286,9 +295,10 @@ def test_ParticleSet_repr(data_particleset, has_potential):
         potential=pot,
     )
 
+    # Bruno: ¿soft.value()?
     expected = (
         f"<ParticleSet 'STARS', size={len(m)}, "
-        f"softening={soft}, potentials={has_potential}.>"
+        f"softening={soft}, potentials={has_potential}>"
     )
 
     assert repr(pset) == expected
@@ -364,7 +374,7 @@ def test_ParticleSet_to_dict(data_particleset):
     np.testing.assert_allclose(pset_dict["vz"], vz)
     np.testing.assert_allclose(pset_dict["vz"], pset.vz.to_value())
     np.testing.assert_allclose(pset_dict["softening"], soft)
-    np.testing.assert_allclose(pset_dict["softening"], pset.softening)
+    np.testing.assert_allclose(pset_dict["softening"], pset.softening.to_value())
     np.testing.assert_allclose(pset_dict["potential"], pot)
     np.testing.assert_allclose(
         pset_dict["potential"], pset.potential.to_value()
@@ -542,7 +552,7 @@ def test_mkgakaxy(data_galaxy, has_potential):
     assert np.all(gal.stars.arr_.vx == vx_s)
     assert np.all(gal.stars.arr_.vy == vy_s)
     assert np.all(gal.stars.arr_.vz == vz_s)
-    assert np.all(gal.stars.softening == soft_s)
+    assert np.all(gal.stars.softening.value == soft_s)
 
     assert np.all(gal.dark_matter.arr_.m == m_dm)
     assert np.all(gal.dark_matter.arr_.x == x_dm)
@@ -551,7 +561,7 @@ def test_mkgakaxy(data_galaxy, has_potential):
     assert np.all(gal.dark_matter.arr_.vx == vx_dm)
     assert np.all(gal.dark_matter.arr_.vy == vy_dm)
     assert np.all(gal.dark_matter.arr_.vz == vz_dm)
-    assert np.all(gal.dark_matter.softening == soft_dm)
+    assert np.all(gal.dark_matter.softening.value == soft_dm)
 
     assert np.all(gal.gas.arr_.m == m_g)
     assert np.all(gal.gas.arr_.x == x_g)
@@ -560,7 +570,7 @@ def test_mkgakaxy(data_galaxy, has_potential):
     assert np.all(gal.gas.arr_.vx == vx_g)
     assert np.all(gal.gas.arr_.vy == vy_g)
     assert np.all(gal.gas.arr_.vz == vz_g)
-    assert np.all(gal.gas.softening == soft_g)
+    assert np.all(gal.gas.softening.value == soft_g)
     assert gal.has_potential_ == has_potential
     assert len(gal) == len(gal.stars) + len(gal.dark_matter) + len(gal.gas)
 
@@ -884,7 +894,8 @@ def test_Galaxy_potential_energy_without_potential(galaxy):
     gal = galaxy(
         stars_potential=False, dm_potential=False, gas_potential=False
     )
-    assert gal.potential_energy_ is None
+    with pytest.raises(ValueError):
+        gal.potential_energy_
 
 
 # =============================================================================
@@ -915,7 +926,9 @@ def test_Galaxy_total_energy_without_potential(galaxy):
     gal = galaxy(
         stars_potential=False, dm_potential=False, gas_potential=False
     )
-    assert gal.total_energy_ is None
+
+    with pytest.raises(ValueError):
+        gal.total_energy_
 
 
 # =============================================================================

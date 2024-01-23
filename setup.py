@@ -52,7 +52,8 @@ with open(galaxychop_INIT_PATH, "r") as f:
 # CONSTANTS
 # =============================================================================
 
-
+# Bruno:
+# Actualizar...
 REQUIREMENTS = [
     "numpy >= 1.13.3",
     "scipy >= 1.0",

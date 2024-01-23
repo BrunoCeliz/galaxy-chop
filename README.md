@@ -73,10 +73,10 @@ $ pip -r requirements-dev
 
 
 
-
-# D: (consideraciones para la instalacion
-# , que me tope al correr tox)
-# dpkg -l python3*-dev
-#  si no tiene el paquete  python3.*-dev
-# instalarlo sudo apt-get install python3.*-dev
-# para que el Cmake ande easy peace
+<!---
+D: (consideraciones para la instalacion
+, que me tope al correr tox)
+dpkg -l python3*-dev
+ si no tiene el paquete  python3.*-dev
+instalarlo sudo apt-get install python3.*-dev
+para que el Cmake ande easy peace --->

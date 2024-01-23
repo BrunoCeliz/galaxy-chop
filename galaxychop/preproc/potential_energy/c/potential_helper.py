@@ -35,7 +35,7 @@ def check(exe, recompilar=True):
             os.system(comando)
         else:
             raise UserWarning("Error, compiled file does not exist")
-            #exit(0)
+            # exit(0)
 
     return
 

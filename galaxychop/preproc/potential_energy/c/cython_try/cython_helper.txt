@@ -27,3 +27,8 @@ setup(
 # a Python session and do from hello import say_hello_to and use the
 # imported function as you see fit.
 
+####################################################
+# Parte 2
+####################################################
+
+# La otra opción es hacer un wrapper (clase de Juan), probemos...

@@ -1,3 +1,6 @@
+# Bruno:
+# ¿No deberían ir más cosas acá? (Rev el ej de las Slides de Juan)
+
 [tool.black]
 line-length = 79
 target-version = ['py38', 'py39', 'py310', 'py311', 'py312']

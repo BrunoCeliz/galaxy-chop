@@ -205,13 +205,13 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     # Update -> funciona, pero pedir la tolerancia default
     # puede generar falsos "False" a.k.a. lo mejor
     # sería no chequear velocidades...
-    return (
-        np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
-    ) #and (
+    return np.allclose(
+        min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol
+    )  # and (
     #  np.isclose(
     #      np.sqrt(vx_cm**2 + vy_cm**2 + vz_cm**2),
     #      0,
     #      rtol=rtol,
     #      atol=atol,
     #  )
-    #)
+    # )

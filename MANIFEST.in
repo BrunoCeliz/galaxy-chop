@@ -2,34 +2,23 @@ include LICENSE.txt
 include README.md
 include CHANGELOG.md
 include CMakeLists.txt
+include pyproject.toml
 
 recursive-include galaxychop *.dat
 recursive-include galaxychop *.npy
 recursive-include galaxychop *.f90
-# Bruno: Para cuando funcione ->
-# recursive-include galaxychop *.c
-# recursive-include galaxychop *.pyx
-
-# Bruno: no queremos incluir nada de draft/
-# recursive-include draft *.py
-# recursive-include draft *.text
-# recursive-include draft *.txt
-
-# Bruno: ¿Esto no es obvio? ¿Hay que aclararlo?
 recursive-include galaxychop *.py
 
 recursive-exclude docs *
-# Bruno: no queremos incluir nada de draft/
 recursive-exclude draft *
 recursive-exclude legacy *
 recursive-exclude legacy_test *
 recursive-exclude resource *
 recursive-exclude tests *
 recursive-exclude tools *
+recursive-exclude _skbuild *
 
 exclude tox.ini
-# Bruno: ¿No sería include al .toml?
-exclude pyproject.toml
 exclude requirements_dev.txt
 exclude .header-template
 exclude .readthedocs.yml

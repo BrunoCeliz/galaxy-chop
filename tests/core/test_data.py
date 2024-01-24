@@ -234,7 +234,7 @@ def test_ParticleSet_to_dataframe(data_particleset, has_potential):
     )
     df = pset.to_dataframe()
     # Bruno: me ganó el hdp
-    # update -> el hdrmp se encapricha con el 
+    # update -> el hdrmp se encapricha con el
     # int32 e int64 de ptypev!!!
     df = df.astype({"ptypev": np.dtype("int64")})
 
@@ -374,7 +374,9 @@ def test_ParticleSet_to_dict(data_particleset):
     np.testing.assert_allclose(pset_dict["vz"], vz)
     np.testing.assert_allclose(pset_dict["vz"], pset.vz.to_value())
     np.testing.assert_allclose(pset_dict["softening"], soft)
-    np.testing.assert_allclose(pset_dict["softening"], pset.softening.to_value())
+    np.testing.assert_allclose(
+        pset_dict["softening"], pset.softening.to_value()
+    )
     np.testing.assert_allclose(pset_dict["potential"], pot)
     np.testing.assert_allclose(
         pset_dict["potential"], pset.potential.to_value()

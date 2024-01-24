@@ -887,12 +887,15 @@ def mkgalaxy(
         Specific potential energy of dark matter particles. Shape: (n,1).
     potential_g : np.ndarray, default value = None
         Specific potential energy of gas particles. Shape: (n,1).
-    softening_s : float, default value = 0.
+    softening_s : Quantity. Default value = 0
         Softening radius of stellar particles. Shape: (1,).
-    softening_dm : float, default value = 0.
+        Default unit: kpc.
+    softening_dm : Quantity. Default value = 0
         Softening radius of dark matter particles. Shape: (1,).
-    softening_g : float, default value = 0.
+        Default unit: kpc.
+    softening_g : Quantity. Default value = 0
         Softening radius of gas particles. Shape: (1,).
+        Default unit: kpc.
 
     Return
     ------

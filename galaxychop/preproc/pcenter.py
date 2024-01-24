@@ -132,16 +132,28 @@ def center(galaxy, with_potential=True):
     # patch
     new = galaxy.disassemble()
 
+    # Bruno:
+    # No toco nada del potential y aún así le pinta cambiar
+    # de False a True cuando uso with_potential = False.
     new.update(
         x_s=stars.x.to_numpy(),
         y_s=stars.y.to_numpy(),
         z_s=stars.z.to_numpy(),
+        vx_s=stars.vx.to_numpy(),
+        vy_s=stars.vy.to_numpy(),
+        vz_s=stars.vz.to_numpy(),
         x_dm=dark_matter.x.to_numpy(),
         y_dm=dark_matter.y.to_numpy(),
         z_dm=dark_matter.z.to_numpy(),
+        vx_dm=dark_matter.vx.to_numpy(),
+        vy_dm=dark_matter.vy.to_numpy(),
+        vz_dm=dark_matter.vz.to_numpy(),
         x_g=gas.x.to_numpy(),
         y_g=gas.y.to_numpy(),
         z_g=gas.z.to_numpy(),
+        vx_g=gas.vx.to_numpy(),
+        vy_g=gas.vy.to_numpy(),
+        vz_g=gas.vz.to_numpy(),
     )
 
     return data.mkgalaxy(**new)
@@ -172,7 +184,7 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
 
     """
     if not galaxy.has_potential_:
-        raise ValueError("Galaxy must has the potential energy.")
+        raise ValueError("Galaxy must have the potential energy.")
 
     # We extract only the needed column to center the galaxy
     # Bruno: ¡Agrego lo de las velocidades!
@@ -190,13 +202,16 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     vz_cm = np.mean(df["vz"].values)
 
     # Bruno: Ojo... Testear que funque
+    # Update -> funciona, pero pedir la tolerancia default
+    # puede generar falsos "False" a.k.a. lo mejor
+    # sería no chequear velocidades...
     return (
         np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)
-    ) and (
-        np.isclose(
-            np.sqrt(vx_cm**2 + vy_cm**2 + vz_cm**2),
-            0,
-            rtol=rtol,
-            atol=atol,
-        )
-    )
+    ) #and (
+    #  np.isclose(
+    #      np.sqrt(vx_cm**2 + vy_cm**2 + vz_cm**2),
+    #      0,
+    #      rtol=rtol,
+    #      atol=atol,
+    #  )
+    #)

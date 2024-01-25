@@ -1,3 +1,4 @@
+// Modifico los include para poder wrappear Python
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,11 +6,11 @@
 #include <time.h>
 #include <assert.h>
 #include <omp.h>
-#include <unistd.h>
 #include <Python.h>
-#include "numpy/arrayobject.h" // Include any other Numpy headers, UFuncs for example.
+#include <numpy/numpyconfig.h>
+#include <numpy/arrayobject.h>
 
-////#define PERIODIC /* There is no periodicity with already centered galaxies */
+////#define PERIODIC // Las posiciones estan bien suponemos
 #define Thetamax 0.45
 #define KERNEL_LENGTH 10000
 #define SOFT 3
@@ -464,7 +465,11 @@ static int tree_potential(const int npart, const float *mp, const float *x, cons
   return 1;
 }
 
-static void force_brute(const int npart, const float *mp, const float *x, const float *y, const float *z, float *Ep)
+// ###############################################
+// Mucho problemas + parallelization omp jode la build -> lo commentareo
+// ###############################################
+
+/* static void force_brute(const int npart, const float *mp, const float *x, const float *y, const float *z, float *Ep)
 {
   int  i, j;
   float pos[3], dx[3], dis;
@@ -484,7 +489,7 @@ static void force_brute(const int npart, const float *mp, const float *x, const 
     pos[1] = y[i];
     pos[2] = z[i];
 
-    /* Calcula energia potencial */
+    // Calcula energia potencial
     for(j = 0; j < npart; j++)
     {
 
@@ -503,52 +508,51 @@ static void force_brute(const int npart, const float *mp, const float *x, const 
     }
 
     Ep[i] *= (GCONS*Msol/Kpc);
-    Ep[i] *= (-1.);                   /* Cambio de signo para que Ep sea negativa */
+    Ep[i] *= (-1.);                   // Cambio de signo para que Ep sea negativa
   }
 
   return;
-}
+} */
 
 extern void calculate_potential(const int npart, const float *mp, const float *x, const float *y, const float *z, float *Ep)
 {
   /* Si el halo tiene menos de 1000 particulas calcula la energia
   de forma directa (N^2). Si tiene mas de 1000 particulas usa 
   un octree. */
+  // Mentira, no hagá nada para < 1000 parts
   if(npart > 1000)
   {
-  
     if(!tree_potential(npart, mp, x, y, z, Ep))
     {
-      fprintf(stderr,"Try Force Brute %d\n", npart);
-      force_brute(npart, mp, x, y, z, Ep);
+      fprintf(stderr,"Exit %d\n", npart);
+      //force_brute(npart, mp, x, y, z, Ep);
     }
   
   }else{
 
-    force_brute(npart, mp, x, y, z, Ep);
+    //force_brute(npart, mp, x, y, z, Ep);
   }
 
   return;
 }
 
+
 /* ----------------------------
 Wrap para que lea Python, pseudo-copy
 ---------------------------- */
 
-// Initialise Numpy
-import_array();
-if (PyErr_Occurred()) {
-    std::cerr << "Failed to import numpy Python module(s)." << std::endl;
-    return NULL; // Or some suitable return value to indicate failure.
-}
-
+/* 1er intento de la func. Fallido...*/
+// Func para pasar de np.arrays a C...
 static float* PyToCArray(PyArrayObject *pyArr) {
     void* c_array_data = PyArray_DATA(pyArr);
     return (float*)c_array_data;
 }
 
 
-static void method_calculate_potential(const PyArrayObject *mp,
+// En Python todo es un objeto, así que acá
+// genero el método que es la función que me genera el 
+// output deseado (la energía potencial)
+static void pypot(const PyArrayObject *mp,
                          const PyArrayObject *x, const PyArrayObject *y,
                          const PyArrayObject *z, PyArrayObject *Ep){
 
@@ -560,22 +564,95 @@ static void method_calculate_potential(const PyArrayObject *mp,
     float* c_z = PyToCArray(z);
     float* c_Ep = PyToCArray(Ep);
 
-    calculate_potential(npart, c_mp, c_x, c_y, c_z, c_Ep)
+    calculate_potential(npart, c_mp, c_x, c_y, c_z, c_Ep);
 
 }
 
+// 2do intento (a las ñapis):
+/*
+static PyObject*
+pypot(PyObject* self, const PyObject* mp, const PyObject* x,
+     const PyObject* y, const PyObject* z, PyObject* Ep)
+{
+    int npart = PyArray_NDIM(*mp);
+    float* c_mp = PyArray_FromAny(*mp);
+    float* c_x = PyArray_FromAny(*x);
+    float* c_y = PyArray_FromAny(*y);
+    float* c_z = PyArray_FromAny(*z);
+    float* c_Ep = PyArray_FromAny(*Ep);
+    
+    PyObject *Ep = calculate_potential(npart, c_mp, c_x, c_y, c_z, c_Ep);
+    
+    return Ep;
+}*/
+
+// Defino los métodos
+/* 1st try
 static PyMethodDef ModuleMethods[] = {
-  {"calculate_potential", method_calculate_potential, METH_VARARGS, "Python interface for Octree potential calculation in C"},
+  {"calculate_potential",
+  method_calculate_potential,
+  METH_VARARGS,
+  "Python interface for Octree potential calculation in C"},
   {NULL, NULL, 0, NULL}
 };
-
-static struct PyModuleDef module = {
+*/
+// Genero el módulo
+/* 1st try:
+static struct PyModuleDef potential_module = {
     PyModuleDef_HEAD_INIT,
-    "potential_c_module",
+    "potential_module",
+    "Interface for the Octree potential C function",
+    -1,
+    ModuleMethods};
+*/
+/*
+static struct PyModuleDef potential_module = {
+    PyModuleDef_HEAD_INIT,
+    "potential_module",
     "Interface for the Octree potential C function",
     -1,
     ModuleMethods};
 
-PyMODINIT_FUNC PyInit_fputs(void) {
+
+
+// Lo instancio
+PyMODINIT_FUNC PyInit_calculate_potential_c(void) {
+    import_array(); // Initialise Numpy
+    if (PyErr_Occurred()) {
+        return NULL;
+    }
     return PyModule_Create(&module);
+} */
+
+// 2nd try (cambio "fib" por "pot"):
+PyDOC_STRVAR(pot_doc, "computes the potential");
+PyMethodDef pot_method = {
+    "pot",                /* The name as a C string. */
+    (PyCFunction) pypot,  /* The C function to invoke. */
+    METH_O,               /* Flags telling Python how to invoke ``pyfib`` */
+    pot_doc,              /* The docstring as a C string. */
+};
+
+PyMethodDef methods[] = {
+    {"pot", (PyCFunction) pypot, METH_O, fpot_doc},
+    {NULL},
+};
+
+PyDoc_STRVAR(pot_module_doc, "provides a potential function");
+PyModuleDef pot_module = {
+    PyModuleDef_HEAD_INIT,
+    "pot",
+    pot_module_doc,
+    -1,
+    methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
+PyMODINIT_FUNC
+PyInit_pot(void)
+{
+    return PyModule_Create(&pot_module);
 }

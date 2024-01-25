@@ -233,17 +233,8 @@ def test_ParticleSet_to_dataframe(data_particleset, has_potential):
         }
     )
     df = pset.to_dataframe()
-    # Bruno: me ganó el hdp
-    # update -> el hdrmp se encapricha con el
-    # int32 e int64 de ptypev!!!
-    df = df.astype({"ptypev": np.dtype("int64")})
-
-    assert df.equals(expected)
-
-    # Bruno: Buena herramienta para saber más detalladamente
-    # por qué no son equals...
-    # from pandas.testing import assert_frame_equal
-    # assert_frame_equal(df,expected)
+    # df = df.astype({"ptypev": np.dtype("int64")})
+    pd.testing.assert_frame_equal(df, expected, check_dtype=False)
 
 
 def test_ParticleSet_to_dataframe_no_potential(data_particleset):

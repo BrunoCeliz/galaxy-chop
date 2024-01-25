@@ -112,7 +112,7 @@ class Aligner(GalaxyTransformerABC):
 
     """
 
-    def __init__(self, r_cut=hparam(default=30)):
+    def __init__(self, r_cut=30):
         self.r_cut = r_cut
 
     @doc_inherit(GalaxyTransformerABC.transform)
@@ -156,22 +156,24 @@ def star_align(galaxy, *, r_cut=None):
     if r_cut is not None and r_cut <= 0.0:
         raise ValueError("r_cut must not be lower than 0.")
 
+    # declare all the different groups of columns
+    pos_columns = ["x", "y", "z"]
+    vel_columns = ["vx", "vy", "vz"]
+
     # Bruno:
     # Antes que anda, ¡Tirar warning si es que no está previamente
     # centrada! -> Esto es por el cálculo de los momentos
     # angulares con velocidades con respecto al origen del box
     # cosmológico =/= galaxia como sistema aislado (!)
-    if not is_centered(galaxy):
-        warnings.warn(
-            "Input Galaxy is not centered. Please, center it \
-            with Centralizer.transform(galaxy, with_potential) \
-            or proceed with caution.",
-            UserWarning,
-        )
-
-    # declare all the different groups of columns
-    pos_columns = ["x", "y", "z"]
-    vel_columns = ["vx", "vy", "vz"]
+    # *Update: is_centered() no está funcionando como
+    # debería, así que revisar y retomar más adelante...
+    # if not is_centered(galaxy):
+    #    warnings.warn(
+    #        "Input Galaxy is not centered. Please, center it \
+    #        with Centralizer.transform(galaxy, with_potential) \
+    #        or proceed with caution.",
+    #        UserWarning,
+    #    )
 
     # Now we extract only the needed column to rotate the galaxy
     # Note: for stars we need more columns to calculate the rotation matrix

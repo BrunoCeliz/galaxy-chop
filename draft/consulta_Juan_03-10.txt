@@ -1,47 +1,3 @@
-galaxychop/
-    - core
-    - preproc
-        - frotran <<< codigo de calculo potencial
-        - potential_grispy.py <<<< codig potencial
-        - potential_energy.py <<< codigo calculo potencial
-
-        - salign.py  <<< alinear estrellas
-        - smr_crop.py
-
-
-
-galaxychop/
-    - core
-    - preproc
-        - potential_energy
-            - __init__.py (potential_energy.py <<< codigo calculo potencial)
-            - frotran <<< codigo de calculo potencial
-            - potential_grispy.py <<<< codig potencial
-        - salign.py  <<< alinear estrellas
-        - smr_crop.py
-
-
-
-
-from galaxychop.preproc import Potential
-
-pot = Potential(backend="grispy")
-gal = pot.transform(gal)
-
-
-class GalaxyTransformerABC(metaclass=ABCMeta):  # preproc/_base.py
-
-    @abc.abstractmethod
-    def transform(self, gal):
-        raise NotImplemethedError()
-
-
-[Trans2(...), Trans1(...), Descomponedor(...)]
-
-
-######
-
-
 class Potential(GalaxyTransformerABC):  # preproc/potential/__init__.py
 
     backend = hparam(default="numpy", coices=POTENTIAL_BACKENDS.keys())
@@ -52,17 +8,3 @@ class Potential(GalaxyTransformerABC):  # preproc/potential/__init__.py
 
 pot = Potential(backend="frotran")
 gal = pot.transform(gal)
-
-
-#####
-
-
-Notas Bruno (be careful):
-
-- gitg para visualizar los merges entre branchs
-- Si no hay llamadas circulares -> en una carpeta (¡Y con un __init__.py!) e.g. potenciales
-- hparam define backend
-- se importa el error NoGravPot para usarlo en otras carpetas/.py
-- hacer la clase de Potential en el __init__.py de esa carpeta. Como el staralign.py no es tan grande, meter la clase ahí y hacer métodos ("transform") que llamen a las func de afuera (¡Para la pipeline!)
-- No pueden existir una clase que "cumpla 2 funciones"....
-- *(siguen las consultas de las chicas, voy a subirlo; dejo de escribir)

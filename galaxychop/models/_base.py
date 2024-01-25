@@ -738,15 +738,6 @@ class DynamicStarsDecomposerMixin:
 # DECOMPOSEDGALAXY CLASS
 # =============================================================================
 
-# Remember los test pls:
-# - El repr de la DecomposedGalaxy debe contener info de Galaxy y
-# Components (rev bien qué es lo que quiero e.g. "Glx de X_i,j,k
-# partículas de gas, dm y stars, con fracción B/T = Y").
-# - DecompGlx.galaxy == la Galaxy que se come.
-# - DecompGlx.components == los Components que se come.
-# - ¿Probar métodos? -> Al vicio porque para eso ya están los
-# de c/ clase por separado (si es que los hereda)...
-
 
 @uttr.s(frozen=True, repr=False)
 class DecomposedGalaxy:

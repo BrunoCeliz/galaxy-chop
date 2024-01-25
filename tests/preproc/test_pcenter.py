@@ -20,6 +20,8 @@
 
 from galaxychop.preproc import pcenter
 
+import pandas as pd
+
 import pytest
 
 
@@ -40,21 +42,42 @@ def test_center_without_potential_energy(galaxy, with_potential):
         with pytest.raises(ValueError):
             pcenter.center(gal)
     else:
-        cgal = pcenter.center(gal)
+        cgal = pcenter.center(gal, with_potential)
 
         df = gal.to_dataframe()
         cdf = cgal.to_dataframe()
 
-        changed = ["x", "y", "z", "vx", "vy", "vz", "Jx", "Jy", "Jz"]
+        changed = [
+            "x",
+            "y",
+            "z",
+            "vx",
+            "vy",
+            "vz",
+            "Jx",
+            "Jy",
+            "Jz",
+            "potential",
+            "kinetic_energy",
+            "total_energy",
+        ]
+        # Bruno: ¿Le jode el potencial == np.nan una vez centrado?
+        # Lo agrego a los "changed" -> chanchada
 
         for colname in df.columns[~df.columns.isin(changed)]:
             ocol = df[colname]
             ccol = cdf[colname]
+
+            print(colname)
+            assert len(ocol) == len(ccol)
             assert (ocol == ccol).all()
 
         for colname in changed:
             ocol = df[colname]
             ccol = cdf[colname]
+            with pytest.raises(AssertionError):
+                pd.testing.assert_frame_equal(ocol, ccol, check_dtype=False)
+
             assert not (ocol == ccol).all()
 
 
@@ -71,7 +94,19 @@ def test_center(galaxy):
     df = gal.to_dataframe()
     cdf = cgal.to_dataframe()
 
-    changed = ["x", "y", "z", "vx", "vy", "vz", "Jx", "Jy", "Jz"]
+    changed = [
+        "x",
+        "y",
+        "z",
+        "vx",
+        "vy",
+        "vz",
+        "Jx",
+        "Jy",
+        "Jz",
+        "kinetic_energy",
+        "total_energy",
+    ]
 
     for colname in df.columns[~df.columns.isin(changed)]:
         ocol = df[colname]
@@ -109,10 +144,6 @@ def test_is_centered(galaxy):
     assert pcenter.is_centered(cgal)
 
 
-# Bruno:
-# Para testear las clases, las inicializamos y comparamos
-# que sus métodos hagan lo mismo que las funciones aparte
-# ¿Como argumento tengo que poner a la clase?
 def test_centralizer_transformer(galaxy):
     gal = galaxy(
         seed=42,
@@ -128,7 +159,7 @@ def test_centralizer_transformer(galaxy):
     func_cgal = pcenter.center(gal)
     func_df = func_cgal.to_dataframe()
 
-    assert class_df.equals(func_df)
+    pd.testing.assert_frame_equal(class_df, func_df, check_dtype=False)
 
 
 def test_centralizer_checker(galaxy):

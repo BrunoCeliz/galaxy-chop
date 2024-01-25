@@ -39,18 +39,15 @@ def GalaxyTransformerABC_not_implemethed():
 @pytest.mark.model
 def test_GalaxyTransformerABC_repr():
     class Transformer(gchop.preproc._base.GalaxyTransformerABC):
-        other = gchop.preproc._base.hparam(default=1)
-
         def transform(self, galaxy):
             ...
 
         def checker(self, galaxy):
             ...
 
-    transformer = Transformer(other="zaraza")
+    transformer = Transformer()
     result = repr(transformer)
-    expected = "Transformer(other='zaraza')"
-    # Bruno: Ojo con esto...
+    expected = "Transformer()"
 
     assert result == expected
 

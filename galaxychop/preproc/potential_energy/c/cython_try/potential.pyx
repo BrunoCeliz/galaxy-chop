@@ -1,5 +1,9 @@
 # Desde acá, reescribo el Octree de C en Cython (!!!)
 
+# Bruno:
+# 1er intetno de transcribir el código de C a un .pyx de Cython.
+# Dios y la Virgen sabrán si está bien y qué puede llegar a fallar...
+
 cimport cython
 
 # Para variables globales:
@@ -442,7 +446,3 @@ cdef int tree_potential(
     free(knlpot);
 
     return True;
-
-# Bruno:
-# 1er intetno de transcribir el código de C a un .pyx de Cython.
-# Dios y la Virgen sabrán si está bien y qué puede llegar a fallar...

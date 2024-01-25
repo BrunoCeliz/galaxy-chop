@@ -13,3 +13,6 @@ cdef extern from "potential.c":
 
 def py_calculate_potential():
     return calculate_potential(npart,mp,x,y,z,Ep)
+
+
+# Dejemos esto. Probamos hacer un wrap de Python en C (new folder)

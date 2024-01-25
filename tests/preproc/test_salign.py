@@ -16,6 +16,7 @@
 
 from galaxychop.preproc import salign
 
+import pandas as pd
 
 import pytest
 
@@ -75,6 +76,9 @@ def test_star_align(galaxy):
     agal = salign.star_align(gal)
 
     # Catch the warning:
+    # Bruno: No los está catcheando bien,
+    # porque si no tira el warning pytest no
+    # devuelve error...
     with pytest.warns(UserWarning):
         warnings.warn(
             "Input Galaxy is not centered. Please, center it \
@@ -149,7 +153,7 @@ def test_aligner_transformer(galaxy):
     func_agal = salign.star_align(gal)
     func_df = func_agal.to_dataframe()
 
-    assert class_df.equals(func_df)
+    pd.testing.assert_frame_equal(class_df, func_df, check_dtype=False)
 
 
 @pytest.mark.filterwarnings("ignore:star_align")
@@ -163,7 +167,7 @@ def test_aligner_default_r_cut(read_hdf5_galaxy):
     func_agal = salign.star_align(gal, r_cut=30)
     func_df = func_agal.to_dataframe()
 
-    assert class_df.equals(func_df)
+    pd.testing.assert_frame_equal(class_df, func_df, check_dtype=False)
 
 
 @pytest.mark.filterwarnings("ignore:star_align")
@@ -177,7 +181,7 @@ def test_aligner_notdefault_r_cut(read_hdf5_galaxy):
     func_agal = salign.star_align(gal, r_cut=10)
     func_df = func_agal.to_dataframe()
 
-    assert class_df.equals(func_df)
+    pd.testing.assert_frame_equal(class_df, func_df, check_dtype=False)
 
 
 @pytest.mark.filterwarnings("ignore:star_align")

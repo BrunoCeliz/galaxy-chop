@@ -66,7 +66,8 @@ class Cutter(GalaxyTransformerABC):
 
     """
 
-    num_radii = hparam(default=3)
+    def __init__(self, num_radii=3):
+        self.num_radii = num_radii
 
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
@@ -105,10 +106,6 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
     if num_radii is not None and num_radii <= 0.0:
         raise ValueError("num_radii must not be lower than 0.")
 
-    # Bruno:
-    # ¿Debería agregar, así como en star_align, un warning de que
-    # la galaxia no está centrada? Por ahora NO lo digo...
-
     # We convert the stars into a dataframe
     stars_df = galaxy.stars.to_dataframe()
 
@@ -127,7 +124,7 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
         vy=trim_stars_df["vy"].to_numpy(),
         vz=trim_stars_df["vz"].to_numpy(),
         potential=trim_stars_df["potential"].to_numpy(),
-        softening=galaxy.stars.softening,
+        softening=galaxy.stars.softening.value,
     )
 
     del trim_stars_df
@@ -170,6 +167,8 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
     # Now we extract only the needed column to rotate the galaxy
     stars_df = galaxy.stars.to_dataframe(attributes=["m", "x", "y", "z"])
 
+    # Bruno: O sea, la estoy cortando de vuelta...
+    # Rehacer...
     to_trim_idxs, cut_radius = _get_half_smr_crop(stars_df, num_radii)
     trim_stars_df = stars_df.drop(to_trim_idxs, axis="rows")
 
@@ -179,10 +178,10 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
     )
 
     # maximum distance index of all particles
-    maxdist_idx = np.argmin(distances)[0]
+    maxdist_idx = np.argmin(distances)
     max_values = distances[maxdist_idx]
 
-    return np.all(np.less_equal([max_values, cut_radius]))
+    return np.all(np.less_equal(max_values, cut_radius))
 
 
 # Bruno:
@@ -225,8 +224,12 @@ def get_radius_half_mass(galaxy, particle="stars"):
         # mal input (!)
         particle_type = data.ParticleSetType.mktype(particle)
         particle_type = data.ParticleSetType.humanize(particle_type)
-
-        df = galaxy.particle_type.to_dataframe()
+        if particle_type == "stars":
+            df = galaxy.stars.to_dataframe()
+        elif particle_type == "dark_matter":
+            df = galaxy.dark_matter.to_dataframe()
+        elif particle_type == "gas":
+            df = galaxy.gas.to_dataframe()
 
     # cut_radius_factor = 1 to get the "half mass radius"
     _, r_half = _get_half_smr_crop(df, cut_radius_factor=1)

@@ -143,7 +143,7 @@ class GchopPipeline(GchopMethodABC):
         galaxy = self.transform(galaxy)
         _, decomp = self.steps[-1]
         result = decomp.decompose(galaxy)
-        # D: decomposed galaxy  (TO DO)
+
         return result
 
     def transform(self, galaxy):

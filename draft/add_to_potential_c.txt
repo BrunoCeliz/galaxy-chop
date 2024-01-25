@@ -1,0 +1,45 @@
+# ESto es lo que Juan escribió:
+
+static float* PyToCArray(PyArrayObject *pyArr) {
+    void* c_array_data = PyArray_DATA(pyArr);
+    return (float*)c_array_data;
+}
+
+
+static void method_calculate_potential(const PyArrayObject *mp,
+                         const PyArrayObject *x, const PyArrayObject *y,
+                         const PyArrayObject *z, PyArrayObject *Ep){
+
+    int npart = PyArray_NDIM(mp);
+
+    float* c_mp = PyToCArray(mp);
+    float* c_x = PyToCArray(x);
+    float* c_y = PyToCArray(y);
+    float* c_z = PyToCArray(z);
+    float* c_Ep = PyToCArray(Ep);
+
+    calculate_potential(npart, c_mp, c_x, c_y, c_z, c_Ep)
+
+
+
+}
+
+static PyMethodDef ModuleMethods[] = {
+  {"calculate_potential", method_calculate_potential, METH_VARARGS, "Python interface for fputs C library function"},
+  {NULL, NULL, 0, NULL}
+};
+
+static struct PyModuleDef module = {
+    PyModuleDef_HEAD_INIT, "potential_c_module",
+    "Interface for the fputs C function", -1, ModuleMethods};
+
+PyMODINIT_FUNC PyInit_fputs(void) {
+    return PyModule_Create(&module);
+}
+
+
+# Más docs:
+https://intermediate-and-advanced-software-carpentry.readthedocs.io/en/latest/c++-wrapping.html
+
+# Buen cookbook:
+https://scipy-cookbook.readthedocs.io/items/C_Extensions_NumPy_arrays.html

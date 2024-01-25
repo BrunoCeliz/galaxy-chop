@@ -5,7 +5,9 @@
 #include <time.h>
 #include <assert.h>
 #include <omp.h>
-
+#include <unistd.h>
+#include <Python.h>
+#include "numpy/arrayobject.h" // Include any other Numpy headers, UFuncs for example.
 
 ////#define PERIODIC /* There is no periodicity with already centered galaxies */
 #define Thetamax 0.45
@@ -527,4 +529,53 @@ extern void calculate_potential(const int npart, const float *mp, const float *x
   }
 
   return;
+}
+
+/* ----------------------------
+Wrap para que lea Python, pseudo-copy
+---------------------------- */
+
+// Initialise Numpy
+import_array();
+if (PyErr_Occurred()) {
+    std::cerr << "Failed to import numpy Python module(s)." << std::endl;
+    return NULL; // Or some suitable return value to indicate failure.
+}
+
+static float* PyToCArray(PyArrayObject *pyArr) {
+    void* c_array_data = PyArray_DATA(pyArr);
+    return (float*)c_array_data;
+}
+
+
+static void method_calculate_potential(const PyArrayObject *mp,
+                         const PyArrayObject *x, const PyArrayObject *y,
+                         const PyArrayObject *z, PyArrayObject *Ep){
+
+    int npart = PyArray_NDIM(mp);
+
+    float* c_mp = PyToCArray(mp);
+    float* c_x = PyToCArray(x);
+    float* c_y = PyToCArray(y);
+    float* c_z = PyToCArray(z);
+    float* c_Ep = PyToCArray(Ep);
+
+    calculate_potential(npart, c_mp, c_x, c_y, c_z, c_Ep)
+
+}
+
+static PyMethodDef ModuleMethods[] = {
+  {"calculate_potential", method_calculate_potential, METH_VARARGS, "Python interface for Octree potential calculation in C"},
+  {NULL, NULL, 0, NULL}
+};
+
+static struct PyModuleDef module = {
+    PyModuleDef_HEAD_INIT,
+    "potential_c_module",
+    "Interface for the Octree potential C function",
+    -1,
+    ModuleMethods};
+
+PyMODINIT_FUNC PyInit_fputs(void) {
+    return PyModule_Create(&module);
 }

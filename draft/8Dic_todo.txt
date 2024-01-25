@@ -1,8 +1,0 @@
-*Tentativa de final Feb-marzo
-*push_dev
-*decmposedgalaxy clase:que el decompose te tire este
- wrapper que contiene comp y galaxia. Los atributos de esta clase son 
- los restultados del transform y del decompose todo en una clase.
-* Revisar/arreglar hparam, init de las subclases, o ABD init subclass, preproc
-    Resolver backend con hparam
-*Valores/conf por default de labels limits and legends de plots 

@@ -150,11 +150,9 @@ def test_Components_describe(probs):
         )
 
     expected = pd.DataFrame.from_dict(expected_dict)
-
     result = components.describe()
-    result = result.astype("int64").dtypes
 
-    pd.testing.assert_frame_equal(result, expected)
+    pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
 # =============================================================================

@@ -75,9 +75,6 @@ class Components:
        Otherwise it adopts the value None.
     """
 
-    # Bruno:
-    # "ptypes" y "m" se repiten dentro de "DecompGlx"...
-    # *Queda para un trabajo futuro...
     labels = attr.ib(validator=vldt.instance_of(np.ndarray))
     ptypes = attr.ib(validator=vldt.instance_of(np.ndarray))
     m = attr.ib(validator=vldt.instance_of(np.ndarray))
@@ -125,9 +122,9 @@ class Components:
     def __repr__(self):
         """x.__repr__() <==> repr(x)."""
         length = len(self)
-        labels = {
-            self.lmap.get(label, label) for label in np.unique(self.labels)
-        }
+        labels = sorted(
+            {self.lmap.get(label, label) for label in np.unique(self.labels)}
+        )
         lmap = bool(self.lmap)
         probs = True if self.probabilities is not None else False
         return (
@@ -371,8 +368,6 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()
 
-    # Bruno:
-    # Ojo con las variables 'X' e 'y'... ¿Falta "Shape: (...;...)"?
     @abc.abstractmethod
     def get_rows_mask(self, X, y, attributes):
         """
@@ -624,9 +619,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         """
         if probs is None:
             return None
-        # Bruno:
-        # ¿Debería agregarse un sms que avise que no están las probs?
-
+     
         # the number of particles are incorrect so we simple remove the data
         probs_shape = list(np.shape(probs)[1:])
 
@@ -760,24 +753,17 @@ class DecomposedGalaxy:
 
     """
 
-    # Me "inspiro" en la relación Galaxy-ParticleSet...
     galaxy = uttr.ib(validator=attr.validators.instance_of(core.data.Galaxy))
     components = uttr.ib(validator=attr.validators.instance_of(Components))
 
-    # Dunders que comparte con "Galaxy"
     def __len__(self):
         """len(x) <=> x.__len__()."""
         return len(self.galaxy)
 
-    # ...y que el repr explique las props de las componentes,
-    # linkeando ambas repr (if possible).
+
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""
         # Trying...
         galaxy_repr = repr(self.galaxy)
         components_repr = repr(self.components)
         return galaxy_repr + "\n" + components_repr
-
-    # Bruno:
-    # ¿Quiero redefinir el __getattr__? Por ahora se ingresa a las
-    # partes como e.g. "decompglx.galaxy" o "decompglx.components".

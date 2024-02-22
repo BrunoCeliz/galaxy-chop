@@ -59,10 +59,9 @@ def make_grid(x, y, z, n_cells=2**4):
 def potential_grispy(
     centre, m, softening, bubble_size, shell_width, l_box, grid
 ):
-    """
-    Compute the potential of a particle given the grid and the system
-    of particles.
+    """Compute the potential.
 
+    of a particle given the grid and the system of particles.
     Given the particle to compute its potential energy, iteratively
     make shells to aproximate their monopole contribution to the total
     potential energy.
@@ -108,10 +107,6 @@ def potential_grispy(
             pot_shells -= m[bubble_ind[0][idx]] / distance
         else:
             continue
-        # Bruno:
-        # Otra versión de esto (mucho más lenta, pero creo que correcta)
-        # d_and_soft = np.sqrt(np.square(distance) + np.square(softening))
-        # pot_shells -= m[bubble_ind[0][idx]]/d_and_soft
 
     d_min_shell = bubble_size  # Shell's lower limit to initialize the loop
     while d_min_shell < l_box:

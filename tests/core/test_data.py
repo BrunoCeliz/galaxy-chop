@@ -286,10 +286,9 @@ def test_ParticleSet_repr(data_particleset, has_potential):
         potential=pot,
     )
 
-    # Bruno: ¿soft.value()?
     expected = (
         f"<ParticleSet 'STARS', size={len(m)}, "
-        f"softening={soft}, potentials={has_potential}>"
+        f"softening={soft},             potentials={has_potential}>"
     )
 
     assert repr(pset) == expected

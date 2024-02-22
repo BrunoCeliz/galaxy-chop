@@ -15,8 +15,10 @@ import datetime as dt
 import os
 import sys
 import pathlib
-import galaxychop
 import m2r2
+
+#
+autodoc_mock_imports = ["galaxychop.preproc.potential_energy.fortran"]
 
 # this path is pointing to project/docs/source
 CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
@@ -25,6 +27,8 @@ UTC_NOW = dt.datetime.utcnow()
 
 sys.path.insert(0, str(CHOP_PATH))
 
+import galaxychop
+
 # -- Project information -----------------------------------------------------
 
 project = "galaxy-chop"
@@ -32,7 +36,7 @@ copyright = "2020, 2021, 2022, 2023, Valeria Cristiani"
 author = "Valeria Cristiani"
 
 # The full version, including alpha/beta/rc tags
-version = galaxychop.__version__
+version = galaxychop.constants.VERSION
 release = version
 
 
@@ -139,9 +143,9 @@ fortran_ext = ["f90", "F90", "f95", "F95"]
 # This variable must be set with file pattern, like "*.f90", or a list of them.
 # It is also possible to specify a directory name; in this case, all files than
 # have an extension matching those define by the config variable `fortran_ext`
-# are used.
+# are used
 fortran_src = [
-    str(CHOP_PATH / "galaxychop" / "preproc" / "fortran"),
+    str(CHOP_PATH / "galaxychop" / "preproc" / "potential_energy" / "fortran"),
 ]
 
 # Indentation string or length (default 4). If it is an integer,

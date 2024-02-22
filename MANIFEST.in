@@ -8,6 +8,8 @@ recursive-include galaxychop *.dat
 recursive-include galaxychop *.npy
 recursive-include galaxychop *.f90
 recursive-include galaxychop *.py
+recursive-include galaxychop *.c
+recursive-include galaxychop *.ipynb
 
 recursive-exclude docs *
 recursive-exclude draft *

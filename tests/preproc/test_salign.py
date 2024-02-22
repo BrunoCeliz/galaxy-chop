@@ -14,13 +14,13 @@
 # IMPORTS
 # =============================================================================
 
+import warnings
+
 from galaxychop.preproc import salign
 
 import pandas as pd
 
 import pytest
-
-import warnings
 
 
 # =============================================================================

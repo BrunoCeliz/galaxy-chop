@@ -74,9 +74,6 @@ class ParticleSetType(enum.IntEnum):
         return self.name.lower()
 
 
-# Bruno:
-# ¿Será que para que, no me de problemas si le doy de comer listas vacías,
-# debo tocar los converters/validators?
 @uttr.s(frozen=True, slots=True, repr=False)
 class ParticleSet:
     """
@@ -136,21 +133,9 @@ class ParticleSet:
         converter=(lambda v: np.copy(v) if v is not None else v),
         repr=False,
     )
-    # Bruno:
-    # Comment de potential -> Si le doy un array "malo" (a.k.a. todos zeros \
-    # o valores positivos) => error; ¿O es que lo ignoro y digo que no tiene\
-    # el potencial calculado?
-    # Tampoco hay que obligar a calcular el potencial...
+
     softening: float = uttr.ib(unit=u.kpc, converter=float, repr=False)
-    # La otra opción sería que se comporte igual que el potencial:
-    # softening: float = uttr.ib(
-    #     unit=u.kpc,
-    #     validator=attr.validators.optional(
-    #         attr.validators.instance_of(float)
-    #     ),
-    #     converter=(lambda v: np.copy(v) if v is not None else v),
-    #     repr=False,
-    # )
+
     has_potential_: bool = uttr.ib(init=False)
 
     kinetic_energy_: np.ndarray = uttr.ib(unit=(u.km / u.s) ** 2, init=False)
@@ -249,7 +234,8 @@ class ParticleSet:
         """repr(x) <=> x.__repr__()."""
         return (
             f"<ParticleSet {self.ptype.name!r}, size={len(self)}, "
-            f"softening={self.softening.value}, potentials={self.has_potential_}>"
+            f"softening={self.softening.value}, \
+            potentials={self.has_potential_}>"
         )
 
     def __len__(self):

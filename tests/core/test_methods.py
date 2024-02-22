@@ -77,7 +77,7 @@ def test_GchopMethodABC_no_params():
         _gchop_decomp_type = "foo"
         _gchop_parameters = []
 
-    assert Foo.gchop_parameters == frozenset()
+    assert Foo._gchop_parameters == frozenset()
 
 
 def test_GchopMethodABC_already_defined__gchop_parameters():
@@ -92,7 +92,7 @@ def test_GchopMethodABC_already_defined__gchop_parameters():
         def __init__(self, x):
             pass
 
-    assert Foo.gchop_parameters == {"x"}
+    assert Foo._gchop_parameters == {"x"}
 
 
 def test_GchopMethodABC_params_in_init():

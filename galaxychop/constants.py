@@ -17,8 +17,17 @@
 from astropy import constants as c
 from astropy import units as u
 
-# import astropy.constants as c
-# import astropy.units as u
+import importlib_metadata
+
+
+# =============================================================================
+# PROJECT VERSION
+# =============================================================================
+
+NAME = "galaxychop"
+
+VERSION = importlib_metadata.version(NAME)
+
 
 # =============================================================================
 # STELLAR DYNAMICS

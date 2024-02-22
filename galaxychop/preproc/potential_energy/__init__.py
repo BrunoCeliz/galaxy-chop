@@ -14,11 +14,11 @@
 # IMPORTS
 # =============================================================================
 
+import warnings
+
 import astropy.units as u
 
 import numpy as np
-
-import warnings
 
 from .grispy_calculation import (
     make_grid,
@@ -31,7 +31,6 @@ from ... import (
 )
 from ...utils import doc_inherit
 
-# D: aplicacion relativa
 try:
     from .fortran import potential as potential_f
 except ImportError:  # pragma: no cover
@@ -94,7 +93,6 @@ def grispy_potential(x, y, z, m, softening):
     l_box, grid = make_grid(x, y, z)
 
     # For each particle, compute its potential energy
-    # Bruno: Rev como hacer más lindo el loop.
     epot = np.empty(len(m))
     for idx, particle in enumerate(m):
         centre = np.array([x[idx], y[idx], z[idx]])
@@ -193,9 +191,6 @@ class Potentializer(GalaxyTransformerABC):
             print("CREATED POTENCIALIZER WITH BACKEND  " + self.backend)
             pass
 
-    #  D: esto tampoco me funciono
-    # backend = hparam(default= DEFAULT_POTENTIAL_BACKEND )
-
     @doc_inherit(GalaxyTransformerABC.transform)
     def transform(self, galaxy):
         return potential(galaxy, backend=self.backend)
@@ -215,7 +210,7 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
     Potential energy calculation.
 
     Given the positions and masses of particles, calculate
-    their specific gravitational potential energy.
+    their specific gravitational potential energy as a function.
 
     Parameters
     ----------
@@ -226,10 +221,7 @@ def potential(galaxy, *, backend=DEFAULT_POTENTIAL_BACKEND):
     galaxy: new ``Galaxy class`` object
         A new galaxy object with the specific potential energy of particles
         calculated.
-
     """
-    # Bruno: Más que error debería ser warning. En una de esas se requiere
-    # re-calcular el potencial.
     if galaxy.has_potential_:
         warnings.warn(
             "Galaxy potential is already calculated. \

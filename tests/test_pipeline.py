@@ -27,9 +27,9 @@ from galaxychop.models.threshold import JThreshold
 from galaxychop.preproc.pcenter import Centralizer, center
 from galaxychop.preproc.potential_energy import Potentializer
 from galaxychop.preproc.salign import Aligner, star_align
-from galaxychop.io import read_hdf5
 
 import pandas as pd
+
 import pytest
 
 

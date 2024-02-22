@@ -16,10 +16,7 @@
 
 import numpy as np
 
-import warnings
-
-from ._base import GalaxyTransformerABC, hparam
-from .pcenter import is_centered
+from ._base import GalaxyTransformerABC
 from ..core import data
 from ..utils import doc_inherit
 
@@ -159,21 +156,6 @@ def star_align(galaxy, *, r_cut=None):
     # declare all the different groups of columns
     pos_columns = ["x", "y", "z"]
     vel_columns = ["vx", "vy", "vz"]
-
-    # Bruno:
-    # Antes que anda, ¡Tirar warning si es que no está previamente
-    # centrada! -> Esto es por el cálculo de los momentos
-    # angulares con velocidades con respecto al origen del box
-    # cosmológico =/= galaxia como sistema aislado (!)
-    # *Update: is_centered() no está funcionando como
-    # debería, así que revisar y retomar más adelante...
-    # if not is_centered(galaxy):
-    #    warnings.warn(
-    #        "Input Galaxy is not centered. Please, center it \
-    #        with Centralizer.transform(galaxy, with_potential) \
-    #        or proceed with caution.",
-    #        UserWarning,
-    #    )
 
     # Now we extract only the needed column to rotate the galaxy
     # Note: for stars we need more columns to calculate the rotation matrix

@@ -14,14 +14,12 @@
 # IMPORTS
 # =============================================================================
 
-# Bruno:
-# Cuando agregue (nuevamente) el Octree de C, volver a acá...
-# Acomodar todo con lo nuevo (Clases que llaman a func externas)...
+
 from .pcenter import Centralizer, center, is_centered
 from .potential_energy import (
     Potentializer,
     potential,
-)  # D: aca no se si esta bien llamado
+)  
 from .salign import Aligner, is_star_aligned, star_align
 from .smr_crop import Cutter, half_star_mass_radius_crop
 
@@ -103,12 +101,8 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-    # D:Creo que esto habria que cambiarlo con los checkers nuevos
     check_center = is_centered(galaxy, rtol=rtol, atol=atol)
-    # check_center = pcenter.is_centered(galaxy, rtol=rtol, atol=atol)
     check_align = is_star_aligned(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
 
-    # check_align = salign.is_star_aligned(
-    #    galaxy, r_cut=r_cut, rtol=rtol, atol=atol
-    # )
+
     return check_center and check_align

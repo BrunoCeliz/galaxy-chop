@@ -1,0 +1,7 @@
+/home/dani/Dani/galaxy-chop/CMakeFiles/potential_mod.dir
+/home/dani/Dani/galaxy-chop/CMakeFiles/edit_cache.dir
+/home/dani/Dani/galaxy-chop/CMakeFiles/rebuild_cache.dir
+/home/dani/Dani/galaxy-chop/CMakeFiles/list_install_components.dir
+/home/dani/Dani/galaxy-chop/CMakeFiles/install.dir
+/home/dani/Dani/galaxy-chop/CMakeFiles/install/local.dir
+/home/dani/Dani/galaxy-chop/CMakeFiles/install/strip.dir

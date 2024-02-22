@@ -40,7 +40,7 @@ def test_Components(probs):
     assert len(components) == 100
 
     expected_repr = (
-        "<Components length=100, labels={0, 1, 2}, "
+        "<Components length=100, labels=[0, 1, 2], "
         f"probabilities={probs}, lmap=False>"
     )
     assert repr(components) == expected_repr
@@ -311,8 +311,6 @@ def test_GalaxyDecomposerABC_decompose(read_hdf5_galaxy):
 
     decomposer = Decomposer()
 
-    # Bruno: Cambio, ahora decompose devuelve una
-    # "DecomposedGalaxy" (mini-envoltura) -> la "desarmo"
     gal_decomp = decomposer.decompose(gal)
     gal_components = gal_decomp.components
 
@@ -350,13 +348,14 @@ def test_Decomposedgalaxy(read_hdf5_galaxy):
 
     decomposer = Decomposer()
 
-    # Bruno: Ya no la desarmo, sino que comparo que
-    # el contenido sea el mismo quelas partes por separado
     gal_decomp = decomposer.decompose(gal)
     gal_components = gal_decomp.components
 
     assert len(gal_decomp) == len(gal)
 
-    expected_repr = repr(gal) + "\n" + repr(gal_components)
-
+    expected_repr =  repr(gal) + "\n" + repr(gal_components)
+    # f"<Components length={length}, labels={labels}, "
+    #        f"probabilities={probs}, lmap={lmap}>"
+    print(repr(gal_decomp))
+    print(expected_repr)
     assert repr(gal_decomp) == expected_repr

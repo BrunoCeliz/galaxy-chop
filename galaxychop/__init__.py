@@ -18,14 +18,6 @@ Implementation of a few galaxy dynamic decomposition methods.
 # IMPORTS
 # =============================================================================
 
-import importlib_metadata
-
-NAME = "galaxychop"
-
-VERSION = importlib_metadata.version(NAME)
-
-__version__ = tuple(VERSION.split("."))
-
 from . import constants, models, preproc, utils
 from .core import (
     Galaxy,
@@ -37,6 +29,8 @@ from .core import (
 from .io import read_hdf5, to_hdf5
 from .pipeline import GchopPipeline, mkpipe
 
+
+__version__ = tuple(constants.VERSION.split("."))
 
 __all__ = [
     "Galaxy",
@@ -54,5 +48,3 @@ __all__ = [
     "GchopPipeline",
     "mkpipe",
 ]
-
-del importlib_metadata

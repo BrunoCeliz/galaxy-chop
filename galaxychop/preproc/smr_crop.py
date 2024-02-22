@@ -16,7 +16,7 @@
 
 import numpy as np
 
-from ._base import GalaxyTransformerABC, hparam
+from ._base import GalaxyTransformerABC
 from ..core import data
 from ..utils import doc_inherit
 
@@ -129,8 +129,6 @@ def half_star_mass_radius_crop(galaxy, *, num_radii=3):
 
     del trim_stars_df
 
-    # Bruno:
-    # Si cortamos las estrellas hasta 3r_half, ¿Por qué no al gas?
     dm = galaxy.dark_matter.copy()
     gas = galaxy.gas.copy()
 
@@ -167,8 +165,6 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
     # Now we extract only the needed column to rotate the galaxy
     stars_df = galaxy.stars.to_dataframe(attributes=["m", "x", "y", "z"])
 
-    # Bruno: O sea, la estoy cortando de vuelta...
-    # Rehacer...
     to_trim_idxs, cut_radius = _get_half_smr_crop(stars_df, num_radii)
     trim_stars_df = stars_df.drop(to_trim_idxs, axis="rows")
 
@@ -184,14 +180,10 @@ def is_star_cutted(galaxy, *, num_radii=3, rtol=1e-05, atol=1e-08):
     return np.all(np.less_equal(max_values, cut_radius))
 
 
-# Bruno:
-# Agrego esto por completitud. No debería estar tan escondido
-# del usuario...
-# ¿Cuál es la mejor forma de hacer al usuario elegir el tipo
-# de partícula? Revisar "ParticleSetType"...
 def get_radius_half_mass(galaxy, particle="stars"):
-    """
-    Compute the radii that encloses half of the mass of the
+    """Compute the radii.
+
+    that encloses half of the mass of the
     selected type of particle.
     For the complete galaxy, set particle = 'all' (also
     admitted False or '').
@@ -213,15 +205,10 @@ def get_radius_half_mass(galaxy, particle="stars"):
         the selected type of particles.
 
     """
-    # Copiamos de core/data.py; ¿Así estaría bien
-    # checkeado/corregido? Ojo...
     if particle in ["", "all", None, False]:
         # We convert the particles into a dataframe
         df = galaxy.to_dataframe()
     else:
-        # Bruno:
-        # en "mktype" ya viene incluida una excepción por un
-        # mal input (!)
         particle_type = data.ParticleSetType.mktype(particle)
         particle_type = data.ParticleSetType.humanize(particle_type)
         if particle_type == "stars":

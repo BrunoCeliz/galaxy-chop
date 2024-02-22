@@ -67,8 +67,9 @@ def hparam(default, **kwargs):
 
 @attr.s(frozen=False, repr=False)  # True, repr=False)
 class GalaxyTransformerABC(metaclass=abc.ABCMeta):
-    """
-    Abstract class to facilitate the creation of preprocessors
+    """Abstract class.
+
+    to facilitate the creation of preprocessors.
     (a.k.a. Transformers).
 
     This class requests the redefinition of one method: transform.
@@ -77,7 +78,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
     __gchop_method_cls_config__ = {"repr": False, "frozen": False}  # True}
 
     # block meta checks =======================================================
-    # Bruno: ¿Entonces esto está al vicio? ¿Quitar?
     def __init_subclass__(cls):
         """
         Initiate of subclasses.
@@ -129,8 +129,7 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def checker(self, galaxy):
-        """
-        Checker method.
+        """Checker method.
 
         Check if the galaxy has already been preprocessed.
         Validation of the input galaxy instance.
@@ -147,7 +146,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
             False otherwise.
 
         """
-
         raise NotImplementedError()
 
     # internal ================================================================

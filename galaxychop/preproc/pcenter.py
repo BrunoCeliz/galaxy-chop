@@ -159,11 +159,6 @@ def center(galaxy, with_potential=True):
     return data.mkgalaxy(**new)
 
 
-# Bruno:
-# Claro, ahora el checker también debería diferenciar si
-# tiene o no tiene el potencial...
-# Primero habría que ver si vale la pena considerar el caso
-# de Galaxia sin potencial...
 def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     """
     Validate if the galaxy is centered.
@@ -186,8 +181,6 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     if not galaxy.has_potential_:
         raise ValueError("Galaxy must have the potential energy.")
 
-    # We extract only the needed column to center the galaxy
-    # Bruno: ¡Agrego lo de las velocidades!
     df = galaxy.to_dataframe(
         attributes=["x", "y", "z", "vx", "vy", "vz", "potential"]
     )
@@ -196,22 +189,4 @@ def is_centered(galaxy, *, rtol=1e-05, atol=1e-08):
     minpot_idx = df.potential.argmin()
     min_values = df.iloc[minpot_idx]
 
-    # mean velocity of the particles
-    vx_cm = np.mean(df["vx"].values)
-    vy_cm = np.mean(df["vy"].values)
-    vz_cm = np.mean(df["vz"].values)
-
-    # Bruno: Ojo... Testear que funque
-    # Update -> funciona, pero pedir la tolerancia default
-    # puede generar falsos "False" a.k.a. lo mejor
-    # sería no chequear velocidades...
-    return np.allclose(
-        min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol
-    )  # and (
-    #  np.isclose(
-    #      np.sqrt(vx_cm**2 + vy_cm**2 + vz_cm**2),
-    #      0,
-    #      rtol=rtol,
-    #      atol=atol,
-    #  )
-    # )
+    return np.allclose(min_values[["x", "y", "z"]], 0, rtol=rtol, atol=atol)

@@ -25,7 +25,7 @@ import h5py
 
 import numpy as np
 
-from . import VERSION
+from .constants import VERSION
 from .core import data
 
 

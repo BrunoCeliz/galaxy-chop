@@ -12,10 +12,16 @@ endif()
 
 # Safety net
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
-  message(
-    FATAL_ERROR
-      "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.\n"
-  )
+  #message(
+  #  FATAL_ERROR
+  #    "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.\n"
+  #)
+  message(STATUS "Franco PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
+  message(STATUS "Franco PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}")
+
+
+  set(PROJECT_BINARY_DIR "${PROJECT_SOURCE_DIR}/BIN_DIR")
+
 endif()
 
 find_package(PythonExtensions)

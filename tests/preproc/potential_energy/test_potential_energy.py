@@ -17,6 +17,7 @@
 # IMPORTS
 # =============================================================================
 
+import warnings
 
 from galaxychop.core import data
 from galaxychop.preproc import potential_energy
@@ -25,7 +26,6 @@ import numpy as np
 import numpy.testing as npt
 
 import pytest
-import warnings
 
 
 # =============================================================================
@@ -142,8 +142,6 @@ def test_Galaxy_potential_energy_backend_consistency_grispy(galaxy):
     pgal_gsp = potential_energy.potential(gal, backend="grispy")
     pgal_f = potential_energy.potential(gal, backend="fortran")
 
-    # 1% de error permitido => decimal = 2 (!); Remember revisar lo del
-    # softening en la implementación del cálculo de potencial de GriSPy...
     decimal = 2
     npt.assert_almost_equal(
         pgal_gsp.stars.potential.value, pgal_f.stars.potential.value, decimal
@@ -156,10 +154,6 @@ def test_Galaxy_potential_energy_backend_consistency_grispy(galaxy):
     npt.assert_almost_equal(
         pgal_gsp.gas.potential.value, pgal_f.gas.potential.value, decimal
     )
-
-
-# Bruno:
-# Agregar para el Octree en cuanto lo integremos..
 
 
 @pytest.mark.xfail
@@ -202,8 +196,8 @@ def test_potentializer_transformer(galaxy):
         gas_potential=True,
     )
 
-    potentializer = potential_energy.Potentializer()
+    potentializer = potential_energy.Potentializer("fortran")
 
-    assert potentializer.transform(
+    assert potentializer.transform(gal) == potential_energy.potential(
         gal, backend="fortran"
-    ) == potential_energy.potential(gal, backend="fortran")
+    )

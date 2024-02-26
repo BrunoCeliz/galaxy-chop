@@ -38,3 +38,4 @@ exclude tox.ini
 exclude requirements_dev.txt
 exclude .header-template
 exclude .readthedocs.yml
+exclude .flake8

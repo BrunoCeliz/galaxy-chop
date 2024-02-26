@@ -17,5 +17,5 @@ env:
 
 jobs:
   testing:
-    uses: BrunoCeliz/galaxy-chop/blob/dev/.github/workflows/tests.yml@fdeaca7eda1fbbea20f0cc4f24711834b3a1b0e3
+    uses: ./blob/dev/.github/workflows/tests.yml@17dea4cc367354951b4b784b7e2ae0a57fa181ba
   

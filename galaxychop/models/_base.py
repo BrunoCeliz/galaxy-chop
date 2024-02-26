@@ -619,7 +619,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         """
         if probs is None:
             return None
-     
+
         # the number of particles are incorrect so we simple remove the data
         probs_shape = list(np.shape(probs)[1:])
 
@@ -759,7 +759,6 @@ class DecomposedGalaxy:
     def __len__(self):
         """len(x) <=> x.__len__()."""
         return len(self.galaxy)
-
 
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""

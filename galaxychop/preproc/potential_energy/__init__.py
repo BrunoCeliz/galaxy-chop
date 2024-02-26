@@ -33,7 +33,7 @@ from ...utils import doc_inherit
 
 try:
     from .fortran import potential as potential_f
-except ImportError:  # pragma: no cover
+except ImportError:
     potential_f = None
 
 #: The default potential backend to use.

@@ -19,3 +19,5 @@ capabilities and many other topics related to dynamic decomposition.
    plotting.ipynb
    decomposers.ipynb
    pre-proccesing_and_decomposition.ipynb
+   pipeline.ipynb
+   new-pre-proccesing_and_decomposition.ipynb

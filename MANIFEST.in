@@ -4,6 +4,20 @@ include CHANGELOG.md
 include CMakeLists.txt
 include pyproject.toml
 
+include *.cmake
+include *.ninja
+include *.txt
+
+recursive-include CMakeFiles *.F
+recursive-include CMakeFiles *.bin
+recursive-include CMakeFiles *.c
+recursive-include CMakeFiles *.check_cache
+recursive-include CMakeFiles *.cmake
+recursive-include CMakeFiles *.ninja
+recursive-include CMakeFiles *.out
+recursive-include CMakeFiles *.txt
+recursive-include CMakeFiles *.yaml
+
 recursive-include galaxychop *.dat
 recursive-include galaxychop *.npy
 recursive-include galaxychop *.f90

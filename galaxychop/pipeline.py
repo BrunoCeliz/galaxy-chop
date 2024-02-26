@@ -14,7 +14,6 @@
 # IMPORTS
 # =============================================================================
 
-# Bruno: WIP
 from .core import GchopMethodABC
 from .utils import Bunch, unique_names
 

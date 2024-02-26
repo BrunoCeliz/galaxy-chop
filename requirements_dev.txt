@@ -17,7 +17,9 @@ isort
 numpy
 scikit-build
 meson==1.3.2
-# agregados para meson meson-python
+autodocsumm==0.1.13
+# agregados para meson 
+meson-python
 https://github.com/quatrope/qafan/archive/refs/heads/master.zip
 
 -r docs/requirements.txt

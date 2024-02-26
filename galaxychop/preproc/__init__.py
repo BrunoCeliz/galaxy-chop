@@ -19,9 +19,9 @@ from .pcenter import Centralizer, center, is_centered
 from .potential_energy import (
     Potentializer,
     potential,
-)  
+)
 from .salign import Aligner, is_star_aligned, star_align
-from .smr_crop import Cutter, half_star_mass_radius_crop
+from .smr_crop import Cutter, half_star_mass_radius_crop, is_star_cutted
 
 
 __all__ = [
@@ -36,6 +36,7 @@ __all__ = [
     "center_and_align",
     "Cutter",
     "half_star_mass_radius_crop",
+    "is_star_cutted",
 ]
 
 
@@ -67,8 +68,8 @@ def center_and_align(galaxy, *, r_cut=None):
 
     """
     center = Centralizer()
-    galaxy = center.transform(galaxy)  # Centering
-    align = Aligner(r_cut)  # D: asi funcionaria ahpra no?
+    galaxy = center.transform(galaxy)
+    align = Aligner(r_cut)
     galaxy = align.transform(galaxy)
 
     return galaxy
@@ -103,6 +104,5 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     """
     check_center = is_centered(galaxy, rtol=rtol, atol=atol)
     check_align = is_star_aligned(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
-
 
     return check_center and check_align

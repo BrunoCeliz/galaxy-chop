@@ -17,8 +17,7 @@ import sys
 import pathlib
 import m2r2
 
-#
-autodoc_mock_imports = ["galaxychop.preproc.potential_energy.fortran"]
+# autodoc_mock_imports = ["galaxychop.preproc.potential_energy.fortran"]
 
 # this path is pointing to project/docs/source
 CURRENT_PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))

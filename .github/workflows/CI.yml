@@ -17,5 +17,5 @@ env:
 
 jobs:
   testing:
-    uses: ./blob/dev/.github/workflows/tests.yml@3f70f2083aa0f2f25d9ff99e6776e86385a51afd
+    uses: ./blob/dev/.github/workflows/tests.yml@aa7b8673d28d2c530b4bc1f8d049f715e57d4e98
   

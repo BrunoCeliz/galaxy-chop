@@ -6,10 +6,12 @@ name: GalaxyChop CI
 
 on:
   push:
-      "dev"
+    branches: 
+      - "dev"
   pull_request:
-      "dev"
-      
+      branches: 
+      - "dev"
+
 env:
   default-python: '3.11'
 

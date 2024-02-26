@@ -17,5 +17,8 @@ env:
 
 jobs:
   testing:
-    uses: vcristiani/galaxy-chop/.github/workflows/tests.yml@6755fca5b3b61910a085a25f94a33e2fb4c1fc3e
-
+    uses: BrunoCeliz/galaxy-chop/blob/dev/.github/workflows/tests.yml
+  PyPI publish:
+    uses: BrunoCeliz/galaxy-chop/blob/dev/.github/workflows/publish.yml
+  GalaxyChop CI:
+    uses: BrunoCeliz/galaxy-chop/blob/dev/.github/workflows/CI.yml 

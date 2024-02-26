@@ -132,11 +132,7 @@ class GchopPipeline(GchopMethodABC):
         r : Result
             Whatever the last step (decomposer) returns from their decompose
             method.
-            # D:
-            # En este momento el decompose devuelve componentes de una galaxia
-            # Tarea para mas adelante hacer que el decompose
-            # tenga la opcion de devolverte un objeto galaxia
-            # con esas componentes
+
 
         """
         galaxy = self.transform(galaxy)

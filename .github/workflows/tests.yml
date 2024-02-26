@@ -5,6 +5,10 @@
 name: Testing
 
 on:
+  push:
+      "dev"
+  pull_request:
+      "dev"
   workflow_call:
 
 jobs:

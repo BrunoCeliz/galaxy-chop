@@ -5,9 +5,11 @@
 name: GalaxyChop CI
 
 on:
-  - push
-  - pull_request
-
+  push:
+      "dev"
+  pull_request:
+      "dev"
+      
 env:
   default-python: '3.11'
 

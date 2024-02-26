@@ -5,6 +5,10 @@
 name: PyPI publish
 
 on:
+  push:
+      "dev"
+  pull_request:
+      "dev"
   release:
     types: [created]
 

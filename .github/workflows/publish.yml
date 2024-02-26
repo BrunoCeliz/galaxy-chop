@@ -16,7 +16,7 @@ on:
 
 jobs:
   testing:
-    uses: BrunoCeliz/galaxy-chop/blob/.github/workflows/tests.yml@3f70f2083aa0f2f25d9ff99e6776e86385a51afd
+    uses: BrunoCeliz/galaxy-chop/blob/.github/workflows/tests.yml@7e90df8a676a7996440a412102b5db3336213845
 
   build:
     needs: testing

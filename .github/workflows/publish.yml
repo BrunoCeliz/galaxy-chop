@@ -10,7 +10,7 @@ on:
 
 jobs:
   testing:
-    uses: BrunoCeliz/galaxy-chop/blob/.github/workflows/tests.yml@7e90df8a676a7996440a412102b5db3336213845
+    uses: "BrunoCeliz/galaxy-chop/blob/.github/workflows/tests.yml@c0d598a09558a1be8d151165536f2ea7db9f6e0a"
 
   build:
     needs: testing
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
         with:
-          python-versions: "cp37-cp37m cp38-cp38 cp39-cp39"
+          python-versions: "cp37-cp37m cp38-cp38 cp39-cp39 "
           build-requirements: "numpy"
           pip-wheel-args: "-w ./dist --no-deps"
       - name: Remove non-compatible packages

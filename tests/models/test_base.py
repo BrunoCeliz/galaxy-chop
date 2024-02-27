@@ -354,7 +354,6 @@ def test_Decomposedgalaxy(read_hdf5_galaxy):
     assert len(gal_decomp) == len(gal)
 
     expected_repr = repr(gal) + "\n" + repr(gal_components)
-
-    print(repr(gal_decomp))
     print(expected_repr)
+    print(gal_decomp)
     assert repr(gal_decomp) == expected_repr

@@ -671,7 +671,7 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
 
         # retrieve and fix the labels
         final_labels = self.complete_labels(
-            X=X, labels=labels, rows_mask=rows_mask
+            X=X, labels=sorted(labels), rows_mask=rows_mask
         )
         final_probs = self.complete_probs(
             X=X, probs=probs, rows_mask=rows_mask

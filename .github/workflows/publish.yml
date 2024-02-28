@@ -10,7 +10,7 @@ on:
 
 jobs:
   testing:
-    uses: "BrunoCeliz/galaxy-chop/blob/.github/workflows/tests.yml@3c38813a2c2cc9d2d1b78f0538b1deedfeef9b44"
+    uses: "BrunoCeliz/galaxy-chop/.github/workflows/tests.yml@3c38813a2c2cc9d2d1b78f0538b1deedfeef9b44"
 
   build:
     needs: testing

@@ -14,10 +14,10 @@
 # IMPORTS
 # =============================================================================
 
+import importlib.metadata
+
 from astropy import constants as c
 from astropy import units as u
-
-import importlib_metadata
 
 
 # =============================================================================
@@ -26,7 +26,7 @@ import importlib_metadata
 
 NAME = "galaxychop"
 
-VERSION = importlib_metadata.version(NAME)
+VERSION = importlib.metadata.version(NAME)
 
 
 # =============================================================================

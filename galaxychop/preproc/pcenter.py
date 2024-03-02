@@ -100,15 +100,22 @@ def center(galaxy, with_potential=True):
         df[columns] = df[columns] - min_values[columns]
 
     else:
-        # We use only positions
+        # We use only positions and mass
         df = galaxy.to_dataframe(
-            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz"]
+            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "m"]
         )
+        
+        # Using only stars (account the gas and dark matter particles
+        # may not be the best option to center the galaxy)
+        cond = (df["ptypev"] == 0)
 
-        # Compute the geometric center
-        x_cm = np.mean(df["x"].values)
-        y_cm = np.mean(df["y"].values)
-        z_cm = np.mean(df["z"].values)
+        # Total stellar mass
+        m_star_tot = np.sum(df[cond]["m"].values)
+
+        # Compute the center of mass using only stars
+        x_cm = np.sum(np.multiply(df[cond]["x"].values, df[cond]["m"].values))/m_star_tot
+        y_cm = np.sum(np.multiply(df[cond]["y"].values, df[cond]["m"].values))/m_star_tot
+        z_cm = np.sum(np.multiply(df[cond]["z"].values, df[cond]["m"].values))/m_star_tot
 
         # We subtract all position columns by the new origin
         # and replace on dataframe
@@ -116,10 +123,10 @@ def center(galaxy, with_potential=True):
         df.loc[:, "y"] -= y_cm
         df.loc[:, "z"] -= z_cm
 
-    # Compute the velocity of the galaxy within the cosmological box
-    vx_cm = np.mean(df["vx"].values)
-    vy_cm = np.mean(df["vy"].values)
-    vz_cm = np.mean(df["vz"].values)
+    # Compute the velocity of the center of mass of the galaxy within the cosmological box
+    vx_cm = np.sum(np.multiply(df[cond]["vx"].values, df[cond]["m"].values))/m_star_tot
+    vy_cm = np.sum(np.multiply(df[cond]["vy"].values, df[cond]["m"].values))/m_star_tot
+    vz_cm = np.sum(np.multiply(df[cond]["vz"].values, df[cond]["m"].values))/m_star_tot
 
     # And modify the dataframe
     df.loc[:, "vx"] -= vx_cm

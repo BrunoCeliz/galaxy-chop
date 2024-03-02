@@ -33,10 +33,12 @@ class Centralizer(GalaxyTransformerABC):
     center their positions and velocities relative to the system.
 
     """
+    def __init__(self, with_potential=True):
+        self.with_potential = with_potential
 
     @doc_inherit(GalaxyTransformerABC.transform)
-    def transform(self, galaxy, **kwargs):
-        return center(galaxy, **kwargs)
+    def transform(self, galaxy):
+        return center(galaxy, with_potential=self.with_potential)
 
     @doc_inherit(GalaxyTransformerABC.checker)
     def checker(self, galaxy, **kwargs):

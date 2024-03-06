@@ -60,10 +60,6 @@ class _GalaxyStellarDynamics:
     eps = uttr.ib(converter=np.copy)
     eps_r = uttr.ib(converter=np.copy)
 
-    # Bruno:
-    # 'x' e 'y' son nombres chotos, ¿no?, debería ser algo más \
-    # intuitivo como 'norm_energy_bin' y 'norm_Jz_bin'. Además \
-    # ¿No se grafica Circularidad(Energía) también?
     x = uttr.ib(converter=np.copy, metadata={"asdict": False})
     y = uttr.ib(converter=np.copy, metadata={"asdict": False})
 
@@ -118,10 +114,6 @@ class _GalaxyStellarDynamics:
         return np.all([np.isfinite(v) for v in selfd.values()], axis=0)
 
 
-# Bruno:
-# Revisar nombre de variables y el uso de componentes no-estelares...
-
-
 def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     # this function exists to silence the warnings in the public one
 
@@ -145,10 +137,6 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     aux0 = np.arange(-1.0, -0.1, bin0)
     aux1 = np.arange(-0.1, 0.0, bin1)
     aux = np.concatenate([aux0, aux1], axis=0)
-    # Bruno:
-    # Yo banco muchísimo el uso de una variable "aux" en mis NBs,
-    # pero mepa que acá, así como 'x' e 'y', deberían llevar nombres
-    # adecuados...
 
     x = np.zeros(len(aux) + 1)
     y = np.zeros(len(aux) + 1)
@@ -156,9 +144,6 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     x[0] = -1.0
     y[0] = np.abs(Jz[np.argmin(E)])
 
-    # Bruno:
-    # ¿Eh? Esto se debería poder hacer de otra forma más en
-    # línea con los otros .py ...
     for i in range(1, len(aux)):
         (mask,) = np.where((E <= aux[i]) & (E > aux[i - 1]))
         s = np.argsort(np.abs(Jz[mask]))
@@ -205,10 +190,6 @@ def _stellar_dynamics(galaxy, bin0, bin1, reassign):
     df_star = df[df.ptypev == ParticleSetType.STARS.value]
     Jr_star = np.sqrt(df_star.Jx.values**2 + df_star.Jy.values**2)
     Etot_s = df_star.total_energy.values
-    # Bruno:
-    # ¿Recién ahora se encarga de las estrellas? ¿De qué me
-    # sirve considerar todo lo anterior para DM? (Igual quizás
-    # para el gas sí es deseable, así que no digo nada...)
 
     # Remove the star particles that are not bound:
     # E > 0 and with E = -inf.
@@ -352,8 +333,7 @@ def stellar_dynamics(
     if not galaxy.has_potential_:
         raise NoGravitationalPotentialError(
             "Galaxy does not have the potential energy calculated"
-        )  # Bruno: En una de esas esto no es necesario
-
+        )
     with warnings.catch_warnings():
         warnings.simplefilter(runtime_warnings, category=RuntimeWarning)
         return _stellar_dynamics(galaxy, bin0, bin1, reassign)

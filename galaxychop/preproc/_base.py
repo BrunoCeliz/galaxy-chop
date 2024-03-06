@@ -95,10 +95,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
                 pass
 
         """
-        # D: esto es lo que no permite a las clases que heredan
-        # poder redefinir el __init__
-        # method_config = getattr(cls, "__gchop_method_cls_config__")
-        # attr.s(maybe_cls=cls, **method_config)
 
     # block  to implement in every method =====================================
 
@@ -123,8 +119,6 @@ class GalaxyTransformerABC(metaclass=abc.ABCMeta):
             preprocessing manipulation.
 
         """
-        # D: aca iría el checkeo de que los atributos sea lo que tiene que ser?
-
         raise NotImplementedError()
 
     @abc.abstractmethod

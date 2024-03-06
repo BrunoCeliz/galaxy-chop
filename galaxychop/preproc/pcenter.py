@@ -33,6 +33,7 @@ class Centralizer(GalaxyTransformerABC):
     center their positions and velocities relative to the system.
 
     """
+
     def __init__(self, with_potential=True):
         self.with_potential = with_potential
 
@@ -86,8 +87,13 @@ def center(galaxy, with_potential=True):
     if with_potential:
         # We extract only the needed column to centrer the galaxy
         df = galaxy.to_dataframe(
-            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "potential"]
+            attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "potential", "m"]
         )
+        
+        cond = df["ptypev"].eq(0)
+        
+        # Total stellar mass
+        m_star_tot = np.sum(df[cond]["m"].values)
 
         # minimum potential index of all particles and we extract data
         # frame row
@@ -104,11 +110,11 @@ def center(galaxy, with_potential=True):
         df = galaxy.to_dataframe(
             attributes=["ptypev", "x", "y", "z", "vx", "vy", "vz", "m"]
         )
-        
+
         # Using only stars (account the gas and dark matter particles
         # may not be the best option to center the galaxy)
-        cond = (df["ptypev"] == 0)
-
+        cond = df["ptypev"].eq(0) # df["ptypev"].eq(0) df["ptypev"] == 0
+        
         # Total stellar mass
         m_star_tot = np.sum(df[cond]["m"].values)
 
@@ -116,6 +122,7 @@ def center(galaxy, with_potential=True):
         x_cm = np.sum(np.multiply(df[cond]["x"].values, df[cond]["m"].values))/m_star_tot
         y_cm = np.sum(np.multiply(df[cond]["y"].values, df[cond]["m"].values))/m_star_tot
         z_cm = np.sum(np.multiply(df[cond]["z"].values, df[cond]["m"].values))/m_star_tot
+
 
         # We subtract all position columns by the new origin
         # and replace on dataframe
@@ -127,7 +134,6 @@ def center(galaxy, with_potential=True):
     vx_cm = np.sum(np.multiply(df[cond]["vx"].values, df[cond]["m"].values))/m_star_tot
     vy_cm = np.sum(np.multiply(df[cond]["vy"].values, df[cond]["m"].values))/m_star_tot
     vz_cm = np.sum(np.multiply(df[cond]["vz"].values, df[cond]["m"].values))/m_star_tot
-
     # And modify the dataframe
     df.loc[:, "vx"] -= vx_cm
     df.loc[:, "vy"] -= vy_cm
@@ -141,9 +147,6 @@ def center(galaxy, with_potential=True):
     # patch
     new = galaxy.disassemble()
 
-    # Bruno:
-    # No toco nada del potential y aún así le pinta cambiar
-    # de False a True cuando uso with_potential = False.
     new.update(
         x_s=stars.x.to_numpy(),
         y_s=stars.y.to_numpy(),

@@ -802,14 +802,6 @@ class Galaxy:
 # API FUNCTIONS
 # =============================================================================
 
-# Bruno:
-# Una cosa que me pasó -> Si no le doy de comer DM y/o gas no debería tirar
-# errores. ¡Puedo hacer un análisis cinemático de las estrellas, sin importar
-# que no tenga la DM!
-# Quizás es un ejemplo medio choto, pero me pasó en mi análisis que descargué
-# sólo estrellas (sin gas ni DM), y con la versión vieja (vcristiani/master)
-# puedo calcular J y alinear sin drama...
-
 
 def mkgalaxy(
     m_s: np.ndarray,
@@ -900,9 +892,7 @@ def mkgalaxy(
         softening=softening_s,
         potential=potential_s,
     )
-    # Bruno:
-    # Acá podría ir un if o un try para tirar un warning avisando
-    # que no hay DM/gas (!)
+
     dark_matter = ParticleSet(
         ParticleSetType.DARK_MATTER,
         m=m_dm,

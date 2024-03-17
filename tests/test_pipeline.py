@@ -37,11 +37,6 @@ import pytest
 # TESTS
 # =============================================================================
 
-# D: entiendo que esto checkea que tan bien esta
-# funcionando el mkpipe utilizando los metodos
-# no el pipeline
-
-
 def test_pipeline_mkpipe(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
 
@@ -112,9 +107,3 @@ def test_pipeline_name_not_str():
             steps=[("first", Centralizer()), (..., JThreshold())]
         )
 
-
-# D:
-# Me queda pendiente poder ver una forma de comparar resultados
-# tengo que ver bien como lo hacen los otros test
-# para poder comparar lo que va haciendo los metodos
-# o simplemente confio en los test de los metodos

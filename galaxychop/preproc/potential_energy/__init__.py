@@ -18,18 +18,18 @@ import warnings
 
 import astropy.units as u
 
-import numpy as np
-
-from .grispy_calculation import (
-    make_grid,
-    potential_grispy,
-)
-from .._base import GalaxyTransformerABC
-from ... import (
+from galaxychop import (
     constants as const,
     core,
 )
-from ...utils import doc_inherit
+from galaxychop.preproc._base import GalaxyTransformerABC
+from galaxychop.preproc.potential_energy.grispy_calculation import (
+    make_grid,
+    potential_grispy,
+)
+from galaxychop.utils import doc_inherit
+
+import numpy as np
 
 try:
     from .fortran import potential as potential_f

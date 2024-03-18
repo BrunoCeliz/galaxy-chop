@@ -25,6 +25,8 @@ from galaxychop.preproc import potential_energy
 import numpy as np
 import numpy.testing as npt
 
+import pandas as pd
+
 import pytest
 
 
@@ -198,6 +200,12 @@ def test_potentializer_transformer(galaxy):
 
     potentializer = potential_energy.Potentializer("fortran")
 
-    assert potentializer.transform(gal) == potential_energy.potential(
+    class_pgal = potentializer.transform(gal)
+    class_df = class_pgal.to_dataframe()
+
+    func_pgal = potential_energy.potential(
         gal, backend="fortran"
     )
+    func_df = func_pgal.to_dataframe()
+
+    pd.testing.assert_frame_equal(class_df, func_df, check_dtype=False)

@@ -762,7 +762,4 @@ class DecomposedGalaxy:
 
     def __repr__(self):
         """repr(x) <=> x.__repr__()."""
-        # Trying...
-        galaxy_repr = repr(self.galaxy)
-        components_repr = repr(self.components)
-        return galaxy_repr + "\n" + components_repr
+        return repr(self.galaxy) + "\n" + repr(self.components)

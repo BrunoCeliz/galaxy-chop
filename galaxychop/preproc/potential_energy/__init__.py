@@ -95,11 +95,10 @@ def grispy_potential(x, y, z, m, softening):
     # For each particle, compute its potential energy
     epot = np.empty(len(m))
     for idx, particle in enumerate(m):
-        centre = np.array([x[idx], y[idx], z[idx]])
+        centre = np.array([[x[idx], y[idx], z[idx]]])
         epot[idx] = potential_grispy(
             centre,
             m,
-            softening,
             bubble_size=5 * softening,
             shell_width=0.1 * l_box,
             l_box=l_box,
@@ -182,10 +181,6 @@ class Potentializer(GalaxyTransformerABC):
         if self.backend not in POTENTIAL_BACKENDS:
             raise TypeError(
                 "The backend entered is not in the possible Backends"
-            )
-        if self.backend == "octree":
-            raise NotImplementedError(
-                "An implementation has not yet been provided"
             )
         else:
             print("CREATED POTENCIALIZER WITH BACKEND  " + self.backend)

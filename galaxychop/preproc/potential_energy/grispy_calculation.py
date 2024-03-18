@@ -1,4 +1,4 @@
-# This file is part of
+    # This file is part of
 # the galaxy-chop project (https://github.com/vcristiani/galaxy-chop)
 # Copyright (c) Cristiani, et al. 2021, 2022, 2023
 # License: MIT
@@ -57,7 +57,7 @@ def make_grid(x, y, z, n_cells=2**4):
 
 
 def potential_grispy(
-    centre, m, softening, bubble_size, shell_width, l_box, grid
+    centre, m, bubble_size, shell_width, l_box, grid
 ):
     """Compute the potential.
 
@@ -94,6 +94,10 @@ def potential_grispy(
         aproximation of the shells. Shape: (1,).
 
     """
+    # Bubble_size is related to the softening, and it must be > 0!
+    if ~(bubble_dist > 0):
+        raise ValueError("This method only works for a softening value > 0.")
+
     # Use the bubble method to find the closest particles
     bubble_dist, bubble_ind = grid.bubble_neighbors(
         centre, distance_upper_bound=bubble_size

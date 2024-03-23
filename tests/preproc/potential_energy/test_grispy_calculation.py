@@ -79,7 +79,6 @@ def test_potential_grispy_one_particle(read_hdf5_galaxy):
     epot = grispy_calculation.potential_grispy(
         centre,
         m_sys,
-        softening,
         5 * softening,
         0.1 * l_box,
         l_box,

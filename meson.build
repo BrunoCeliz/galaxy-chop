@@ -40,11 +40,6 @@ potential_source = custom_target('potentialmodule.c',
 f_sources = ['galaxychop/preproc/potential_energy/fortran/__init__.py']
 py.install_sources(f_sources, subdir:'galaxychop/preproc/potential_energy/fortran')
 
-c_sources = ['galaxychop/preproc/potential_energy/c/potential_helper.py']
-py.install_sources(c_sources, subdir:'galaxychop/preproc/potential_energy/c')
-
-wrapPYc_sources = ['galaxychop/preproc/potential_energy/c/wrapPY_c/wrap_setup.py']
-py.install_sources(wrapPYc_sources, subdir:'galaxychop/preproc/potential_energy/c/wrapPY_c')
 
 main_sources = [
   'galaxychop/pipeline.py',

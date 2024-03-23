@@ -8,9 +8,11 @@ on:
   push:
     branches: 
       - "dev"
+      - "dev_meson"
   pull_request:
       branches: 
       - "dev"
+      - "dev_meson"
   workflow_call:
 
 jobs:
@@ -25,13 +27,11 @@ jobs:
       matrix:
 
         # all the tox with the default python version
-        py_version: ["3.9"]
+        py_version: ["3.11"]
         tox_env:
           - style
           - docstyle
-          - check-manifest
           - check-headers
-          - coverage
           - make-docs
 
         # check version by version

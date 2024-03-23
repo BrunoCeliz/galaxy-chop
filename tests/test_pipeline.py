@@ -37,6 +37,7 @@ import pytest
 # TESTS
 # =============================================================================
 
+
 def test_pipeline_mkpipe(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
 
@@ -106,4 +107,3 @@ def test_pipeline_name_not_str():
         pipeline.GchopPipeline(
             steps=[("first", Centralizer()), (..., JThreshold())]
         )
-

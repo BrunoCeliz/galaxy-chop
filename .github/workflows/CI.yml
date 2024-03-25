@@ -13,5 +13,5 @@ env:
 
 jobs:
   testing:
-    uses: "BrunoCeliz/galaxy-chop/.github/workflows/tests.yml@9f536a9c1f06f43f6af387fe9a7a0bd1f7c7b557"
+    uses: "BrunoCeliz/galaxy-chop/.github/workflows/tests.yml@282b8e69157307c6da5a3453d996b80982cf017e"
   

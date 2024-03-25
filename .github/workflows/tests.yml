@@ -8,11 +8,9 @@ on:
   push:
     branches: 
       - "dev"
-      - "dev_meson"
   pull_request:
       branches: 
       - "dev"
-      - "dev_meson"
   workflow_call:
 
 jobs:

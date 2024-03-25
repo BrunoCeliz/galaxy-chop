@@ -25,7 +25,7 @@ jobs:
       matrix:
 
         # all the tox with the default python version
-        py_version: ["3.9"]
+        py_version: ["3.11"]
         tox_env:
           - style
           - docstyle

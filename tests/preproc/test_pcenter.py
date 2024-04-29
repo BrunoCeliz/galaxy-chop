@@ -61,8 +61,6 @@ def test_center_without_potential_energy(galaxy, with_potential):
             "kinetic_energy",
             "total_energy",
         ]
-        # Bruno: ¿Le jode el potencial == np.nan una vez centrado?
-        # Lo agrego a los "changed" -> chanchada
 
         for colname in df.columns[~df.columns.isin(changed)]:
             ocol = df[colname]

@@ -148,8 +148,8 @@ def center(galaxy, with_potential=True):
         df.loc[:, "y"] -= y_cm
         df.loc[:, "z"] -= z_cm
 
-    # Compute the velocity of the center of mass of
-    # the galaxy within the cosmological box
+    # Compute the velocity of the center of mass
+    # of the galaxy within the cosmological box
     vx_cm = (
         np.sum(np.multiply(df[cond]["vx"].values, df[cond]["m"].values))
         / m_star_tot

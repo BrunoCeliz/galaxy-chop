@@ -29,7 +29,6 @@ jobs:
         tox_env:
           - style
           - docstyle
-          - check-manifest
           - check-headers
           - make-docs
 

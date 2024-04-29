@@ -3,10 +3,12 @@ include README.md
 include CHANGELOG.md
 include CMakeLists.txt
 include pyproject.toml
+include meson.build
 
 include *.cmake
 include *.ninja
 include *.txt
+
 
 recursive-include CMakeFiles *.F
 recursive-include CMakeFiles *.bin

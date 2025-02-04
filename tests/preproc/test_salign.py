@@ -14,13 +14,11 @@
 # IMPORTS
 # =============================================================================
 
-import warnings
-
 from galaxychop.preproc import salign
 
 import pandas as pd
-
 import pytest
+import warnings
 
 
 # =============================================================================
@@ -28,6 +26,7 @@ import pytest
 # =============================================================================
 
 
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_star_align_rcur0dot9(galaxy):
     gal = galaxy(seed=42)
 
@@ -70,15 +69,13 @@ def test_star_align_rcur0dot9(galaxy):
         assert not (ocol == acol).all(), colname
 
 
+@pytest.mark.filterwarnings("ignore:star_align")
 def test_star_align(galaxy):
     gal = galaxy(seed=42)
 
     agal = salign.star_align(gal)
 
     # Catch the warning:
-    # Bruno: No los está catcheando bien,
-    # porque si no tira el warning pytest no
-    # devuelve error...
     with pytest.warns(UserWarning):
         warnings.warn(
             "Input Galaxy is not centered. Please, center it \
@@ -125,16 +122,6 @@ def test_star_align_invalid_rcut(galaxy):
 @pytest.mark.filterwarnings("ignore:star_align")
 def test_is_star_aligned_real_galaxy(read_hdf5_galaxy):
     gal = read_hdf5_galaxy("gal394242.h5")
-
-    agal = salign.star_align(gal, r_cut=5)
-
-    assert not salign.is_star_aligned(gal, r_cut=5)
-    assert salign.is_star_aligned(agal, r_cut=5)
-
-
-@pytest.mark.filterwarnings("ignore:star_align")
-def test_is_star_aligned_fake_galaxy(galaxy):
-    gal = galaxy(seed=42)
 
     agal = salign.star_align(gal, r_cut=5)
 

@@ -123,13 +123,17 @@ class Components:
         """x.__repr__() <==> repr(x)."""
         length = len(self)
         labels = sorted(
-            {self.lmap.get(label, label) for label in np.unique(self.labels)}
+            {
+                str(self.lmap.get(label, label))
+                for label in np.unique(self.labels)
+            }
         )
         lmap = bool(self.lmap)
         probs = True if self.probabilities is not None else False
+
         return (
             f"<Components length={length}, labels={labels}, "
-            f"probabilities={probs}, lmap={lmap}>"
+            + f"probabilities={probs}, lmap={lmap}>"
         )
 
     def to_dataframe(self, attributes=None, lmap=None):

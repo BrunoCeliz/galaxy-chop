@@ -15,9 +15,11 @@
 # =============================================================================
 
 import numpy as np
+import warnings
 
 from ._base import GalaxyTransformerABC
 from ..core import data
+from ..preproc import is_centered
 from ..utils import doc_inherit
 
 # =============================================================================
@@ -150,6 +152,15 @@ def star_align(galaxy, *, r_cut=None):
         z-axis.
 
     """
+    if not is_centered(galaxy):
+        if not is_centered(galaxy):
+            warnings.warn(
+                    "Input Galaxy is not centered. Please, center it \
+                    with Centralizer.transform(galaxy, with_potential) \
+                    or proceed with caution.",
+                    UserWarning,
+                )
+
     if r_cut is not None and r_cut <= 0.0:
         raise ValueError("r_cut must not be lower than 0.")
 
@@ -242,6 +253,14 @@ def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
+    if not is_centered(galaxy):
+        warnings.warn(
+                "Input Galaxy is not centered. Please, center it \
+                with Centralizer.transform(galaxy, with_potential) \
+                or proceed with caution.",
+                UserWarning,
+            )
+
     # Now we extract only the needed column to rotate the galaxy
     df = galaxy.stars.to_dataframe(
         attributes=["m", "x", "y", "z", "Jx", "Jy", "Jz"]
@@ -252,6 +271,8 @@ def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
     Jxtot = np.sum(df.Jx.values[mask] * df.m.values[mask])
     Jytot = np.sum(df.Jy.values[mask] * df.m.values[mask])
     Jztot = np.sum(df.Jz.values[mask] * df.m.values[mask])
-    Jtot = np.sqrt(Jxtot**2 + Jytot**2 + Jztot**2)
+    # B: Para checkear que esté alineada, 1st check que esté
+    # centrada and then check que Jz sea positivo y mayor
+    # a los demás...
 
-    return np.allclose(Jztot, Jtot, rtol=rtol, atol=atol)
+    return Jztot > 0 and Jztot > Jxtot and Jztot > Jytot

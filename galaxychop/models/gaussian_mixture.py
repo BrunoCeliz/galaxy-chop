@@ -222,9 +222,11 @@ class AutoGaussianMixture(DynamicStarsGaussianDecomposerABC):
 
     >>> import galaxychop as gchop
     >>> galaxy = gchop.read_hdf5(...)
-    >>> galaxy = gchop.utils.star_align(gchop.utils.center(galaxy))
-    >>> chopper = gchop.AutoGaussianMixture()
-    >>> chopper.decompose(galaxy)
+    >>> Centralizer = gchop.preproc.Centralizer()
+    >>> Aligner = gchop.preproc.Aligner()
+    >>> Decomposer = gchop.models.AutoGaussianMixture()
+    >>> galaxy = Aligner.transform(Centralizer.transform(galaxy))
+    >>> Decomposer.decompose(galaxy)
 
     References
     ----------

@@ -153,16 +153,15 @@ def star_align(galaxy, *, r_cut=None):
 
     """
     if not is_centered(galaxy):
-        if not is_centered(galaxy):
-            warnings.warn(
-                    "Input Galaxy is not centered. Please, center it \
-                    with Centralizer.transform(galaxy, with_potential) \
-                    or proceed with caution.",
-                    UserWarning,
-                )
+        warnings.warn(
+                "Input Galaxy is not centered. Please, center it \
+                with Centralizer.transform(galaxy) \
+                or proceed with caution.",
+                UserWarning,
+            )
 
     if r_cut is not None and r_cut <= 0.0:
-        raise ValueError("r_cut must not be lower than 0.")
+        raise ValueError("r_cut must be larger than 0.")
 
     # declare all the different groups of columns
     pos_columns = ["x", "y", "z"]
@@ -253,14 +252,6 @@ def is_star_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-    if not is_centered(galaxy):
-        warnings.warn(
-                "Input Galaxy is not centered. Please, center it \
-                with Centralizer.transform(galaxy, with_potential) \
-                or proceed with caution.",
-                UserWarning,
-            )
-
     # Now we extract only the needed column to rotate the galaxy
     df = galaxy.stars.to_dataframe(
         attributes=["m", "x", "y", "z", "Jx", "Jy", "Jz"]

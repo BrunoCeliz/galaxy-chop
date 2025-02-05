@@ -26,10 +26,13 @@ import pandas as pd
 
 import uttr
 
+import warnings
+
 from .. import (
     constants as consts,
     core,
 )
+from ..preproc import is_centered, is_star_aligned
 from ..core import sdynamics as sdyn
 from ..utils import doc_inherit
 
@@ -662,6 +665,23 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
             decomposition.
 
         """
+        # Before anything, check if centered and aligned (!)
+        if not is_centered(galaxy):
+            warnings.warn(
+                    "Input Galaxy is not centered. Please, center it \
+                    with Centralizer.transform(galaxy) \
+                    or proceed with caution.",
+                    UserWarning,
+                )
+            
+        if not is_star_aligned(galaxy):
+            warnings.warn(
+                    "Input Galaxy is not aligned. Please, align it \
+                    with Aligner.transform(galaxy) \
+                    or proceed with caution.",
+                    UserWarning,
+                )
+
         attributes = self.get_attributes()
 
         X, y = self.attributes_matrix(galaxy, attributes=attributes)

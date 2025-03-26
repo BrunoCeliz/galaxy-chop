@@ -28,6 +28,7 @@ It runs in numerical N-body simulations populated with semi-analytical models an
 - **KMeans:** Implementation of [Scikit-Learn](https://scikit-learn.org/stable/about.html#citing-scikit-learn) K-means as a model for dynamical decomposing of galaxies.
 - **GaussianMixture:** Implementation of the dynamic decomposition model of galaxies described by [Obreja et al.(2018)](https://ui.adsabs.harvard.edu/abs/2018MNRAS.477.4915O/abstract).
 - **AutoGaussianMixture:** Implementation of the  dynamic decomposition model of galaxies described by [Du et al.(2019)](https://ui.adsabs.harvard.edu/abs/2019ApJ...884..129D/abstract)
+- **JEHistogram:** Implementation of the dynamic decomposition model of galaxies described by [Cristiani et al.(2024)](https://ui.adsabs.harvard.edu/abs/2024A%26A...692A..63C/abstract).
 
 **And many more**
 

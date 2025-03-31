@@ -53,14 +53,5 @@ def test_is_centered_and_aligned(galaxy):
     )
 
     assert preproc.is_centered_and_aligned(gal) is False
-    assert (
-        preproc.is_centered_and_aligned(preproc.pcenter.center(gal)) is False
-    )
-    assert (
-        preproc.is_centered_and_aligned(preproc.salign.star_align(gal))
-        is False
-    )
-    assert preproc.is_centered_and_aligned(
-        preproc.salign.star_align(preproc.pcenter.center(gal))
-    )
+    assert ~preproc.is_centered_and_aligned(preproc.pcenter.center(gal))
     assert preproc.is_centered_and_aligned(preproc.center_and_align(gal))

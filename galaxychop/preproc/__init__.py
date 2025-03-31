@@ -102,7 +102,11 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-    check_center = is_centered(galaxy, rtol=rtol, atol=atol)
-    check_align = is_star_aligned(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
+
+    center = Centralizer()
+    align = Aligner(r_cut)
+
+    check_center = center.checker(galaxy, rtol=rtol, atol=atol)
+    check_align = align.checker(galaxy, r_cut=r_cut, rtol=rtol, atol=atol)
 
     return check_center and check_align

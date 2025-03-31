@@ -14,8 +14,9 @@
 # IMPORTS
 # =============================================================================
 
-import numpy as np
 import warnings
+
+import numpy as np
 
 from ._base import GalaxyTransformerABC
 from ..core import data
@@ -154,11 +155,11 @@ def star_align(galaxy, *, r_cut=None):
     """
     if not is_centered(galaxy):
         warnings.warn(
-                "Input Galaxy is not centered. Please, center it \
+            "Input Galaxy is not centered. Please, center it \
                 with Centralizer.transform(galaxy) \
                 or proceed with caution.",
-                UserWarning,
-            )
+            UserWarning,
+        )
 
     if r_cut is not None and r_cut <= 0.0:
         raise ValueError("r_cut must be larger than 0.")

@@ -15,6 +15,7 @@
 # =============================================================================
 
 import abc
+import warnings
 from collections import OrderedDict
 
 import attr
@@ -26,16 +27,11 @@ import pandas as pd
 
 import uttr
 
-import warnings
-
-from .. import (
-    constants as consts,
-    core,
-)
-from ..preproc import is_centered, is_star_aligned
+from .. import constants as consts
+from .. import core
 from ..core import sdynamics as sdyn
+from ..preproc import is_centered, is_star_aligned
 from ..utils import doc_inherit
-
 
 # =============================================================================
 # CONSTANTS
@@ -668,19 +664,19 @@ class GalaxyDecomposerABC(metaclass=abc.ABCMeta):
         # Before anything, check if centered and aligned (!)
         if not is_centered(galaxy):
             warnings.warn(
-                    "Input Galaxy is not centered. Please, center it \
+                "Input Galaxy is not centered. Please, center it \
                     with Centralizer.transform(galaxy) \
                     or proceed with caution.",
-                    UserWarning,
-                )
-            
+                UserWarning,
+            )
+
         if not is_star_aligned(galaxy):
             warnings.warn(
-                    "Input Galaxy is not aligned. Please, align it \
+                "Input Galaxy is not aligned. Please, align it \
                     with Aligner.transform(galaxy) \
                     or proceed with caution.",
-                    UserWarning,
-                )
+                UserWarning,
+            )
 
         attributes = self.get_attributes()
 

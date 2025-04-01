@@ -48,9 +48,9 @@ jobs:
       - uses: actions/checkout@master
 
       # optionals
-      - name: Install pandoc
+      - name: Install pandoc 2.x  # Extremely important for make-docs...
         if: ${{ matrix.tox_env == 'make-docs'}}
-        run: sudo apt-get install pandoc
+        run: sudo apt-get install pandoc=2.*  # Extremely important for make-docs...
       # tox steps
       - name: Set up Python
         uses: actions/setup-python@v2

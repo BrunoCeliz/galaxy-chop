@@ -26,4 +26,5 @@ https://github.com/quatrope/qafan/archive/refs/heads/master.zip
 
 -r docs/requirements.txt
 sphinx-autobuild
+# pip install nbconvert==6.5.3 lxml_html_clean for a workaround on newest make-docs dependencies?
 matplotlib

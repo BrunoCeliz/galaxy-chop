@@ -102,7 +102,6 @@ def is_centered_and_aligned(galaxy, *, r_cut=None, rtol=1e-05, atol=1e-08):
         is aligned with the z-axis, False otherwise.
 
     """
-
     center = Centralizer()
     align = Aligner(r_cut)
 
